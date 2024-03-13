@@ -1,11 +1,10 @@
-import { Schema, Document, model, Types } from "mongoose";
+import mongoose, { Schema, Document, model, Types } from "mongoose";
 import bcrypt from "bcrypt";
 import { UserRole } from "../Enums/UserRole";
 
 
 
-interface UserDocument extends Document {
-    userId:  Types.ObjectId;
+ interface IUser extends Document {
     username: string;
     firstname: string;
     lastname: string;
@@ -15,15 +14,58 @@ interface UserDocument extends Document {
     role: UserRole;
 }
 
-const userSchema = new Schema<UserDocument>({
-    userId: { type:  Schema.Types.ObjectId, default: () => new Types.ObjectId() },
-    username: { type: String, required: true, maxlength: 50 },
-    firstname: { type: String, required: true },
-    lastname: { type: String, required: true },
-    email: { type: String, required: true },
-    password: { type: String, required: true },
-    isAdmin: { type: Boolean, default: false },
-    role: { type: String, enum: Object.values(UserRole), default: UserRole.User }
+const userSchema = new Schema<IUser>({
+    username: 
+    {
+        type: String, 
+        required: true, 
+        maxlength: 50 
+    },
+    firstname:
+     {
+         type: String, 
+         required: true 
+     },
+    lastname: { 
+        type: String, 
+        required: true 
+    },
+    email:
+     { type: String, 
+        required: true 
+    },
+    password:
+     {
+         type: String,
+         required: true 
+    },
+    isAdmin: 
+    { 
+        type: Boolean, 
+        default: false 
+    },
+    role: 
+    { 
+        type: String, 
+        enum: Object.values(UserRole), 
+        default: UserRole.User 
+    }
 });
 
-export default model<UserDocument>('User', userSchema);
+
+userSchema.pre<IUser>("save", async function (next) {
+    const user = this;
+    const hash = await bcrypt.hash(this.password, 10);
+    this.password = hash;
+    next();
+  });
+  
+  userSchema.methods.isValidPassword = async function (password: string) {
+    const user = this;
+    const compare = await bcrypt.compare(password, user.password);
+    return compare;
+  };
+  
+
+const UserModel = mongoose.model<IUser>('User', userSchema);
+export { IUser, UserModel }
