@@ -5,4 +5,3 @@ dist
 logs/
 coverage/
 package-lock.json
-*.log
