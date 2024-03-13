@@ -3,6 +3,6 @@ node_modules/
 dist
 .vscode/
 logs/
-tests/
 coverage/
 package-lock.json
+*.log
