@@ -1,0 +1,40 @@
+import { Model } from 'mongoose';
+import { UserModel, IUser } from '../Models/UserModel';
+
+export class UserService {
+  private userModel: Model<IUser>;
+
+  constructor(userModel: Model<IUser>) {
+    this.userModel = userModel;
+  }
+
+  async createUser(username: string, firstname: string, lastname: string, email: string, password: string): Promise<IUser> {
+    const newUser = new this.userModel({
+         username, 
+         email,
+         firstname,
+         lastname,
+          password });
+    return await newUser.save();
+  }
+
+  async getUserById(userId: string): Promise<IUser | null> {
+    return await this.userModel.findById(userId).exec();
+  }
+
+  async getUserByEmail(email: string): Promise<IUser | null> {
+    return await this.userModel.findOne({ email }).exec();
+  }
+
+  async getUserByUsername(username: string): Promise<IUser | null> {
+    return await this.userModel.findOne({ username }).exec();
+  }
+
+  async updateUser(userId: string, updates: Partial<IUser>): Promise<IUser | null> {
+    return await this.userModel.findByIdAndUpdate(userId, updates, { new: true }).exec();
+  }
+
+  async deleteUser(userId: string): Promise<IUser | null> {
+    return await this.userModel.findByIdAndDelete(userId).exec();
+  }
+}
