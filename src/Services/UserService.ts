@@ -9,13 +9,20 @@ export class UserService {
   }
 
   async createUser(username: string, firstname: string, lastname: string, email: string, password: string): Promise<IUser> {
-    const newUser = new this.userModel({
-         username, 
-         email,
-         firstname,
-         lastname,
-          password });
-    return await newUser.save();
+
+    try {
+      const newUser = new this.userModel({
+        username, 
+        email,
+        firstname,
+        lastname,
+         password });
+   return await newUser.save();
+      
+    } catch (error) {
+      throw new Error(`Error creating user: ${error.message}`);
+    }
+
   }
 
   async getUserById(userId: string): Promise<IUser | null> {

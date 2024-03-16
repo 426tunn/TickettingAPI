@@ -1,4 +1,4 @@
-import { Config } from "./envConfig/config";
+import { Config } from "./Config/config";
 import { connectToDB } from "./database";
 const app = require('./index');
 const logger = require('./logging/logger');

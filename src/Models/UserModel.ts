@@ -5,6 +5,7 @@ import { UserRole } from "../Enums/UserRole";
 
 
  interface IUser extends Document {
+    _id: Types.ObjectId;
     username: string;
     firstname: string;
     lastname: string;
@@ -12,6 +13,8 @@ import { UserRole } from "../Enums/UserRole";
     password: string;
     isAdmin: boolean;
     role: UserRole;
+
+    isValidPassword(password: string): Promise<boolean>; 
 }
 
 const userSchema = new Schema<IUser>({

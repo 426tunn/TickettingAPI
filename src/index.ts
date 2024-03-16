@@ -6,6 +6,7 @@ const passport = require("passport")
 const rateLimit = require('express-rate-limit')
 const helmet = require('helmet');
 const logger = require('./logging/logger');
+import userRoutes from './Routes/UserRoute';
 
 
 const app = express();
@@ -21,6 +22,8 @@ const limiter = rateLimit({
 
 app.use(helmet());
 app.use(limiter)
+
+app.use("/api/users", userRoutes)
 
 app.get('/', (req, res) => {
     logger.info('WELCOME')
