@@ -1,7 +1,7 @@
 import {Request, Response} from 'express';
 import {UserService} from '../Services/UserService';
 import jwt from 'jsonwebtoken';
-import { UserModel } from '../Models/UserModel';
+import { IUser, UserModel } from '../Models/UserModel';
 import { validationResult } from 'express-validator';
 
 
@@ -10,6 +10,12 @@ export class UserController {
 constructor(){
     this.userService = new UserService(UserModel);
     this.registerUser = this.registerUser.bind(this);
+    this.loginUser = this.loginUser.bind(this);
+    this.logoutUser = this.logoutUser.bind(this);
+    this.getAllUsers = this.getAllUsers.bind(this);
+    this.getUserById = this.getUserById.bind(this);
+    this.updateUser = this.updateUser.bind(this);
+    this.deleteUser = this.deleteUser.bind(this);
 }
     async registerUser(req: Request, res: Response){
         const errors = validationResult(req);
@@ -54,8 +60,18 @@ constructor(){
             if (!isPasswordValid) {
                 return res.status(401).json({error: 'Invalid email or password'});
             }
+            (req.session as any).user = user;
             const token = jwt.sign({id: user._id}, process.env.JWT_SECRET as string, {expiresIn: '1h'});
             res.status(200).json({ message: 'Login successful', token });
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
+
+    async logoutUser(req: Request, res: Response){
+        try {
+            (req.session as any).destroy();
+            res.status(200).json({message: 'Logout successful'});
         } catch (error) {
             res.status(500).json({error: error.message});
         }
@@ -78,6 +94,24 @@ constructor(){
             }
             const user = await this.userService.getUserById(userId);
             res.status(200).json({user});
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
+
+    async updateUser(req: Request, res: Response){
+        try {
+            const userId = req.params.userId;
+            if (!userId) {
+                return res.status(400).json({error: 'User ID is required'});
+            }
+            const user = await this.userService.getUserById(userId);
+            if (!user) {
+                return res.status(404).json({error: 'User not found'});
+            }            
+            const updates : Partial<IUser> = req.body;
+            await this.userService.updateUser(userId, updates);
+            res.status(200).json({message: 'User updated successfully', user});
         } catch (error) {
             res.status(500).json({error: error.message});
         }

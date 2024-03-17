@@ -15,11 +15,14 @@ UserRouter.post('/register',  [
 
 UserRouter.post('/login', userController.loginUser);
 
+UserRouter.get('/logout', userController.logoutUser);
 
-// UserRouter.get('/profile', userController.getUserProfile);
+UserRouter.get('/profiles', userController.getAllUsers);
 
-// UserRouter.put('/profile', userController.updateUserProfile);
+UserRouter.get('/profile/:userId', userController.getUserById);
 
-// Add other routes as needed
+UserRouter.put('/profile/:userId', userController.updateUser);
+
+UserRouter.delete('/profile/:userId', userController.deleteUser);
 
 export default UserRouter;
