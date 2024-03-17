@@ -60,6 +60,42 @@ constructor(){
             res.status(500).json({error: error.message});
         }
     }
+
+    async getAllUsers(req: Request, res: Response){
+        try {
+            const users = await this.userService.getAllUsers();
+            res.status(200).json({users});
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
+
+    async getUserById(req: Request, res: Response){
+        try {
+            const userId = req.params.userId;
+            if (!userId) {
+                return res.status(400).json({error: 'User ID is required'});
+            }
+            const user = await this.userService.getUserById(userId);
+            res.status(200).json({user});
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
+
+    async deleteUser(req: Request, res: Response){
+        try {
+            const userId = req.params.userId;
+            if (!userId) {
+                return res.status(400).json({error: 'User ID is required'});
+            }
+            const user = await this.userService.deleteUser(userId);
+            res.status(200).json({message: 'User deleted successfully', user});
+        } catch (error) {
+            res.status(500).json({error: error.message});
+        }
+    }
+
     }
 
 
