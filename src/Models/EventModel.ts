@@ -1,7 +1,7 @@
-import { EventStatus, } from "Enums/EventStatus";
-import { EventTypes } from "Enums/EventTypes";
-import { EventVisibility } from "Enums/EventVisibility";
-import { LocationTypes } from "Enums/LocationTypes";
+import { EventStatus, } from "../Enums/EventStatus";
+import { EventTypes } from "../Enums/EventTypes";
+import { EventVisibility } from "../Enums/EventVisibility";
+import { LocationTypes } from "../Enums/LocationTypes";
 import { IUser } from "./UserModel";
 import { IEventVenue } from "./EventVenueModel";
 import { IEventTicketType } from "./EventTicketTypeModel";
