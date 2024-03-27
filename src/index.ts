@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const logger = require('./logging/logger');
 const session = require('express-session');
 import userRoutes from './Routes/UserRoute';
+import eventRoutes from "./Routes/EventRoute";
 
 const SECRET = Config.SESSION_SECRET;
 const app = express();
@@ -31,6 +32,7 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use("/api/v1/events", eventRoutes);
 app.use("/api", userRoutes)
 
 app.get('/', (req, res) => {
