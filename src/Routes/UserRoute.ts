@@ -40,7 +40,7 @@ UserRouter.delete('/:userId',  userController.deleteUser);
 
 /**
  * @openapi
- * /api/users/register:
+ * /api/v1/users/register:
  *   post:
  *     summary: Register a new user
  *     requestBody:
@@ -78,7 +78,7 @@ UserRouter.delete('/:userId',  userController.deleteUser);
 
 /**
  * @openapi
- * /api/users/login:
+ * /api/v1/users/login:
  *   post:
  *     summary: Login user
  *     requestBody:
@@ -109,7 +109,7 @@ UserRouter.delete('/:userId',  userController.deleteUser);
 
 /**
  * @openapi
- * /api/users:
+ * /api/v1/users:
  *   get:
  *     summary: Get all users
  *     security: [{ bearerAuth: [] }]
@@ -124,7 +124,7 @@ UserRouter.delete('/:userId',  userController.deleteUser);
 
  /**
  * @openapi
- *   /api/users/{userId}:
+ *   /api/v1/users/{userId}:
  *    get: 
  *     summary: Get user by id
  *     security: [{ bearerAuth: [] }]     
@@ -148,7 +148,7 @@ UserRouter.delete('/:userId',  userController.deleteUser);
 
  /**
  * @openapi
- *   /api/users/{userId}:
+ *   /api/v1/users/{userId}:
  *    patch: 
  *     summary: Update user by id
  *     security: [{ bearerAuth: [] }]  
@@ -197,7 +197,7 @@ UserRouter.delete('/:userId',  userController.deleteUser);
 
 /**
  * @openapi  
- *   /api/users/role/{userId}:
+ *   /api/v1/users/role/{userId}:
  *    put: 
  *     summary: Update user role by id
  *     parameters:
@@ -232,7 +232,7 @@ UserRouter.delete('/:userId',  userController.deleteUser);
  
 /**
  * @openapi
- *   /api/users/{userId}:
+ *   /api/v1/users/{userId}:
  *    delete: 
  *     summary: Delete user by id
  *     parameters:

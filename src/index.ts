@@ -2,7 +2,7 @@ import express from 'express';
 import { Config } from './Config/config';
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './Config/swaggerConfig';
-const passport = require("./Config/PassportConfig");
+import passport from "./Config/PassportConfig"
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const logger = require('./logging/logger');

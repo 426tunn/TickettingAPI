@@ -6,7 +6,7 @@ import { validationResult } from 'express-validator';
 import { UserRole } from 'Enums/UserRole';
 import { Config } from '../Config/config';
 import {generateTokenWithRole, isEmail}  from '../Utils/authUtils';
-import { Types } from 'mongoose';
+
 
 export class UserController {
     private userService: UserService;
