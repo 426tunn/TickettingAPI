@@ -1,4 +1,4 @@
 export enum LocationTypes {
-    Online = 'Online',
-    Physical = 'Physical'
+    Online = "Online",
+    Physical = "Physical",
 }
