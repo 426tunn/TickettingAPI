@@ -1,9 +1,9 @@
-const winston = require('winston')
+import winston from "winston";
 
 const options = {
     file: {
-        level: 'info',
-        filename: './logs/app.log',
+        level: "info",
+        filename: "./logs/app.log",
         handleExceptions: true,
         json: true,
         maxsize: 5242880, // 5MB
@@ -11,20 +11,18 @@ const options = {
         colorize: false,
     },
     console: {
-        level: 'debug',
+        level: "debug",
         handleExceptions: true,
         json: false,
         colorize: true,
     },
 };
 
-const logger = winston.createLogger({
+export const logger = winston.createLogger({
     levels: winston.config.npm.levels,
     transports: [
         new winston.transports.File(options.file),
-        new winston.transports.Console(options.console)
+        new winston.transports.Console(options.console),
     ],
-    exitOnError: false
-})
-
-module.exports = logger
+    exitOnError: false,
+});

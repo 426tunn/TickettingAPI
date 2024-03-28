@@ -1,6 +1,6 @@
-import { Router } from 'express';
+import { Router } from "express";
 import { UserController } from "../Controllers/UserController";
-import { check, body } from 'express-validator';
+import { check, body } from "express-validator";
 import { authenticateJWT } from '../Utils/authUtils';
 
 
@@ -9,17 +9,23 @@ const UserRouter = Router();
 const userController = new UserController();
 
 
-UserRouter.post('/register',  [
-    check('username').notEmpty().withMessage('Username is required'),
-    check('firstname').notEmpty().withMessage('First name is required'),
-    check('lastname').notEmpty().withMessage('Last name is required'),
-    check('email').isEmail().withMessage('Invalid email format'),
-    check('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
-], userController.registerUser);
+UserRouter.post(
+    "/register",
+    [
+        check("username").notEmpty().withMessage("Username is required"),
+        check("firstname").notEmpty().withMessage("First name is required"),
+        check("lastname").notEmpty().withMessage("Last name is required"),
+        check("email").isEmail().withMessage("Invalid email format"),
+        check("password")
+            .isLength({ min: 6 })
+            .withMessage("Password must be at least 6 characters long"),
+    ],
+    userController.registerUser,
+);
 
-UserRouter.post('/login', userController.loginUser);
+UserRouter.post("/login", userController.loginUser);
 
-UserRouter.get('/logout', userController.logoutUser);
+UserRouter.get("/logout", userController.logoutUser);
 
 UserRouter.get('/', authenticateJWT, userController.getAllUsers);
 

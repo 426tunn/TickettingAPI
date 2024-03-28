@@ -7,96 +7,110 @@ import { UserRole } from 'Enums/UserRole';
 import { Config } from '../Config/config';
 import {generateTokenWithRole, isEmail}  from '../Utils/authUtils';
 import { Types } from 'mongoose';
-// import authUtils from 'Utils/authUtils';
-
 
 export class UserController {
     private userService: UserService;
-constructor(){
-    this.userService = new UserService(UserModel);
-    this.registerUser = this.registerUser.bind(this);
-    this.loginUser = this.loginUser.bind(this);
-    this.logoutUser = this.logoutUser.bind(this);
-    this.getAllUsers = this.getAllUsers.bind(this);
-    this.getUserById = this.getUserById.bind(this);
-    this.updateUser = this.updateUser.bind(this);
-    this.deleteUser = this.deleteUser.bind(this);
-}
-    async registerUser(req: Request, res: Response){
+    constructor() {
+        this.userService = new UserService(UserModel);
+        this.registerUser = this.registerUser.bind(this);
+        this.loginUser = this.loginUser.bind(this);
+        this.logoutUser = this.logoutUser.bind(this);
+        this.getAllUsers = this.getAllUsers.bind(this);
+        this.getUserById = this.getUserById.bind(this);
+        this.updateUser = this.updateUser.bind(this);
+        this.deleteUser = this.deleteUser.bind(this);
+    }
+    async registerUser(req: Request, res: Response) {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-    
+
         const { username, firstname, lastname, email, password } = req.body;
 
         try {
-            
             if (!this.userService) {
-                return res.status(500).json({error: 'User service is not initialized'});
+                return res
+                    .status(500)
+                    .json({ error: "User service is not initialized" });
             }
-            const userEmailExists = await this.userService.getUserByEmail(email);
-            const userUsernameExists = await this.userService.getUserByUsername(username);
+            const userEmailExists =
+                await this.userService.getUserByEmail(email);
+            const userUsernameExists =
+                await this.userService.getUserByUsername(username);
             if (userUsernameExists) {
-                return res.status(409).json({error: 'username already exists'});
+                return res
+                    .status(409)
+                    .json({ error: "username already exists" });
             } else if (userEmailExists) {
-                return res.status(409).json({error: 'email already exists'});
+                return res.status(409).json({ error: "email already exists" });
             }
-            const user = await this.userService.createUser(username, firstname, lastname, email, password);
-            res.status(201).json({message: 'Signup Sucessful', user});
+            const user = await this.userService.createUser(
+                username,
+                firstname,
+                lastname,
+                email,
+                password,
+            );
+            res.status(201).json({ message: "Signup Sucessful", user });
         } catch (error) {
-            res.status(500).json({error: error.message});
+            res.status(500).json({ error: error.message });
         }
     }
 
-    async loginUser(req: Request, res: Response){
+    async loginUser(req: Request, res: Response) {
         try {
-            const {usernameOrEmail, password} = req.body;
+            const { usernameOrEmail, password } = req.body;
             let user: any;
-            if (usernameOrEmail.includes('@')) {
+            if (usernameOrEmail.includes("@")) {
                 user = await this.userService.getUserByEmail(usernameOrEmail);
             } else {
-                user = await this.userService.getUserByUsername(usernameOrEmail);
+                user =
+                    await this.userService.getUserByUsername(usernameOrEmail);
             }
             if (!user) {
-                return res.status(401).json({error: 'Invalid email or password'});
+                return res
+                    .status(401)
+                    .json({ error: "Invalid email or password" });
             }
             const isPasswordValid = await user.isValidPassword(password);
             if (!isPasswordValid) {
-                return res.status(401).json({error: 'Invalid email or password'});
+                return res
+                    .status(401)
+                    .json({ error: "Invalid email or password" });
             }
             (req.session as any).user = user;
             const role = user.role;
             const token = generateTokenWithRole(user, role);
             res.status(200).json({ message: 'Login successful', token });
         } catch (error) {
-            res.status(500).json({error: error.message});
+            res.status(500).json({ error: error.message });
         }
     }
 
-    async logoutUser(req: Request, res: Response){
+    async logoutUser(req: Request, res: Response) {
         try {
             (req.session as any).destroy();
-            res.status(200).json({message: 'Logout successful'});
+            res.status(200).json({ message: "Logout successful" });
         } catch (error) {
-            res.status(500).json({error: error.message});
+            res.status(500).json({ error: error.message });
         }
     }
 
-    async getAllUsers(req: Request, res: Response){
+    async getAllUsers(req: Request, res: Response) {
         try {
             const role = (req as any).user.role;
             if(role !== 'admin'){
                 return res.status(401).json({error: "Only Admin can access this route"});
             }
             const users = await this.userService.getAllUsers();
-            res.status(200).json({users});
+            res.status(200).json({ users });
         } catch (error) {
-            res.status(500).json({error: error.message});
+            res.status(500).json({ error: error.message });
         }
     }
 
-    async getUserById(req: Request, res: Response){
+    async getUserById(req: Request, res: Response) {
         try {
             const role = (req as any).user.role;
             if(role !== 'admin'){
@@ -104,26 +118,25 @@ constructor(){
             }            
             const userId = req.params.userId;
             if (!userId) {
-                return res.status(400).json({error: 'User ID is required'});
+                return res.status(400).json({ error: "User ID is required" });
             }
             const user = await this.userService.getUserById(userId);
-            res.status(200).json({user});
+            res.status(200).json({ user });
         } catch (error) {
-            res.status(500).json({error: error.message});
+            res.status(500).json({ error: error.message });
         }
     }
-
 
     async updateUserRole(req: Request, res: Response){
         try {
             const role = (req as any).user.role;
-            if(role !== 'admin'){
+            if(role !== "admin"){
                 return res.status(401).json({error: "Only Admin can access this route"});
             }     
             const userId = req.params.userId;
             const roleToUpdate = req.body.role as UserRole;
             if (!userId) {
-                return res.status(400).json({error: 'User ID is required'});
+                return res.status(400).json({ error: "User ID is required" });
             }
             if (!roleToUpdate) {
                 return res.status(400).json({error: 'Role is required'});
@@ -134,18 +147,18 @@ constructor(){
             }
             res.status(200).json({message: 'User role updated successfully', user: updatedUser});
         } catch (error) {
-            res.status(500).json({error: error.message});
+            res.status(500).json({ error: error.message });
         }
     }
 
 
 
 
-    async updateUser(req: Request, res: Response){
+    async updateUser(req: Request, res: Response) {
         try {               
             const userId = req.params.userId;
             if (!userId) {
-                return res.status(400).json({error: 'User ID is required'});
+                return res.status(400).json({ error: "User ID is required" });
             }
             const user = await this.userService.getUserById(userId);
             if (!user) {
@@ -169,9 +182,12 @@ constructor(){
 
             await this.userService.updateUser(userId, updates);
             const updatedUser = await this.userService.getUserById(userId);
-            res.status(200).json({message: 'User updated successfully', updatedUser});
+            res.status(200).json({
+                message: "User updated successfully",
+                updatedUser,
+            });
         } catch (error) {
-            res.status(500).json({error: error.message});
+            res.status(500).json({ error: error.message });
         }
     }
 
@@ -204,7 +220,7 @@ constructor(){
     //     }
     // }
 
-    async deleteUser(req: Request, res: Response){
+    async deleteUser(req: Request, res: Response) {
         try {
             const role = (req as any).user.role;
             if(role !== 'admin'){
@@ -212,12 +228,15 @@ constructor(){
             }                 
             const userId = req.params.userId;
             if (!userId) {
-                return res.status(400).json({error: 'User ID is required'});
+                return res.status(400).json({ error: "User ID is required" });
             }
             const user = await this.userService.deleteUser(userId);
-            res.status(200).json({message: 'User deleted successfully', user});
+            res.status(200).json({
+                message: "User deleted successfully",
+                user,
+            });
         } catch (error) {
-            res.status(500).json({error: error.message});
+            res.status(500).json({ error: error.message });
         }
     }
 
