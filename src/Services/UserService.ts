@@ -1,5 +1,6 @@
 import { Model } from 'mongoose';
 import { UserModel, IUser } from '../Models/UserModel';
+import { UserRole } from 'Enums/UserRole';
 
 export class UserService {
   private userModel: Model<IUser>;
@@ -36,6 +37,12 @@ export class UserService {
   async getUserByUsername(username: string): Promise<IUser | null> {
     return await this.userModel.findOne({ username }).exec();
   }
+
+
+  async updateUserRole(userId: string, role: UserRole): Promise<IUser | null> {
+    return await this.userModel.findByIdAndUpdate(userId, { role }, { new: true }).exec();
+  }
+
 
   async updateUser(userId: string, updates: Partial<IUser>): Promise<IUser | null> {
     return await this.userModel.findByIdAndUpdate(userId, updates, { new: true }).exec();

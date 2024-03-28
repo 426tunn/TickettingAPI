@@ -1,6 +1,8 @@
 import express from 'express';
 import { Config } from './Config/config';
-const passport = require("passport");
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './Config/swaggerConfig';
+import passport from './Config/PassportConfig';
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const logger = require('./logging/logger');
@@ -12,13 +14,13 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}))
 
-const limiter = rateLimit({
+const limiter = rateLimit({ 
 	windowMs: 15 * 60 * 1000, // 15 minutes
 	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
 	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
-
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(helmet());
 app.use(limiter)
 
@@ -31,7 +33,7 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use("/api", userRoutes)
+app.use("/api/users", userRoutes)
 
 app.get('/', (req, res) => {
     logger.info('WELCOME')
