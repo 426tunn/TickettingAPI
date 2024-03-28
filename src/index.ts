@@ -1,10 +1,10 @@
 import express from 'express';
 import { Config } from './Config/config';
-const passport = require("passport");
-const rateLimit = require('express-rate-limit');
-const helmet = require('helmet');
-const logger = require('./logging/logger');
-const session = require('express-session');
+import passport from "passport";
+import rateLimit from 'express-rate-limit';
+import helmet from "helmet";
+import { logger } from './logging/logger';
+import session from "express-session";
 import userRoutes from './Routes/UserRoute';
 import eventRoutes from "./Routes/EventRoute";
 
@@ -50,4 +50,4 @@ app.use((err : Error, req: express.Request, res: express.Response, next: express
 })
 
 
-module.exports = app
+export default app;

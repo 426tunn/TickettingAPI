@@ -1,6 +1,6 @@
-const morgan = require('morgan')
-const json = require('morgan-json')
-const logger = require('./logger')
+import morgan from "morgan";
+import json from "morgan-json";
+import { logger } from "./logger";
 
 const format = json({
   method: ':method',

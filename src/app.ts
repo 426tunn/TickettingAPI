@@ -1,7 +1,7 @@
 import { Config } from "./Config/config";
 import { connectToDB } from "./database";
-const app = require('./index');
-const logger = require('./logging/logger');
+import app from "./index";
+import { logger } from "./logging/logger";
 
 
 connectToDB();
