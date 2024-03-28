@@ -3,9 +3,9 @@ export enum EventStatus {
     // Running = 'Running',
     // Ended = 'Ended'
 
-    Pending = 'Pending',
-    Approved = 'Approved',
-    Suspended = 'Suspended',
-    Cancelled = 'Cancelled',
-    Completed = 'Completed'
+    Pending = "Pending",
+    Approved = "Approved",
+    Suspended = "Suspended",
+    Cancelled = "Cancelled",
+    Completed = "Completed",
 }
