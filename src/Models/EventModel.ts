@@ -1,11 +1,11 @@
-import { EventStatus } from "../Enums/EventStatus";
+import { EventStatus, } from "../Enums/EventStatus";
 import { EventTypes } from "../Enums/EventTypes";
 import { EventVisibility } from "../Enums/EventVisibility";
 import { LocationTypes } from "../Enums/LocationTypes";
 import { IUser } from "./UserModel";
 import { IEventVenue } from "./EventVenueModel";
 import { IEventTicketType } from "./EventTicketTypeModel";
-import mongoose, { Schema, Document, model, Types } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
 interface IEvent extends Document {
     name: string;
