@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { EventModel, IEvent } from "../Models/EventModel";
 import { EventService } from "../Services/EventService";
 import { validationResult } from "express-validator";
+import { IUser } from "Models/UserModel";
 
 export class EventController {
     private eventService: EventService;
@@ -32,9 +33,7 @@ export class EventController {
                 return res.status(400).json({ errors: errors.array() });
             }
 
-            // TODO: update organizerId with user session id
-            // TODO: create a new venue from req.body.venue and pass it as the value id of new object
-            const organizerId = "5f4ebe073c6a0d23745063d0";
+            const organizerId = (req.user as IUser)._id;
             const eventData = { ...req.body, organizerId };
             const newEvent = await this.eventService.createEvent(eventData);
             res.status(201).json({ event: newEvent });

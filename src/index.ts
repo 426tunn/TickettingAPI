@@ -9,6 +9,7 @@ import userRoutes from "./Routes/UserRoute";
 import eventRoutes from "./Routes/EventRoute";
 import { authenticateJWT } from "./Utils/authUtils";
 import "./Config/PassportConfig";
+import eventVenueRouter from "./Routes/EventVenueRoute";
 
 const SECRET = Config.SESSION_SECRET;
 const app = express();
@@ -37,8 +38,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/api/v1/events", authenticateJWT, eventRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/events", authenticateJWT, eventRoutes);
+app.use("/api/v1/event-venues", eventVenueRouter);
 
 app.get("/", (req, res) => {
     logger.info("WELCOME");
