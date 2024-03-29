@@ -1,8 +1,12 @@
-import { Request, Response } from "express";
-import { UserService } from "../Services/UserService";
-import jwt from "jsonwebtoken";
-import { IUser, UserModel } from "../Models/UserModel";
-import { validationResult } from "express-validator";
+import {Request, Response} from 'express';
+import {UserService} from '../Services/UserService';
+import jwt from 'jsonwebtoken';
+import { IUser, UserModel } from '../Models/UserModel';
+import { validationResult } from 'express-validator';
+import { UserRole } from 'Enums/UserRole';
+import { Config } from '../Config/config';
+import {generateTokenWithRole, isEmail}  from '../Utils/authUtils';
+
 
 export class UserController {
     private userService: UserService;
@@ -76,12 +80,9 @@ export class UserController {
                     .json({ error: "Invalid email or password" });
             }
             (req.session as any).user = user;
-            const token = jwt.sign(
-                { id: user._id },
-                process.env.JWT_SECRET as string,
-                { expiresIn: "1h" },
-            );
-            res.status(200).json({ message: "Login successful", token });
+            const role = user.role;
+            const token = generateTokenWithRole(user, role);
+            res.status(200).json({ message: 'Login successful', token });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -98,6 +99,10 @@ export class UserController {
 
     async getAllUsers(req: Request, res: Response) {
         try {
+            const role = (req as any).user.role;
+            if(role !== 'admin'){
+                return res.status(401).json({error: "Only Admin can access this route"});
+            }
             const users = await this.userService.getAllUsers();
             res.status(200).json({ users });
         } catch (error) {
@@ -107,6 +112,10 @@ export class UserController {
 
     async getUserById(req: Request, res: Response) {
         try {
+            const role = (req as any).user.role;
+            if(role !== 'admin'){
+                return res.status(401).json({error: "Only Admin can access this route"});
+            }            
             const userId = req.params.userId;
             if (!userId) {
                 return res.status(400).json({ error: "User ID is required" });
@@ -118,29 +127,105 @@ export class UserController {
         }
     }
 
-    async updateUser(req: Request, res: Response) {
+    async updateUserRole(req: Request, res: Response){
         try {
+            const role = (req as any).user.role;
+            if(role !== "admin"){
+                return res.status(401).json({error: "Only Admin can access this route"});
+            }     
+            const userId = req.params.userId;
+            const roleToUpdate = req.body.role as UserRole;
+            if (!userId) {
+                return res.status(400).json({ error: "User ID is required" });
+            }
+            if (!roleToUpdate) {
+                return res.status(400).json({error: 'Role is required'});
+            }
+            const updatedUser = await this.userService.updateUserRole(userId, roleToUpdate);
+            if (!updatedUser) {
+                return res.status(404).json({error: 'User not found'});
+            }
+            res.status(200).json({message: 'User role updated successfully', user: updatedUser});
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+
+
+
+    async updateUser(req: Request, res: Response) {
+        try {               
             const userId = req.params.userId;
             if (!userId) {
                 return res.status(400).json({ error: "User ID is required" });
             }
             const user = await this.userService.getUserById(userId);
             if (!user) {
-                return res.status(404).json({ error: "User not found" });
+                return res.status(404).json({error: 'User not found'});
+            } 
+            if((req as any).user._id !== userId){
+                return res
+                .status(401)
+                .json(
+                    {error: "You can only edit your own user information"}
+                    );
             }
-            const updates: Partial<IUser> = req.body;
+
+            const updates : Partial<IUser> = req.body;
+            if (Object.keys(updates).length === 0) {
+                return res.status(400).json({error: 'No updates provided'});
+            }
+            if (updates.email && !isEmail(updates.email)) {
+                return res.status(400).json({error: 'Invalid email'});
+            }
+
             await this.userService.updateUser(userId, updates);
+            const updatedUser = await this.userService.getUserById(userId);
             res.status(200).json({
                 message: "User updated successfully",
-                user,
+                updatedUser,
             });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     }
 
+
+    // async passwordReset(req: Request, res: Response){
+    //     try {
+    //         const email = req.body.email;
+    //         if (!email) {
+    //             return res.status(400).json({error: 'Email is required'});
+    //         }
+    //         const user = await this.userService.getUserByEmail(email);
+    //         if (!user) {
+    //             return res.status(404).json({error: 'User not found'});
+    //         }
+    //         user.resetPasswordToken = crypto.randomBytes(20).toString('hex');
+    //         user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
+    //         await user.save();
+    //         const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${user.resetPasswordToken}`;
+    //         const html = `
+    //         <p>Please make a PUT request to: ${resetUrl}</p>
+    //         <p>Send password in the request body</p>`;
+    //         await sendEmail({
+    //             email: user.email,
+    //             subject: 'Password Reset',
+    //             html
+    //         });
+    //         res.status(200).json({message: 'Check your email for password reset instructions'})
+    //     } catch (error) {
+    //         res.status(500).json({error: error.message});
+    //     }
+    // }
+
     async deleteUser(req: Request, res: Response) {
         try {
+            const role = (req as any).user.role;
+            if(role !== 'admin'){
+                return res.status(401).json({error: "Only Admin can access this route"});
+            }                 
             const userId = req.params.userId;
             if (!userId) {
                 return res.status(400).json({ error: "User ID is required" });
@@ -154,6 +239,5 @@ export class UserController {
             res.status(500).json({ error: error.message });
         }
     }
-}
 
-//compare with your other proj first
+    }

@@ -1,5 +1,6 @@
-import { Model } from "mongoose";
-import { UserModel, IUser } from "../Models/UserModel";
+import { Model } from 'mongoose';
+import { UserModel, IUser } from '../Models/UserModel';
+import { UserRole } from 'Enums/UserRole';
 
 export class UserService {
     private userModel: Model<IUser>;
@@ -37,9 +38,15 @@ export class UserService {
         return await this.userModel.findOne({ email }).exec();
     }
 
-    async getUserByUsername(username: string): Promise<IUser | null> {
-        return await this.userModel.findOne({ username }).exec();
-    }
+  async getUserByUsername(username: string): Promise<IUser | null> {
+    return await this.userModel.findOne({ username }).exec();
+  }
+
+
+  async updateUserRole(userId: string, role: UserRole): Promise<IUser | null> {
+    return await this.userModel.findByIdAndUpdate(userId, { role }, { new: true }).exec();
+  }
+
 
     async updateUser(
         userId: string,

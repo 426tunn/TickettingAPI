@@ -1,12 +1,31 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { UserService } from "Services/UserService";
-import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
-import { IUser, UserModel } from "Models/UserModel";
+import { UserService } from "../Services/UserService";
+import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
+import { IUser, UserModel } from "../Models/UserModel";
 import bcrypt from "bcrypt";
+import { Config } from "./config";
 
-const userService = new UserService(UserModel);
-const JWT_SECRET = process.env.JWT_SECRET;
+const userService = new UserService( UserModel);
+const JWT_SECRET = Config.JWTSecret;
+
+passport.use(
+    'jwt',
+    new JWTStrategy(
+        {
+            secretOrKey: JWT_SECRET,
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
+        },
+        async (payload, done)=> {
+            try {
+            return done(null, payload.user); //it does 'req.user = payload.user
+        } catch(error){
+            done(error);
+        }
+        }
+       
+    )
+);
 
 passport.use(
     "login",
@@ -69,22 +88,7 @@ passport.use(
     ),
 );
 
-passport.use(
-    "jwt",
-    new JWTStrategy(
-        {
-            secretOrKey: JWT_SECRET,
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-        },
-        async (payload, done) => {
-            try {
-                return done(null, payload.user); //it does 'req.user = payload.user
-            } catch (error) {
-                done(error);
-            }
-        },
-    ),
-);
+
 
 passport.serializeUser((user: IUser, done) => {
     done(null, user._id);
