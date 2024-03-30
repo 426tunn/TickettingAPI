@@ -12,15 +12,9 @@ export class UserController {
     private userService: UserService;
     constructor() {
         this.userService = new UserService(UserModel);
-        this.registerUser = this.registerUser.bind(this);
-        this.loginUser = this.loginUser.bind(this);
-        this.logoutUser = this.logoutUser.bind(this);
-        this.getAllUsers = this.getAllUsers.bind(this);
-        this.getUserById = this.getUserById.bind(this);
-        this.updateUser = this.updateUser.bind(this);
-        this.deleteUser = this.deleteUser.bind(this);
     }
-    async registerUser(req: Request, res: Response) {
+
+    public registerUser = async (req: Request, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
@@ -52,13 +46,13 @@ export class UserController {
                 email,
                 password,
             );
-            res.status(201).json({ message: "Signup Sucessful", user });
+            res.status(201).json({ message: "Signup Successful", user });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     }
 
-    async loginUser(req: Request, res: Response) {
+    public loginUser = async (req: Request, res: Response) => {
         try {
             const { usernameOrEmail, password } = req.body;
             let user: any;
@@ -88,7 +82,7 @@ export class UserController {
         }
     }
 
-    async logoutUser(req: Request, res: Response) {
+    public logoutUser = (req: Request, res: Response) => {
         try {
             (req.session as any).destroy();
             res.status(200).json({ message: "Logout successful" });
@@ -97,7 +91,7 @@ export class UserController {
         }
     }
 
-    async getAllUsers(req: Request, res: Response) {
+    public getAllUsers = async (req: Request, res: Response) => {
         try {
             const role = (req as any).user.role;
             if(role !== 'admin'){
@@ -110,7 +104,7 @@ export class UserController {
         }
     }
 
-    async getUserById(req: Request, res: Response) {
+    public getUserById = async (req: Request, res: Response) => {
         try {
             const role = (req as any).user.role;
             if(role !== 'admin'){
@@ -127,7 +121,7 @@ export class UserController {
         }
     }
 
-    async updateUserRole(req: Request, res: Response){
+    public updateUserRole = async (req: Request, res: Response) => {
         try {
             const role = (req as any).user.role;
             if(role !== "admin"){
@@ -154,7 +148,7 @@ export class UserController {
 
 
 
-    async updateUser(req: Request, res: Response) {
+    public updateUser = async (req: Request, res: Response) =>  {
         try {               
             const userId = req.params.userId;
             if (!userId) {
@@ -220,7 +214,7 @@ export class UserController {
     //     }
     // }
 
-    async deleteUser(req: Request, res: Response) {
+    public deleteUser = async (req: Request, res: Response) => {
         try {
             const role = (req as any).user.role;
             if(role !== 'admin'){
