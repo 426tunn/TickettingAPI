@@ -1,8 +1,7 @@
 import { Router } from "express";
 import { UserController } from "../Controllers/UserController";
-import { check, body } from "express-validator";
-import { authenticateJWT } from '../Utils/authUtils';
-
+import { check } from "express-validator";
+import { authenticateJWT } from '../Middlewares/AuthMiddleware';
 
 
 const UserRouter = Router();

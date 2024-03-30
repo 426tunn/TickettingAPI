@@ -51,7 +51,7 @@ export class EventVenueController {
             const eventVenueId = req.params.eventVenueId;
             const event = await this.eventVenueService.getEventVenueById(eventVenueId);
             if (event == null) {
-                return res.status(404).json({ error: "Event does not exists" });
+                return res.status(404).json({ error: "Event venue does not exists" });
             }
             return res.status(200).json(event);
         } catch (error) {
@@ -68,7 +68,7 @@ export class EventVenueController {
 
             const event = await this.eventVenueService.getEventVenueById(eventVenueId);
             if (event == null) {
-                return res.status(404).json({ error: "Event does not exists" });
+                return res.status(404).json({ error: "Event venue not exists" });
             }
 
             const eventVenueUpdate = req.body;
