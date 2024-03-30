@@ -1,11 +1,11 @@
 import {Request, Response} from 'express';
 import {UserService} from '../Services/UserService';
-import jwt from 'jsonwebtoken';
 import { IUser, UserModel } from '../Models/UserModel';
 import { validationResult } from 'express-validator';
 import { UserRole } from 'Enums/UserRole';
-import { Config } from '../Config/config';
 import {generateTokenWithRole, isEmail}  from '../Utils/authUtils';
+import { Types } from 'mongoose';
+
 
 
 export class UserController {
@@ -61,7 +61,7 @@ export class UserController {
     async loginUser(req: Request, res: Response) {
         try {
             const { usernameOrEmail, password } = req.body;
-            let user: any;
+            let user: IUser;
             if (usernameOrEmail.includes("@")) {
                 user = await this.userService.getUserByEmail(usernameOrEmail);
             } else {
@@ -79,7 +79,7 @@ export class UserController {
                     .status(401)
                     .json({ error: "Invalid email or password" });
             }
-            (req.session as any).user = user;
+            // req.session.user = user;
             const role = user.role;
             const token = generateTokenWithRole(user, role);
             res.status(200).json({ message: 'Login successful', token });
@@ -90,7 +90,12 @@ export class UserController {
 
     async logoutUser(req: Request, res: Response) {
         try {
-            (req.session as any).destroy();
+            req.session.destroy((err) => {
+                if (err) {
+                    throw err; 
+                }
+                res.status(200).json({ message: "Logout successful" });
+            });
             res.status(200).json({ message: "Logout successful" });
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -99,10 +104,6 @@ export class UserController {
 
     async getAllUsers(req: Request, res: Response) {
         try {
-            const role = (req as any).user.role;
-            if(role !== 'admin'){
-                return res.status(401).json({error: "Only Admin can access this route"});
-            }
             const users = await this.userService.getAllUsers();
             res.status(200).json({ users });
         } catch (error) {
@@ -111,11 +112,7 @@ export class UserController {
     }
 
     async getUserById(req: Request, res: Response) {
-        try {
-            const role = (req as any).user.role;
-            if(role !== 'admin'){
-                return res.status(401).json({error: "Only Admin can access this route"});
-            }            
+        try {     
             const userId = req.params.userId;
             if (!userId) {
                 return res.status(400).json({ error: "User ID is required" });
@@ -128,11 +125,7 @@ export class UserController {
     }
 
     async updateUserRole(req: Request, res: Response){
-        try {
-            const role = (req as any).user.role;
-            if(role !== "admin"){
-                return res.status(401).json({error: "Only Admin can access this route"});
-            }     
+        try { 
             const userId = req.params.userId;
             const roleToUpdate = req.body.role as UserRole;
             if (!userId) {
@@ -157,6 +150,7 @@ export class UserController {
     async updateUser(req: Request, res: Response) {
         try {               
             const userId = req.params.userId;
+            // let user: IUser;
             if (!userId) {
                 return res.status(400).json({ error: "User ID is required" });
             }
@@ -164,7 +158,8 @@ export class UserController {
             if (!user) {
                 return res.status(404).json({error: 'User not found'});
             } 
-            if((req as any).user._id !== userId){
+            const userIdObject = new Types.ObjectId(userId); 
+            if((req.user as IUser)._id !== userIdObject){
                 return res
                 .status(401)
                 .json(
@@ -222,7 +217,7 @@ export class UserController {
 
     async deleteUser(req: Request, res: Response) {
         try {
-            const role = (req as any).user.role;
+            const role = (req.user as IUser).role;
             if(role !== 'admin'){
                 return res.status(401).json({error: "Only Admin can access this route"});
             }                 

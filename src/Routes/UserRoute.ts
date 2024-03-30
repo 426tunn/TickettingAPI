@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { UserController } from "../Controllers/UserController";
-import { check, body } from "express-validator";
-import { authenticateJWT } from '../Utils/authUtils';
+import { check} from "express-validator";
+import { authenticateJWT, checkIfUserIsAdmin } from '../Utils/authUtils';
 
 
 
@@ -27,16 +27,21 @@ UserRouter.post("/login", userController.loginUser);
 
 UserRouter.get("/logout", userController.logoutUser);
 
-UserRouter.get('/', authenticateJWT, userController.getAllUsers);
+UserRouter.get('/', authenticateJWT, checkIfUserIsAdmin, userController.getAllUsers);
 
-UserRouter.get('/:userId', authenticateJWT, userController.getUserById);
+UserRouter.get('/:userId', authenticateJWT, checkIfUserIsAdmin, userController.getUserById);
 
-UserRouter.patch('/:userId', authenticateJWT,  userController.updateUser);
+UserRouter.patch('/:userId', authenticateJWT, userController.updateUser);
 
-UserRouter.patch('/role/:userId',  userController.updateUserRole);
+UserRouter.patch('/role/:userId',  authenticateJWT,  checkIfUserIsAdmin, userController.updateUserRole);
 
-UserRouter.delete('/:userId',  userController.deleteUser);
+UserRouter.delete('/:userId',  authenticateJWT, userController.deleteUser);
 
+//TODO: Add forgot password and reset password routes
+//TODO: Add refresh token routes
+//TODO: Add email verification
+//TODO: Add email verification routes
+//TODO: Add LOGOUT routes
 
 /**
  * @openapi

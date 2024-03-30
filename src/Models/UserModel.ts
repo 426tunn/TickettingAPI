@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, model, Types } from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 import bcrypt from "bcrypt";
 import { UserRole } from "../Enums/UserRole";
 
@@ -46,15 +46,13 @@ const userSchema = new Schema<IUser>({
 });
 
 userSchema.pre<IUser>("save", async function (next) {
-    const user = this;
     const hash = await bcrypt.hash(this.password, 10);
     this.password = hash;
     next();
 });
 
 userSchema.methods.isValidPassword = async function (password: string) {
-    const user = this;
-    const compare = await bcrypt.compare(password, user.password);
+    const compare = await bcrypt.compare(password, this.password);
     return compare;
 };
 
