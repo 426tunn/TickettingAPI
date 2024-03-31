@@ -107,7 +107,7 @@ export class UserController {
 
     public getUserById = async (req: Request, res: Response) => {
         try {
-            const role = (req as any).user.role;
+            const role = (req.user as IUser).role;
             if(role !== 'admin'){
                 return res.status(401).json({error: "Only Admin can access this route"});
             }            
@@ -126,7 +126,7 @@ export class UserController {
 
     public updateUserRole = async (req: Request, res: Response) => {
         try {
-            const role = (req as any).user.role;
+            const role = (req.user as IUser).role;
             if(role !== "admin"){
                 return res.status(401).json({error: "Only Admin can access this route"});
             }     

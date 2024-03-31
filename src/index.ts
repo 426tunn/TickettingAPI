@@ -7,7 +7,6 @@ import { logger } from "./logging/logger";
 import session from "express-session";
 import userRoutes from "./Routes/UserRoute";
 import eventRoutes from "./Routes/EventRoute";
-import { authenticateJWT } from "./Middlewares/AuthMiddleware";
 import "./Config/PassportConfig";
 import eventVenueRouter from "./Routes/EventVenueRoute";
 import swaggerUi from "swagger-ui-express";
