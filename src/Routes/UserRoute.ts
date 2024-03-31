@@ -2,8 +2,6 @@ import { Router } from "express";
 import { UserController } from "../Controllers/UserController";
 import { check } from "express-validator";
 import { authenticateJWT } from '../Middlewares/AuthMiddleware';
-
-import { check} from "express-validator";
 import { checkIfUserIsAdmin } from '../Utils/authUtils';
 
 
