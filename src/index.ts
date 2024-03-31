@@ -7,7 +7,7 @@ import { logger } from "./logging/logger";
 import session from "express-session";
 import userRoutes from "./Routes/UserRoute";
 import eventRoutes from "./Routes/EventRoute";
-import { authenticateJWT } from "./Utils/authUtils";
+import { authenticateJWT } from "./Middlewares/AuthMiddleware";
 import "./Config/PassportConfig";
 import eventVenueRouter from "./Routes/EventVenueRoute";
 import swaggerUi from "swagger-ui-express";
@@ -42,7 +42,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/api/v1/users", userRoutes);
-app.use("/api/v1/events", authenticateJWT, eventRoutes);
+app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/event-venues", eventVenueRouter);
 
 app.get("/", (req, res) => {

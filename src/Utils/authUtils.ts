@@ -15,6 +15,11 @@ export function generateTokenWithRole(user: IUser, role: string) {
     return token;
 }
 
+export function isEmail(email: string) {
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+}
+
 export function authenticateJWT(req: Request, res: Response, next: NextFunction) {
     passport.authenticate('jwt', { session: false }, (err: Error, user: IUser) => {
         if (err || !user) {
@@ -40,6 +45,3 @@ export function isEmail(email: string) {
     const re = /\S+@\S+\.\S+/;
     return re.test(email);
 }
-
-
-

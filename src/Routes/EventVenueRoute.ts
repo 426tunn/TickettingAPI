@@ -1,11 +1,14 @@
 import router, { Router } from "express";
 import { EventVenueController } from "../Controllers/EventVenueController";
 import { body } from "express-validator";
+import { isAdminMiddleware } from "../Middlewares/AuthMiddleware";
 
 const eventVenueRouter: Router = router();
 const eventVenueController = new EventVenueController();
 
-eventVenueRouter.get("/", eventVenueController.getAllEventVenues);
+eventVenueRouter.get(
+    "/", isAdminMiddleware, eventVenueController.getAllEventVenues
+);
 eventVenueRouter.post(
     "/",
     [
