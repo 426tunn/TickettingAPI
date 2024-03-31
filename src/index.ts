@@ -10,6 +10,8 @@ import eventRoutes from "./Routes/EventRoute";
 import { authenticateJWT } from "./Middlewares/AuthMiddleware";
 import "./Config/PassportConfig";
 import eventVenueRouter from "./Routes/EventVenueRoute";
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from "./Config/swaggerConfig";
 
 const SECRET = Config.SESSION_SECRET;
 const app = express();
@@ -23,6 +25,7 @@ const limiter = rateLimit({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(helmet());
 app.use(limiter);
 
@@ -60,6 +63,7 @@ app.use(
         res.status(500).json({
             error: err.message,
         });
+        next(err);
     },
 );
 
