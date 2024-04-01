@@ -1,7 +1,9 @@
 import router, { Router } from "express";
 import { EventController } from "../Controllers/EventController";
 import { body } from "express-validator";
-import { isAdminMiddleware } from "../Middlewares/AuthMiddleware";
+import {
+    authenticateJWT, checkIfUserIsAdmin 
+} from "../Middlewares/AuthMiddleware";
 
 const eventRouter: Router = router();
 const eventController = new EventController();
@@ -9,7 +11,8 @@ const eventController = new EventController();
 eventRouter.get("/", eventController.getAllEvents);
 eventRouter.post(
     "/",
-    isAdminMiddleware,
+    authenticateJWT,
+    checkIfUserIsAdmin,
     [
         body("name").notEmpty().withMessage("Event name is required"),
         body("description")
@@ -39,10 +42,10 @@ eventRouter.post(
 );
 eventRouter.get("/:eventId", eventController.getEventById);
 eventRouter.patch(
-    "/:eventId", isAdminMiddleware, eventController.updateEventById
+    "/:eventId", authenticateJWT, checkIfUserIsAdmin, eventController.updateEventById
 );
 eventRouter.delete(
-    "/:eventId", isAdminMiddleware, eventController.deleteEventById
+    "/:eventId", authenticateJWT, checkIfUserIsAdmin, eventController.deleteEventById
 );
 
 export default eventRouter;
