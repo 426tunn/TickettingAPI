@@ -14,10 +14,10 @@ export function authenticateJWT(req: Request, res: Response, next: NextFunction)
 }
 
 export function checkIfUserIsAdmin(req: Request, res: Response, next: NextFunction) {
-    if (!req.user) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
-    if ((req.user as IUser).role !== 'admin') {
+    const isAdminUser = [
+        UserRole.Admin, UserRole.SuperAdmin
+    ].includes((req.user as IUser).role);
+    if (!isAdminUser) {
         return res.status(403).json({ message: 'Forbidden' });
     }
     next();
