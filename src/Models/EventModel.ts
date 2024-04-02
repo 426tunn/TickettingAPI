@@ -43,7 +43,7 @@ const eventSchema = new Schema<IEvent>(
             type: String,
             enum: Object.values(EventVisibility),
             // default: EventVisibility.Public,
-            // required: true,
+            required: true,
         },
         type: {
             type: String,
