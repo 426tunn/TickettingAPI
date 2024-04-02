@@ -132,7 +132,10 @@ export class UserController {
             }     
           
             const userId = req.params.userId;
-            const roleToUpdate = req.body.role as UserRole;
+            const roleToUpdate  = req.body.role as UserRole;
+            if (roleToUpdate !== "admin" && roleToUpdate !== "user") {
+                return res.status(400).json({error: 'Invalid role'});
+            }
             if (!userId) {
                 return res.status(400).json({ error: "User ID is required" });
             }

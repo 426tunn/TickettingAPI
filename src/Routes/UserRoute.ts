@@ -1,8 +1,7 @@
 import { Router } from "express";
 import { UserController } from "../Controllers/UserController";
 import { check } from "express-validator";
-import { authenticateJWT } from '../Middlewares/AuthMiddleware';
-import { checkIfUserIsAdmin } from '../Utils/authUtils';
+import { authenticateJWT, isAdminMiddleware } from '../Middlewares/AuthMiddleware';
 
 
 const UserRouter = Router();
@@ -27,13 +26,13 @@ UserRouter.post("/login", userController.loginUser);
 
 UserRouter.get("/logout", userController.logoutUser);
 
-UserRouter.get('/', authenticateJWT, checkIfUserIsAdmin, userController.getAllUsers);
+UserRouter.get('/', authenticateJWT, isAdminMiddleware, userController.getAllUsers);
 
-UserRouter.get('/:userId', authenticateJWT, checkIfUserIsAdmin, userController.getUserById);
+UserRouter.get('/:userId', authenticateJWT, isAdminMiddleware, userController.getUserById);
 
 UserRouter.patch('/:userId', authenticateJWT, userController.updateUser);
 
-UserRouter.patch('/role/:userId',  authenticateJWT,  checkIfUserIsAdmin, userController.updateUserRole);
+UserRouter.patch('/role/:userId',  authenticateJWT,  isAdminMiddleware, userController.updateUserRole);
 
 UserRouter.delete('/:userId',  authenticateJWT, userController.deleteUser);
 
