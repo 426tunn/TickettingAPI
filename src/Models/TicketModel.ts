@@ -1,10 +1,12 @@
 import mongoose, { Schema, Document, model, Types } from "mongoose";
 import { IEventTicketType } from "./EventTicketTypeModel";
 import { IUser } from "./UserModel";
+import { IEvent } from "./EventModel";
 
 interface ITicket extends Document {
     eventTicketTypeId: IEventTicketType;
     userId: IUser;
+    eventId: IEvent;
 }
 
 const ticketSchema = new Schema<ITicket>(
@@ -17,6 +19,11 @@ const ticketSchema = new Schema<ITicket>(
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
+            required: true,
+        },
+        eventId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Event",
             required: true,
         },
     },

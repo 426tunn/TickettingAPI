@@ -15,7 +15,7 @@ interface IEvent extends Document {
     type: EventTypes;
     venue: IEventVenue;
     location: LocationTypes;
-    tickets: IEventTicketType[];
+    ticketTypes: IEventTicketType[];
     organizerId: IUser;
     startDate: Date;
     endDate: Date;
@@ -56,7 +56,7 @@ const eventSchema = new Schema<IEvent>(
             ref: "EventVenue",
             required: true,
         },
-        tickets: [
+        ticketTypes: [
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: "EventTicketType",

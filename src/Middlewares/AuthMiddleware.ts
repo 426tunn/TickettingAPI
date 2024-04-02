@@ -13,19 +13,12 @@ export function authenticateJWT(req: Request, res: Response, next: NextFunction)
     })(req, res, next);
 }
 
-export function isAdminMiddleware(req: Request, res: Response, next: NextFunction) {
-    passport.authenticate('jwt', { session: false }, (err: Error, user: IUser) => {
-        if (err || !user) {
-            return res.status(401).json({ message: 'Unauthorized' });
-        }
-
-        const adminRoles = [UserRole.Admin, UserRole.SuperAdmin];
-        const userIsAdmin = adminRoles.includes(user?.role)
-        if (!userIsAdmin) {
-            return res.status(401).json({ message: 'Unauthorized' });
-        }
-
-        req.user = user;
-        next();
-    })(req, res, next);
+export function checkIfUserIsAdmin(req: Request, res: Response, next: NextFunction) {
+    const isAdminUser = [
+        UserRole.Admin, UserRole.SuperAdmin
+    ].includes((req.user as IUser).role);
+    if (!isAdminUser) {
+        return res.status(403).json({ message: 'Forbidden' });
+    }
+    next();
 }
