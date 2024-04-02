@@ -1,4 +1,3 @@
-import { UserRole } from '../Enums/UserRole';
 import { IUser } from 'Models/UserModel';
 import { Request, Response, NextFunction } from 'express';
 import passport from 'passport';
@@ -13,11 +12,12 @@ export function authenticateJWT(req: Request, res: Response, next: NextFunction)
     })(req, res, next);
 }
 
+
 export function checkIfUserIsAdmin(req: Request, res: Response, next: NextFunction) {
-    const isAdminUser = [
-        UserRole.Admin, UserRole.SuperAdmin
-    ].includes((req.user as IUser).role);
-    if (!isAdminUser) {
+    if (!req.user) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    if ((req.user as IUser).role !== 'admin') {
         return res.status(403).json({ message: 'Forbidden' });
     }
     next();
