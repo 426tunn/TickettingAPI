@@ -1,5 +1,5 @@
-import { Model } from 'mongoose';
-import { UserModel, IUser } from '../Models/UserModel';
+import {  Model } from 'mongoose';
+import { IUser } from '../Models/UserModel';
 import { UserRole } from 'Enums/UserRole';
 
 export class UserService {

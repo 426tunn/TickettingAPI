@@ -5,13 +5,17 @@ import passport from 'passport';
 import { IUser } from '../Models/UserModel';
 
 
-export function generateTokenWithRole(user: IUser, role: string) {
+export function generateTokenWithRole(res: Response, user: IUser, role: string) {
     const payload = {
         user: user,
         role: role
     };
 
     const token = jwt.sign(payload, Config.JWTSecret, { expiresIn: '1h' });
+    res.cookie('jwt_token', token, { 
+        maxAge: 3600000, 
+        httpOnly: true 
+    });
     return token;
 }
 

@@ -5,6 +5,7 @@ import { validationResult } from 'express-validator';
 import { UserRole } from 'Enums/UserRole';
 import {generateTokenWithRole, isEmail}  from '../Utils/authUtils';
 import { Types } from 'mongoose';
+import { revokedTokens } from "../Middlewares/AuthMiddleware";
 
 
 
@@ -73,28 +74,29 @@ export class UserController {
                     .status(401)
                     .json({ error: "Invalid email or password" });
             }
-            // req.session.user = user;
             const role = user.role;
-            const token = generateTokenWithRole(user, role);
+            const token = generateTokenWithRole(res, user, role);
             res.status(200).json({ message: 'Login successful', token });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     }
 
-    public logoutUser = (req: Request, res: Response) => {
+    public logoutUser = async (req: Request, res: Response) => {
         try {
-            req.session.destroy((err) => {
-                if (err) {
-                    throw err; 
-                }
-                res.status(200).json({ message: "Logout successful" });
-            });
+           
+            const token = req.cookies.jwt_token;
+            if (token) {
+                revokedTokens.add(token);
+            }
+            res.clearCookie("jwt-token");
             res.status(200).json({ message: "Logout successful" });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     }
+
+
 
     public getAllUsers = async (req: Request, res: Response) => {
         try {
@@ -194,34 +196,6 @@ export class UserController {
         }
     }
 
-
-    // async passwordReset(req: Request, res: Response){
-    //     try {
-    //         const email = req.body.email;
-    //         if (!email) {
-    //             return res.status(400).json({error: 'Email is required'});
-    //         }
-    //         const user = await this.userService.getUserByEmail(email);
-    //         if (!user) {
-    //             return res.status(404).json({error: 'User not found'});
-    //         }
-    //         user.resetPasswordToken = crypto.randomBytes(20).toString('hex');
-    //         user.resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour
-    //         await user.save();
-    //         const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${user.resetPasswordToken}`;
-    //         const html = `
-    //         <p>Please make a PUT request to: ${resetUrl}</p>
-    //         <p>Send password in the request body</p>`;
-    //         await sendEmail({
-    //             email: user.email,
-    //             subject: 'Password Reset',
-    //             html
-    //         });
-    //         res.status(200).json({message: 'Check your email for password reset instructions'})
-    //     } catch (error) {
-    //         res.status(500).json({error: error.message});
-    //     }
-    // }
 
     public deleteUser = async (req: Request, res: Response) => {
         try {
