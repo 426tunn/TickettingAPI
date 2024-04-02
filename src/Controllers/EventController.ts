@@ -35,6 +35,8 @@ export class EventController {
 
             const organizerId = (req.user as IUser)._id;
             const eventData = { ...req.body, organizerId };
+            console.log(eventData);
+            
             const newEvent = await this.eventService.createEvent(eventData);
             res.status(201).json({ event: newEvent });
         } catch (error) {
