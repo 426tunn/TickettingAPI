@@ -2,7 +2,7 @@ import { ITicket } from "../Models/TicketModel";
 import { Model } from "mongoose";
 
 export class TicketService {
-    constructor(public ticketModel: Model<ITicket>) { }
+    constructor(public ticketModel: Model<ITicket>) {}
 
     async getAllTickets(): Promise<ITicket[] | null> {
         return this.ticketModel.find();
@@ -18,7 +18,7 @@ export class TicketService {
 
     async getUserEventTicket(
         userId: string,
-        eventId: string
+        eventId: string,
     ): Promise<ITicket[] | null> {
         return this.ticketModel.find({ userId, eventId });
     }
@@ -26,12 +26,12 @@ export class TicketService {
     async createTicket({
         eventTicketTypeId,
         userId,
-        eventId
+        eventId,
     }: ITicket): Promise<ITicket> {
         return this.ticketModel.create({
             eventTicketTypeId,
             userId,
-            eventId
+            eventId,
         });
     }
 
@@ -52,20 +52,19 @@ export class TicketService {
         const finalUpdate = { ...ticketUpdate, userId, eventId };
         return this.ticketModel.findOneAndUpdate(
             { userId, eventId },
-            finalUpdate, {
-            new: true,
-        });
+            finalUpdate,
+            {
+                new: true,
+            },
+        );
     }
 
     async deleteTicketByEventIdAndUserId(
         eventId: string,
         userId: string,
     ): Promise<ITicket | null> {
-        return this.ticketModel.findOneAndDelete(
-            { userId, eventId }
-        );
+        return this.ticketModel.findOneAndDelete({ userId, eventId });
     }
-
 
     async deleteTicketById(ticketId: string): Promise<null> {
         return this.ticketModel.findByIdAndDelete(ticketId);

@@ -1,4 +1,4 @@
-import { EventStatus, } from "../Enums/EventStatus";
+import { EventStatus } from "../Enums/EventStatus";
 import { EventTypes } from "../Enums/EventTypes";
 import { EventVisibility } from "../Enums/EventVisibility";
 import { LocationTypes } from "../Enums/LocationTypes";

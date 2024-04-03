@@ -2,7 +2,7 @@ import { IEvent } from "Models/EventModel";
 import { Model } from "mongoose";
 
 export class EventService {
-    constructor(public eventModel: Model<IEvent>) { }
+    constructor(public eventModel: Model<IEvent>) {}
 
     async getAllEvents(): Promise<IEvent[] | null> {
         return this.eventModel.find();
