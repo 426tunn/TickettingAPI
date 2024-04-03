@@ -13,8 +13,9 @@ import eventVenueRouter from "./Routes/EventVenueRoute";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./Config/swaggerConfig";
 import { authenticateJWT } from "./Utils/authUtils";
-import { checkRevokedToken } from "./Middlewares/AuthMiddleware";
+import { checkIfUserIsAdmin, checkRevokedToken } from "./Middlewares/AuthMiddleware";
 import cookieParser from "cookie-parser";
+import eventTicketTypeRouter from "./Routes/EventTicketTypeRoute";
 
 const SECRET = Config.SESSION_SECRET;
 const app = express();
@@ -49,6 +50,12 @@ app.use("/api/v1/users", checkRevokedToken, userRoutes);
 app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/event-venues", eventVenueRouter);
 app.use("/api/v1/tickets", authenticateJWT, ticketRoutes);
+app.use(
+    "/api/v1/ticket-types",
+    authenticateJWT,
+    checkIfUserIsAdmin,
+    eventTicketTypeRouter
+);
 
 app.get("/", (req, res) => {
     logger.info("WELCOME");

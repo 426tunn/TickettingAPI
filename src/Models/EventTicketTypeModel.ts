@@ -1,10 +1,10 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { TicketTypes } from "Enums/TicketTypes";
+import { TicketTypes } from "../Enums/TicketTypes";
 
 interface IEventTicketType extends Document {
     name: TicketTypes;
     price: number;
-    NoOfTickets: number;
+    noOfTickets: number;
 }
 
 const eventTicketTypeSchema = new Schema<IEventTicketType>(
@@ -19,7 +19,7 @@ const eventTicketTypeSchema = new Schema<IEventTicketType>(
             type: Number,
             required: true,
         },
-        NoOfTickets: {
+        noOfTickets: {
             type: Number,
             required: true,
         },
