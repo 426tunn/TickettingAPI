@@ -42,6 +42,25 @@ export function checkIfUserIsAdmin(
     next();
 }
 
+export function checkIfUserIsSuperAdmin(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) {
+    if (!req.user) {
+        return res
+            .status(401)
+            .json({ message: "Unauthorized: Yu need to be logged in" });
+    }
+
+    if ((req.user as IUser).role !== "superadmin") {
+        return res
+            .status(403)
+            .json({ message: "Forbidden: User is not a super admin" });
+    }
+    next();
+}
+
 // Middleware to check if the token is revoked
 export const checkRevokedToken = (
     req: Request,
