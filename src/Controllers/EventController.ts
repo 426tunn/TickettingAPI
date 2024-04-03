@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { EventModel, IEvent } from "../Models/EventModel";
 import { EventService } from "../Services/EventService";
 import { validationResult } from "express-validator";
-import { IUser } from "Models/UserModel";
+import { IUser } from "../Models/UserModel";
 
 export class EventController {
     private eventService: EventService;

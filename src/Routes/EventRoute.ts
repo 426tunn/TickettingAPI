@@ -36,9 +36,6 @@ eventRouter.post(
             .notEmpty()
             .isDate()
             .withMessage("Event end date is required"),
-        body("totalTickets")
-            .notEmpty()
-            .withMessage("Event total Tickets is required"),
     ],
     eventController.createEvent,
 );
