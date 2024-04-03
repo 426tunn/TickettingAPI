@@ -13,7 +13,7 @@ import eventVenueRouter from "./Routes/EventVenueRoute";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./Config/swaggerConfig";
 import { authenticateJWT } from "./Utils/authUtils";
-import { checkIfUserIsAdmin, checkRevokedToken } from "./Middlewares/AuthMiddleware";
+import { checkRevokedToken } from "./Middlewares/AuthMiddleware";
 import cookieParser from "cookie-parser";
 import eventTicketTypeRouter from "./Routes/EventTicketTypeRoute";
 
@@ -53,7 +53,6 @@ app.use("/api/v1/tickets", authenticateJWT, ticketRoutes);
 app.use(
     "/api/v1/ticket-types",
     authenticateJWT,
-    checkIfUserIsAdmin,
     eventTicketTypeRouter
 );
 
