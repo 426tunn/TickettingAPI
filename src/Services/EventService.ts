@@ -35,7 +35,6 @@ export class EventService {
             startDate,
             endDate,
             bannerImageUrl,
-            totalTickets,
         });
     }
 
