@@ -2,13 +2,20 @@ import { Request, Response } from "express";
 import { TicketModel, ITicket } from "../Models/TicketModel";
 import { TicketService } from "../Services/TicketService";
 import { validationResult } from "express-validator";
+import { EventService } from "../Services/EventService";
+import { UserService } from "../Services/UserService";
+import { UserModel } from "../Models/UserModel";
+import { EventModel } from "../Models/EventModel";
 
 export class TicketController {
     private ticketService: TicketService;
+    private eventService: EventService;
+    private userService: UserService;
 
-    // TODO: validate ticketid, eventid and userids
     constructor() {
         this.ticketService = new TicketService(TicketModel);
+        this.eventService = new EventService(EventModel);
+        this.userService = new UserService(UserModel);
     }
 
     public getAllTickets = async (
@@ -47,6 +54,12 @@ export class TicketController {
     ): Promise<Response<ITicket[] | []>> => {
         try {
             const { eventId } = req.params;
+            const event = await this.eventService.getEventById(eventId);
+            if (event == null) {
+                return res
+                    .status(404)
+                    .json({ error: "Event does not exists" });
+            }
             const tickets = await this.ticketService.getEventTickets(eventId);
             return res.status(200).json({ tickets });
         } catch (error) {
@@ -60,6 +73,20 @@ export class TicketController {
     ): Promise<Response<ITicket[] | []>> => {
         try {
             const { eventId, userId } = req.params;
+            const event = await this.eventService.getEventById(eventId);
+            const user = await this.userService.getUserById(userId);
+
+            if (event == null) {
+                return res
+                    .status(404)
+                    .json({ error: "Event does not exists" });
+            }
+            if (user == null) {
+                return res
+                    .status(404)
+                    .json({ error: "User does not exists" });
+            }
+
             const tickets = await this.ticketService.getUserEventTicket(
                 userId,
                 eventId,
@@ -122,8 +149,20 @@ export class TicketController {
     ): Promise<Response<ITicket | null>> => {
         try {
             const { ticketId, userId, eventId } = req.params;
-
+            const event = await this.eventService.getEventById(eventId);
+            const user = await this.userService.getUserById(userId);
             const ticket = await this.ticketService.getTicketById(ticketId);
+
+            if (event == null) {
+                return res
+                    .status(404)
+                    .json({ error: "Event does not exists" });
+            }
+            if (user == null) {
+                return res
+                    .status(404)
+                    .json({ error: "User does not exists" });
+            }
             if (ticket == null) {
                 return res
                     .status(404)
@@ -173,12 +212,26 @@ export class TicketController {
         try {
             const { ticketId, userId, eventId } = req.params;
 
+            const event = await this.eventService.getEventById(eventId);
+            const user = await this.userService.getUserById(userId);
             const ticket = await this.ticketService.getTicketById(ticketId);
+
+            if (event == null) {
+                return res
+                    .status(404)
+                    .json({ error: "Event does not exists" });
+            }
+            if (user == null) {
+                return res
+                    .status(404)
+                    .json({ error: "User does not exists" });
+            }
             if (ticket == null) {
                 return res
                     .status(404)
                     .json({ error: "Ticket does not exists" });
             }
+
 
             await this.ticketService.deleteTicketByEventIdAndUserId(
                 eventId,
