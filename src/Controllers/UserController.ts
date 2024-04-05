@@ -171,11 +171,9 @@ export class UserController {
             }
             const userIdObject = new Types.ObjectId(userId);
             if ((req.user as IUser)._id !== userIdObject) {
-                return res
-                    .status(401)
-                    .json({
-                        error: "You can only edit your own user information",
-                    });
+                return res.status(401).json({
+                    error: "You can only edit your own user information",
+                });
             }
 
             const updates: Partial<IUser> = req.body;

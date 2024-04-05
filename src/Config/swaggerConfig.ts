@@ -1,4 +1,3 @@
-import * as path from "path";
 import * as swaggerJsdoc from "swagger-jsdoc";
 import { Config } from "./config";
 

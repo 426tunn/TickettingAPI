@@ -2,7 +2,7 @@ import { IEventTicketType } from "Models/EventTicketTypeModel";
 import { Model } from "mongoose";
 
 export class EventTicketTypeService {
-    constructor(public eventTicketTypeModel: Model<IEventTicketType>) { }
+    constructor(public eventTicketTypeModel: Model<IEventTicketType>) {}
 
     async getAllEventTicketTypes(): Promise<IEventTicketType[] | null> {
         return this.eventTicketTypeModel.find();
@@ -11,17 +11,17 @@ export class EventTicketTypeService {
     async createEventTicketType({
         name,
         price,
-        noOfTickets
+        noOfTickets,
     }: IEventTicketType): Promise<IEventTicketType> {
         return this.eventTicketTypeModel.create({
             name,
             price,
-            noOfTickets
+            noOfTickets,
         });
     }
 
     async getEventTicketTypeById(
-        eventTicketTypeId: string
+        eventTicketTypeId: string,
     ): Promise<IEventTicketType | null> {
         return this.eventTicketTypeModel.findById(eventTicketTypeId);
     }
@@ -32,8 +32,8 @@ export class EventTicketTypeService {
     ): Promise<IEventTicketType | null> {
         return this.eventTicketTypeModel.findByIdAndUpdate(
             eventTicketTypeId,
-            eventTicketTypeUpdate, 
-            { new: true, }
+            eventTicketTypeUpdate,
+            { new: true },
         );
     }
 

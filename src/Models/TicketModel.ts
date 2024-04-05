@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, model, Types } from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 import { IEventTicketType } from "./EventTicketTypeModel";
 import { IUser } from "./UserModel";
 import { IEvent } from "./EventModel";

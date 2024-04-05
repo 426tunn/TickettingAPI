@@ -50,13 +50,9 @@ app.use("/api/v1/users", checkRevokedToken, userRoutes);
 app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/event-venues", eventVenueRouter);
 app.use("/api/v1/tickets", authenticateJWT, ticketRoutes);
-app.use(
-    "/api/v1/ticket-types",
-    authenticateJWT,
-    eventTicketTypeRouter
-);
+app.use("/api/v1/ticket-types", authenticateJWT, eventTicketTypeRouter);
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
     logger.info("WELCOME");
     res.status(200).send({
         message: "Welcome!!",
@@ -66,11 +62,10 @@ app.get("/", (req, res) => {
 app.use(
     (
         err: Error,
-        req: express.Request,
+        _req: express.Request,
         res: express.Response,
         next: express.NextFunction,
     ) => {
-        // console.log(err);
         res.status(500).json({
             error: err.message,
         });

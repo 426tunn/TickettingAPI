@@ -7,7 +7,7 @@ config();
     });
 })();
 
-var getConfig = function () {
+const getConfig = function () {
     return {
         PORT: Number(process.env.PORT || 3010),
         DBURL: String(process.env.DBURL),

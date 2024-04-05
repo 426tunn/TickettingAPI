@@ -56,9 +56,7 @@ export class TicketController {
             const { eventId } = req.params;
             const event = await this.eventService.getEventById(eventId);
             if (event == null) {
-                return res
-                    .status(404)
-                    .json({ error: "Event does not exists" });
+                return res.status(404).json({ error: "Event does not exists" });
             }
             const tickets = await this.ticketService.getEventTickets(eventId);
             return res.status(200).json({ tickets });
@@ -77,14 +75,10 @@ export class TicketController {
             const user = await this.userService.getUserById(userId);
 
             if (event == null) {
-                return res
-                    .status(404)
-                    .json({ error: "Event does not exists" });
+                return res.status(404).json({ error: "Event does not exists" });
             }
             if (user == null) {
-                return res
-                    .status(404)
-                    .json({ error: "User does not exists" });
+                return res.status(404).json({ error: "User does not exists" });
             }
 
             const tickets = await this.ticketService.getUserEventTicket(
@@ -154,14 +148,10 @@ export class TicketController {
             const ticket = await this.ticketService.getTicketById(ticketId);
 
             if (event == null) {
-                return res
-                    .status(404)
-                    .json({ error: "Event does not exists" });
+                return res.status(404).json({ error: "Event does not exists" });
             }
             if (user == null) {
-                return res
-                    .status(404)
-                    .json({ error: "User does not exists" });
+                return res.status(404).json({ error: "User does not exists" });
             }
             if (ticket == null) {
                 return res
@@ -217,21 +207,16 @@ export class TicketController {
             const ticket = await this.ticketService.getTicketById(ticketId);
 
             if (event == null) {
-                return res
-                    .status(404)
-                    .json({ error: "Event does not exists" });
+                return res.status(404).json({ error: "Event does not exists" });
             }
             if (user == null) {
-                return res
-                    .status(404)
-                    .json({ error: "User does not exists" });
+                return res.status(404).json({ error: "User does not exists" });
             }
             if (ticket == null) {
                 return res
                     .status(404)
                     .json({ error: "Ticket does not exists" });
             }
-
 
             await this.ticketService.deleteTicketByEventIdAndUserId(
                 eventId,
