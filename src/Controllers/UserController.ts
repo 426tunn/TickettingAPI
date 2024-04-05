@@ -6,6 +6,7 @@ import { UserRole } from "Enums/UserRole";
 import { generateTokenWithRole, isEmail } from "../Utils/authUtils";
 import { Types } from "mongoose";
 import { revokedTokens } from "../Middlewares/AuthMiddleware";
+import { IAuthenticatedRequest } from "Types/RequestTypes";
 
 export class UserController {
     private userService: UserService;
@@ -102,9 +103,9 @@ export class UserController {
         }
     };
 
-    public getUserById = async (req: Request, res: Response) => {
+    public getUserById = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
         try {
-            const role = (req.user as IUser).role;
+            const role = req.user.role;
             if (role !== "admin") {
                 return res
                     .status(401)
@@ -122,9 +123,9 @@ export class UserController {
         }
     };
 
-    public updateUserRole = async (req: Request, res: Response) => {
+    public updateUserRole = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
         try {
-            const role = (req.user as IUser).role;
+            const role = req.user.role;
             if (role !== "admin") {
                 return res
                     .status(401)
@@ -158,7 +159,7 @@ export class UserController {
         }
     };
 
-    public updateUser = async (req: Request, res: Response) => {
+    public updateUser = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
         try {
             const userId = req.params.userId;
             // let user: IUser;
@@ -170,7 +171,7 @@ export class UserController {
                 return res.status(404).json({ error: "User not found" });
             }
             const userIdObject = new Types.ObjectId(userId);
-            if ((req.user as IUser)._id !== userIdObject) {
+            if (req.user._id !== userIdObject) {
                 return res.status(401).json({
                     error: "You can only edit your own user information",
                 });
@@ -195,9 +196,9 @@ export class UserController {
         }
     };
 
-    public deleteUser = async (req: Request, res: Response) => {
+    public deleteUser = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
         try {
-            const role = (req.user as IUser).role;
+            const role = req.user.role;
             if (role !== "admin") {
                 return res
                     .status(401)

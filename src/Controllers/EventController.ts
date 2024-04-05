@@ -3,6 +3,7 @@ import { EventModel, IEvent } from "../Models/EventModel";
 import { EventService } from "../Services/EventService";
 import { validationResult } from "express-validator";
 import { IUser } from "../Models/UserModel";
+import { IAuthenticatedRequest } from "Types/RequestTypes";
 
 export class EventController {
     private eventService: EventService;
@@ -24,7 +25,7 @@ export class EventController {
     };
 
     public createEvent = async (
-        req: Request,
+        req: IAuthenticatedRequest<IUser>,
         res: Response,
     ): Promise<Response<IEvent>> => {
         try {
@@ -33,7 +34,7 @@ export class EventController {
                 return res.status(400).json({ errors: errors.array() });
             }
 
-            const organizerId = (req.user as IUser)._id;
+            const organizerId = req.user._id;
             const eventData = { ...req.body, organizerId };
 
             const newEvent = await this.eventService.createEvent(eventData);
