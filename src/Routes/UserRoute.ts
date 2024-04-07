@@ -1,13 +1,11 @@
 import { Router } from "express";
 import { UserController } from "../Controllers/UserController";
 import { check } from "express-validator";
-import { authenticateJWT } from '../Middlewares/AuthMiddleware';
-import { checkIfUserIsAdmin } from '../Middlewares/AuthMiddleware';
-
+import { authenticateJWT } from "../Middlewares/AuthMiddleware";
+import { checkIfUserIsAdmin } from "../Middlewares/AuthMiddleware";
 
 const UserRouter = Router();
 const userController = new UserController();
-
 
 UserRouter.post(
     "/register",
@@ -25,23 +23,40 @@ UserRouter.post(
 
 UserRouter.post("/login", userController.loginUser);
 
-UserRouter.get("/logout", userController.logoutUser);
+UserRouter.post("/logout", userController.logoutUser);
+UserRouter.post("/forgot-password", userController.forgotPassword);
+UserRouter.post("/reset-password", userController.resetPassword);
 
-UserRouter.get('/', authenticateJWT, checkIfUserIsAdmin, userController.getAllUsers);
+UserRouter.get(
+    "/",
+    // authenticateJWT,
+    // checkIfUserIsAdmin,
+    userController.getAllUsers,
+);
 
-UserRouter.get('/:userId', authenticateJWT, checkIfUserIsAdmin, userController.getUserById);
+UserRouter.get(
+    "/:userId",
+    authenticateJWT,
+    checkIfUserIsAdmin,
+    userController.getUserById,
+);
 
-UserRouter.patch('/:userId', authenticateJWT, userController.updateUser);
+UserRouter.patch("/:userId", authenticateJWT, userController.updateUser);
 
-UserRouter.patch('/role/:userId',  authenticateJWT,  checkIfUserIsAdmin, userController.updateUserRole);
+UserRouter.patch(
+    "/role/:userId",
+    authenticateJWT,
+    checkIfUserIsAdmin,
+    userController.updateUserRole,
+);
 
-UserRouter.delete('/:userId', authenticateJWT, userController.deleteUser);
+UserRouter.delete("/:userId", 
+// authenticateJWT, 
+userController.deleteUser);
 
 //TODO: Add forgot password and reset password routes
-//TODO: Add refresh token routes
 //TODO: Add email verification
 //TODO: Add email verification routes
-//TODO: Add LOGOUT routes
 
 /**
  * @openapi
@@ -80,7 +95,6 @@ UserRouter.delete('/:userId', authenticateJWT, userController.deleteUser);
  *         description: Internal server error
  */
 
-
 /**
  * @openapi
  * /api/v1/users/login:
@@ -111,7 +125,6 @@ UserRouter.delete('/:userId', authenticateJWT, userController.deleteUser);
  *         description: Internal server error
  */
 
-
 /**
  * @openapi
  * /api/v1/users:
@@ -128,82 +141,82 @@ UserRouter.delete('/:userId', authenticateJWT, userController.deleteUser);
  */
 
 /**
-* @openapi
-*   /api/v1/users/{userId}:
-*    get: 
-*     summary: Get user by id
-*     security: [{ bearerAuth: [] }]     
-*     parameters:
-*       - in: path
-*         name: userId
-*         schema:
-*           type: string
-*         required: true
-*         description: The users id
-*     responses:
-*       200:
-*         description: Successful get user by id
-*       401:
-*         description: Unauthorized
-*       404:
-*         description: User not found
-*       500:
-*         description: Internal server error
-*/
+ * @openapi
+ *   /api/v1/users/{userId}:
+ *    get:
+ *     summary: Get user by id
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The users id
+ *     responses:
+ *       200:
+ *         description: Successful get user by id
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
 
 /**
-* @openapi
-*   /api/v1/users/{userId}:
-*    patch: 
-*     summary: Update user by id
-*     security: [{ bearerAuth: [] }]  
-*     parameters:
-*       - in: path
-*         name: userId
-*         schema:
-*           type: string
-*         required: true
-*         description: The users id
-*     requestBody:
-*       required: true
-*       content:
-*         application/json:
-*           schema:
-*             type: object
-*             properties:
-*               username:
-*                 type: string
-*               firstname:
-*                 type: string
-*               lastname:
-*                 type: string
-*               email:
-*                 type: string
-*                 format: email
-*               role:
-*                 type: string
-*                 enum: [admin, user]
-*             example:
-*               username: testUser
-*               firstname: John
-*               lastname: Doe
-*               email: test@example.com
-*               role: user
-*     responses:
-*       200:
-*         description: Successful update user by id
-*       401:
-*         description: Unauthorized
-*       404:
-*         description: User not found
-*       500:
-*         description: Internal server error
-*/
+ * @openapi
+ *   /api/v1/users/{userId}:
+ *    patch:
+ *     summary: Update user by id
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The users id
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               firstname:
+ *                 type: string
+ *               lastname:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               role:
+ *                 type: string
+ *                 enum: [admin, user]
+ *             example:
+ *               username: testUser
+ *               firstname: John
+ *               lastname: Doe
+ *               email: test@example.com
+ *               role: user
+ *     responses:
+ *       200:
+ *         description: Successful update user by id
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
 
 /**
- * @openapi  
+ * @openapi
  *   /api/v1/users/role/{userId}:
- *    put: 
+ *    put:
  *     summary: Update user role by id
  *     parameters:
  *       - in: path
@@ -238,7 +251,7 @@ UserRouter.delete('/:userId', authenticateJWT, userController.deleteUser);
 /**
  * @openapi
  *   /api/v1/users/{userId}:
- *    delete: 
+ *    delete:
  *     summary: Delete user by id
  *     parameters:
  *       - in: path
@@ -257,5 +270,5 @@ UserRouter.delete('/:userId', authenticateJWT, userController.deleteUser);
  *       500:
  *         description: Internal server error
  *
-*/
+ */
 export default UserRouter;

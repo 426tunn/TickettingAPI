@@ -1,6 +1,6 @@
-import {  Model } from 'mongoose';
-import { IUser } from '../Models/UserModel';
-import { UserRole } from 'Enums/UserRole';
+import { Model } from "mongoose";
+import { IUser } from "../Models/UserModel";
+import { UserRole } from "Enums/UserRole";
 
 export class UserService {
     private userModel: Model<IUser>;
@@ -38,15 +38,18 @@ export class UserService {
         return await this.userModel.findOne({ email }).exec();
     }
 
-  async getUserByUsername(username: string): Promise<IUser | null> {
-    return await this.userModel.findOne({ username }).exec();
-  }
+    async getUserByUsername(username: string): Promise<IUser | null> {
+        return await this.userModel.findOne({ username }).exec();
+    }
 
-
-  async updateUserRole(userId: string, role: UserRole): Promise<IUser | null> {
-    return await this.userModel.findByIdAndUpdate(userId, { role }, { new: true }).exec();
-  }
-
+    async updateUserRole(
+        userId: string,
+        role: UserRole,
+    ): Promise<IUser | null> {
+        return await this.userModel
+            .findByIdAndUpdate(userId, { role }, { new: true })
+            .exec();
+    }
 
     async updateUser(
         userId: string,
@@ -63,5 +66,9 @@ export class UserService {
 
     async deleteUser(userId: string): Promise<IUser | null> {
         return await this.userModel.findByIdAndDelete(userId).exec();
+    }
+
+    async getUserByResetToken(resetToken: string): Promise<IUser | null> {
+        return this.userModel.findOne({ resetPasswordToken: resetToken });
     }
 }
