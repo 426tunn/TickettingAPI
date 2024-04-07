@@ -1,4 +1,4 @@
-import { IEvent } from "Models/EventModel";
+import { IEvent } from "../Models/EventModel";
 import { Model } from "mongoose";
 
 export class EventService {
@@ -21,7 +21,6 @@ export class EventService {
         startDate,
         endDate,
         bannerImageUrl,
-        totalTickets,
     }: IEvent): Promise<IEvent> {
         return this.eventModel.create({
             name,
@@ -36,7 +35,6 @@ export class EventService {
             startDate,
             endDate,
             bannerImageUrl,
-            totalTickets,
         });
     }
 

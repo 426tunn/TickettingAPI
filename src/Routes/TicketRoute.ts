@@ -1,4 +1,3 @@
-// TODO: make naming convention for req body same as model attributes for all routes
 import router, { Router } from "express";
 import { TicketController } from "../Controllers/TicketController";
 import { body } from "express-validator";

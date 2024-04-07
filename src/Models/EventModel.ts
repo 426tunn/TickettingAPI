@@ -20,7 +20,6 @@ interface IEvent extends Document {
     startDate: Date;
     endDate: Date;
     bannerImageUrl?: string | null;
-    totalTickets: number;
 }
 
 const eventSchema = new Schema<IEvent>(
@@ -84,10 +83,6 @@ const eventSchema = new Schema<IEvent>(
         },
         bannerImageUrl: {
             type: String,
-        },
-        totalTickets: {
-            type: Number,
-            required: true,
         },
     },
     { timestamps: true },

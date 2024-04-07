@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserService } from "../Services/UserService";
-import { IUser, UserModel, hashPassword } from "../Models/UserModel";
+import { IUser, UserModel } from "../Models/UserModel";
 import { validationResult } from "express-validator";
 import { UserRole } from "Enums/UserRole";
 import { generateTokenWithRole, isEmail } from "../Utils/authUtils";
@@ -8,7 +8,7 @@ import { Types } from "mongoose";
 import { revokedTokens } from "../Middlewares/AuthMiddleware";
 import * as crypto from 'crypto';
 import { sendPasswordResetEmail } from "../Utils/emailUtils";
-
+import { IAuthenticatedRequest } from "Types/RequestTypes";
 
 export class UserController {
     private userService: UserService;
@@ -109,7 +109,7 @@ export class UserController {
         }
     };
 
-    public getUserById = async (req: Request, res: Response) => {
+    public getUserById = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
         try {
             const role = (req.user as IUser).role;
             if (role !== "admin") {
@@ -169,7 +169,7 @@ export class UserController {
         }
     };
 
-    public updateUser = async (req: Request, res: Response) => {
+    public updateUser = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
         try {
             const userId = req.params.userId;
             // let user: IUser;
@@ -189,6 +189,7 @@ export class UserController {
                     });
             }
 
+            const updates: Partial<IUser> = req.body;
             const updates: Partial<IUser> = req.body;
             if (Object.keys(updates).length === 0) {
                 return res.status(400).json({ error: "No updates provided" });
@@ -266,7 +267,7 @@ export class UserController {
         }
     }
 
-    public deleteUser = async (req: Request, res: Response) => {
+    public deleteUser = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
         try {
             const userId = req.params.userId;
             if (!userId) {
