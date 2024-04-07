@@ -32,6 +32,7 @@ export function checkIfUserIsAdmin(
             .status(401)
             .json({ message: "Unauthorized: You need to be logged in" });
     }
+
     if (
         req.user?.role !== "admin" &&
         req.user?.role !== "superadmin"
