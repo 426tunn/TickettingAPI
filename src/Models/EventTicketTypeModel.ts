@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document} from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 import { TicketTypes } from "Enums/TicketTypes";
 
 interface IEventTicketType extends Document {

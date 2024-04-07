@@ -13,8 +13,9 @@ ticketRouter.post(
     "/",
     authenticateJWT,
     [
-        body("eventTicketTypeId").notEmpty().withMessage(
-            "Event Ticket Type is required"),
+        body("eventTicketTypeId")
+            .notEmpty()
+            .withMessage("Event Ticket Type is required"),
         body("userId").notEmpty().withMessage("User is required"),
         body("eventId").notEmpty().withMessage("Event is required"),
     ],
@@ -26,22 +27,22 @@ ticketRouter.get("/:ticketId", ticketController.getTicketById);
 ticketRouter.get("/events/:eventId", ticketController.getEventTickets);
 
 ticketRouter.get(
-    "/events/:eventId/users/:userId", ticketController.getUserEventTicket
+    "/events/:eventId/users/:userId",
+    ticketController.getUserEventTicket,
 );
 
 ticketRouter.patch("/:ticketId", ticketController.updateTicketById);
 
 ticketRouter.patch(
     "/:ticketId/events/:eventId/users/:userId",
-    ticketController.updateTicketByEventIdAndUserId
+    ticketController.updateTicketByEventIdAndUserId,
 );
 
 ticketRouter.delete("/:ticketId", ticketController.deleteTicketById);
 
 ticketRouter.delete(
     "/:ticketId/events/:eventId/users/:userId",
-    ticketController.deleteTicketByEventIdAndUserId
+    ticketController.deleteTicketByEventIdAndUserId,
 );
-
 
 export default ticketRouter;

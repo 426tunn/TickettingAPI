@@ -1,30 +1,29 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { UserService } from "../Services/UserService";
-import { Strategy as JWTStrategy, ExtractJwt } from 'passport-jwt';
+import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
 import { IUser, UserModel } from "../Models/UserModel";
 import bcrypt from "bcrypt";
 import { Config } from "./config";
 
-const userService = new UserService( UserModel);
+const userService = new UserService(UserModel);
 const JWT_SECRET = Config.JWTSecret;
 
 passport.use(
-    'jwt',
+    "jwt",
     new JWTStrategy(
         {
             secretOrKey: JWT_SECRET,
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
         },
-        async (payload, done)=> {
+        async (payload, done) => {
             try {
-            return done(null, payload.user); //it does 'req.user = payload.user
-        } catch(error){
-            done(error);
-        }
-        }
-       
-    )
+                return done(null, payload.user); //it does 'req.user = payload.user
+            } catch (error) {
+                done(error);
+            }
+        },
+    ),
 );
 
 passport.use(
@@ -88,8 +87,6 @@ passport.use(
     ),
 );
 
-
-
 passport.serializeUser((user: IUser, done) => {
     done(null, user._id);
 });
@@ -102,4 +99,3 @@ passport.deserializeUser(async (userId: string, done) => {
         done(error);
     }
 });
-

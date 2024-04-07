@@ -2,14 +2,18 @@ import router, { Router } from "express";
 import { EventVenueController } from "../Controllers/EventVenueController";
 import { body } from "express-validator";
 import {
-    authenticateJWT, checkIfUserIsAdmin 
+    authenticateJWT,
+    checkIfUserIsAdmin,
 } from "../Middlewares/AuthMiddleware";
 
 const eventVenueRouter: Router = router();
 const eventVenueController = new EventVenueController();
 
 eventVenueRouter.get(
-    "/", authenticateJWT, checkIfUserIsAdmin, eventVenueController.getAllEventVenues
+    "/",
+    authenticateJWT,
+    checkIfUserIsAdmin,
+    eventVenueController.getAllEventVenues,
 );
 eventVenueRouter.post(
     "/",
@@ -23,7 +27,13 @@ eventVenueRouter.post(
     eventVenueController.createEventVenue,
 );
 eventVenueRouter.get("/:eventVenueId", eventVenueController.getEventVenueById);
-eventVenueRouter.patch("/:eventVenueId", eventVenueController.updateEventVenueById);
-eventVenueRouter.delete("/:eventVenueId", eventVenueController.deleteEventVenueById);
+eventVenueRouter.patch(
+    "/:eventVenueId",
+    eventVenueController.updateEventVenueById,
+);
+eventVenueRouter.delete(
+    "/:eventVenueId",
+    eventVenueController.deleteEventVenueById,
+);
 
 export default eventVenueRouter;

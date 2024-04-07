@@ -2,7 +2,9 @@ import router, { Router } from "express";
 import { EventController } from "../Controllers/EventController";
 import { body } from "express-validator";
 import {
-    authenticateJWT, checkIfUserIsAdmin, checkRevokedToken 
+    authenticateJWT,
+    checkIfUserIsAdmin,
+    checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
 
 const eventRouter: Router = router();
@@ -42,10 +44,18 @@ eventRouter.post(
 );
 eventRouter.get("/:eventId", eventController.getEventById);
 eventRouter.patch(
-    "/:eventId", authenticateJWT, checkIfUserIsAdmin, checkRevokedToken, eventController.updateEventById
+    "/:eventId",
+    authenticateJWT,
+    checkIfUserIsAdmin,
+    checkRevokedToken,
+    eventController.updateEventById,
 );
 eventRouter.delete(
-    "/:eventId", authenticateJWT, checkIfUserIsAdmin, checkRevokedToken, eventController.deleteEventById
+    "/:eventId",
+    authenticateJWT,
+    checkIfUserIsAdmin,
+    checkRevokedToken,
+    eventController.deleteEventById,
 );
 
 export default eventRouter;
