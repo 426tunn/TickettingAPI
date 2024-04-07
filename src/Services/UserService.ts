@@ -67,4 +67,8 @@ export class UserService {
     async deleteUser(userId: string): Promise<IUser | null> {
         return await this.userModel.findByIdAndDelete(userId).exec();
     }
+
+    async getUserByResetToken(resetToken: string): Promise<IUser | null> {
+        return this.userModel.findOne({ resetPasswordToken: resetToken });
+    }
 }

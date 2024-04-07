@@ -1,12 +1,15 @@
 import { Request, Response } from "express";
 import { UserService } from "../Services/UserService";
-import { IUser, UserModel } from "../Models/UserModel";
+import { IUser, UserModel, hashPassword } from "../Models/UserModel";
 import { validationResult } from "express-validator";
 import { UserRole } from "Enums/UserRole";
 import { generateTokenWithRole, isEmail } from "../Utils/authUtils";
 import { Types } from "mongoose";
 import { revokedTokens } from "../Middlewares/AuthMiddleware";
 import { IAuthenticatedRequest } from "Types/RequestTypes";
+import * as crypto from 'crypto';
+import { sendPasswordResetEmail } from "../Utils/emailUtils";
+
 
 export class UserController {
     private userService: UserService;
@@ -65,13 +68,17 @@ export class UserController {
             if (!user) {
                 return res
                     .status(401)
-                    .json({ error: "Invalid email or password" });
+                    .json({ error: "Invalid email or username" });
             }
+            console.log('User found:', user);
+            console.log('Plain-text password:', password);
             const isPasswordValid = await user.isValidPassword(password);
+            console.log('isPasswordValid:', isPasswordValid);
+            console.log('Stored hashed password:', user.password);
             if (!isPasswordValid) {
                 return res
                     .status(401)
-                    .json({ error: "Invalid email or password" });
+                    .json({ error: "Invalid password" });
             }
             const role = user.role;
             const token = generateTokenWithRole(res, user, role);
@@ -134,7 +141,11 @@ export class UserController {
 
             const userId = req.params.userId;
             const roleToUpdate = req.body.role as UserRole;
-            if (roleToUpdate !== "admin" && roleToUpdate !== "user") {
+            if (
+                roleToUpdate !== "admin" &&
+                roleToUpdate !== "user" &&
+                roleToUpdate !== "superadmin"
+            ) {
                 return res.status(400).json({ error: "Invalid role" });
             }
             if (!userId) {
@@ -196,14 +207,67 @@ export class UserController {
         }
     };
 
+    public forgotPassword = async (req: Request, res: Response) => {
+        try {
+            const { email } = req.body;
+            const user = await this.userService.getUserByEmail(email);
+            if (!user) {
+                return res.status(404).json({ error: "User not found forgot" });
+            }
+            const originalResetToken = crypto.randomBytes(32).toString("hex");
+            user.resetPasswordToken = crypto
+                .createHash("sha256")
+                .update(originalResetToken)
+                .digest("hex");
+            console.log("token sent: ", user.resetPasswordToken);
+            user.resetPasswordExpire = new Date(Date.now() + 600000);
+            await user.save();
+            await sendPasswordResetEmail(email, originalResetToken);
+            res.status(200).json({ message: "Password reset token sent to email" });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    public resetPassword = async (req: Request, res: Response) => {
+        try {
+            const { resetToken } = req.body;
+            const { NewPassword } = req.body;
+            if (!resetToken) {
+                return res.status(400).json({ error: "Reset token is required" });
+            }
+            const resetPasswordToken = crypto
+                .createHash("sha256")
+                .update(resetToken)
+                .digest("hex");
+            const user = await this.userService.getUserByResetToken(resetPasswordToken);
+            if (!user) {
+                return res.status(404).json({ error: "User not found reset" });
+            }
+
+            if (new Date() > user.resetPasswordExpire!) {
+                return res.status(400).json({ error: "Reset token has expired" });
+            }
+
+            console.log("raw password to be saved: ", NewPassword);
+            const hashedPassword = await hashPassword(NewPassword);
+            console.log("hashed password to be saved", hashedPassword);
+            console.log("previous password: ", user.password);
+            user.password = hashedPassword;
+            //when i set user.password = hashedPassword, the value changed
+            console.log("new password: ", user.password);
+            user.resetPasswordToken = null;
+            user.resetPasswordExpire = null;
+            await user.save();
+            res.status(200).json({ message: "Password reset successful" });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+
     public deleteUser = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
         try {
-            const role = req.user.role;
-            if (role !== "admin") {
-                return res
-                    .status(401)
-                    .json({ error: "Only Admin can access this route" });
-            }
             const userId = req.params.userId;
             if (!userId) {
                 return res.status(400).json({ error: "User ID is required" });

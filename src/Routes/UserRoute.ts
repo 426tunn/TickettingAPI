@@ -23,7 +23,9 @@ UserRouter.post(
 
 UserRouter.post("/login", userController.loginUser);
 
-UserRouter.get("/logout", userController.logoutUser);
+UserRouter.post("/logout", userController.logoutUser);
+UserRouter.post("/forgot-password", userController.forgotPassword);
+UserRouter.post("/reset-password", userController.resetPassword);
 
 UserRouter.get(
     "/",
@@ -51,10 +53,8 @@ UserRouter.patch(
 UserRouter.delete("/:userId", authenticateJWT, userController.deleteUser);
 
 //TODO: Add forgot password and reset password routes
-//TODO: Add refresh token routes
 //TODO: Add email verification
 //TODO: Add email verification routes
-//TODO: Add LOGOUT routes
 
 /**
  * @openapi
