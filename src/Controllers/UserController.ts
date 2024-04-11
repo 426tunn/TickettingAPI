@@ -181,8 +181,8 @@ export class UserController {
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
             }
-            const userIdObject = new Types.ObjectId(userId);
-            if ((req.user as IUser)._id !== userIdObject) {
+
+            if (req.user._id.toString() !== userId) {
                 return res
                     .status(401)
                     .json({
