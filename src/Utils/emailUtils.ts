@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { Config } from "../Config/config";
+import { logger } from "../logging/logger";
 
 const transporter = nodemailer.createTransport({
     service: "googlemail.com",
@@ -11,11 +12,11 @@ const transporter = nodemailer.createTransport({
 
 export const sendPasswordResetEmail = async (email: string, resetToken: string) => {
     try {
-    const mailOptions = {
-        from: Config.EMAIL,
-        to: email,
-        subject: "Password Reset",
-        text: `You are receiving this email because you (or someone else) has requested a password reset for your account.
+        const mailOptions = {
+            from: Config.EMAIL,
+            to: email,
+            subject: "Password Reset",
+            text: `You are receiving this email because you (or someone else) has requested a password reset for your account.
 
         Please click the following link, or paste it into your browser to complete the process:
         
@@ -23,13 +24,13 @@ export const sendPasswordResetEmail = async (email: string, resetToken: string) 
         reset: ${resetToken}
         
         If you did not request this, please ignore this email and your password will remain unchanged.`,
-    };
+        };
 
 
         await transporter.sendMail(mailOptions);
-     console.log('Email sent successfully');
+        logger.info('Email sent successfully');
     } catch (error) {
         console.error('Error sending email:', error);
-        throw new Error('Error sending password reset email')        
+        throw new Error('Error sending password reset email')
     }
 };
