@@ -101,7 +101,7 @@ export class UserController {
         }
     };
 
-    public getAllUsers = async (req: Request, res: Response) => {
+    public getAllUsers = async (_req: Request, res: Response) => {
         try {
             const users = await this.userService.getAllUsers();
             res.status(200).json({ users });
@@ -112,7 +112,7 @@ export class UserController {
 
     public getUserById = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
         try {
-            const role = req.user.role;
+            const role = (req.user as IUser).role;
             if (role !== "admin") {
                 return res
                     .status(401)
@@ -130,9 +130,9 @@ export class UserController {
         }
     };
 
-    public updateUserRole = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
+    public updateUserRole = async (req: Request, res: Response) => {
         try {
-            const role = req.user.role;
+            const role = (req.user as IUser).role;
             if (role !== "admin") {
                 return res
                     .status(401)
@@ -182,10 +182,12 @@ export class UserController {
                 return res.status(404).json({ error: "User not found" });
             }
             const userIdObject = new Types.ObjectId(userId);
-            if (req.user._id !== userIdObject) {
-                return res.status(401).json({
-                    error: "You can only edit your own user information",
-                });
+            if ((req.user as IUser)._id !== userIdObject) {
+                return res
+                    .status(401)
+                    .json({
+                        error: "You can only edit your own user information",
+                    });
             }
 
             const updates: Partial<IUser> = req.body;
@@ -264,7 +266,6 @@ export class UserController {
             res.status(500).json({ error: error.message });
         }
     }
-
 
     public deleteUser = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
         try {
