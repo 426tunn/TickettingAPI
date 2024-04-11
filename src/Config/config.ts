@@ -15,7 +15,7 @@ const getConfig = function () {
         SESSION_SECRET: String(process.env.SESSION_SECRET),
         HOST_URL: String(process.env.HOST_URL),
         EMAIL: String(process.env.EMAIL),
-        EMAIL_PASSWORD: String(process.env.EMAIL_PASSWORD)
+        EMAIL_PASSWORD: String(process.env.EMAIL_PASSWORD),
     };
 };
 

@@ -10,7 +10,10 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export const sendPasswordResetEmail = async (email: string, resetToken: string) => {
+export const sendPasswordResetEmail = async (
+    email: string,
+    resetToken: string,
+) => {
     try {
         const mailOptions = {
             from: Config.EMAIL,
@@ -26,11 +29,10 @@ export const sendPasswordResetEmail = async (email: string, resetToken: string) 
         If you did not request this, please ignore this email and your password will remain unchanged.`,
         };
 
-
         await transporter.sendMail(mailOptions);
-        logger.info('Email sent successfully');
+        logger.info("Email sent successfully");
     } catch (error) {
-        console.error('Error sending email:', error);
-        throw new Error('Error sending password reset email')
+        console.error("Error sending email:", error);
+        throw new Error("Error sending password reset email");
     }
 };
