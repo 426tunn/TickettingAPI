@@ -190,7 +190,6 @@ export class UserController {
             }
 
             const updates: Partial<IUser> = req.body;
-            const updates: Partial<IUser> = req.body;
             if (Object.keys(updates).length === 0) {
                 return res.status(400).json({ error: "No updates provided" });
             }
@@ -250,12 +249,7 @@ export class UserController {
             if (new Date() > user.resetPasswordExpire!) {
                 return res.status(400).json({ error: "Reset token has expired" });
               }
-             
-            console.log("raw password to be saved: ", NewPassword);
-            const hashedPassword = await hashPassword(NewPassword);
-            console.log("hashed password to be saved",hashedPassword);
-            console.log("previous password: ",user.password);
-            user.password = hashedPassword;
+            user.password = NewPassword;
             //when i set user.password = hashedPassword, the value changed
             console.log("new password: ",user.password);
             user.resetPasswordToken = null;
