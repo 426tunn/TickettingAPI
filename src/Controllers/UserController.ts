@@ -70,11 +70,7 @@ export class UserController {
                     .status(401)
                     .json({ error: "Invalid email or username" });
             }
-            console.log('User found:', user);
-            console.log('Plain-text password:', password);
             const isPasswordValid = await user.isValidPassword(password);
-            console.log('isPasswordValid:', isPasswordValid);
-            console.log('Stored hashed password:', user.password);
             if (!isPasswordValid) {
                 return res
                     .status(401)
@@ -216,13 +212,14 @@ export class UserController {
             if (!user) {
                 return res.status(404).json({ error: "User not found forgot" });
             }
+
             const originalResetToken = crypto.randomBytes(32).toString("hex");
             user.resetPasswordToken = crypto
                 .createHash("sha256")
                 .update(originalResetToken)
                 .digest("hex");
-            console.log("token sent: ", user.resetPasswordToken);
             user.resetPasswordExpire = new Date(Date.now() + 600000);
+
             await user.save();
             await sendPasswordResetEmail(email, originalResetToken);
             res.status(200).json({ message: "Password reset token sent to email" });
@@ -234,7 +231,7 @@ export class UserController {
     public resetPassword = async (req: Request, res: Response) => {
         try {
             const { resetToken } = req.body;
-            const { NewPassword } = req.body;
+            const { password } = req.body;
             if (!resetToken) {
                 return res.status(400).json({ error: "Reset token is required" });
             }
@@ -244,23 +241,19 @@ export class UserController {
                 .digest("hex");
             const user = await this.userService.getUserByResetToken(resetPasswordToken);
             if (!user) {
-                return res.status(404).json({ error: "User not found reset" });
+                return res.status(404).json({ error: "User not found or reset token has expired" });
             }
 
             if (new Date() > user.resetPasswordExpire!) {
                 return res.status(400).json({ error: "Reset token has expired" });
             }
 
-            console.log("raw password to be saved: ", NewPassword);
-            const hashedPassword = await hashPassword(NewPassword);
-            console.log("hashed password to be saved", hashedPassword);
-            console.log("previous password: ", user.password);
-            user.password = hashedPassword;
-            //when i set user.password = hashedPassword, the value changed
-            console.log("new password: ", user.password);
+            user.password = password;
+
             user.resetPasswordToken = null;
             user.resetPasswordExpire = null;
             await user.save();
+
             res.status(200).json({ message: "Password reset successful" });
         } catch (error) {
             res.status(500).json({ error: error.message });
