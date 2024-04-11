@@ -12,7 +12,7 @@ interface IUser extends Document {
     isAdmin: boolean;
     role: UserRole;
     resetPasswordToken?: string;
-    resetPasswordExpire?: Date; 
+    resetPasswordExpire?: Date;
     isValidPassword(password: string): Promise<boolean>;
 }
 
@@ -45,13 +45,13 @@ const userSchema = new Schema<IUser>({
         default: UserRole.User,
     },
     resetPasswordToken: String,
-    resetPasswordExpire: Date,    
+    resetPasswordExpire: Date,
 });
 
 export const hashPassword = async (password: string) => {
     const hash = await bcrypt.hash(password, 10);
     return hash;
-  };
+};
 
 userSchema.pre<IUser>("save", async function (next) {
     this.password = await hashPassword(this.password);
@@ -59,8 +59,6 @@ userSchema.pre<IUser>("save", async function (next) {
 });
 
 userSchema.methods.isValidPassword = async function (password: string) {
-    console.log('Password from input:', password);
-    console.log('Stored password:', this.password);
     const compare = await bcrypt.compare(password, this.password);
     return compare;
 };

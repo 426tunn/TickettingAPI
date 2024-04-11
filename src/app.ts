@@ -1,4 +1,3 @@
-// TODO: create types for variables, functions, parameters etc in one place
 import { Config } from "./Config/config";
 import { connectToDB } from "./database";
 import app from "./index";

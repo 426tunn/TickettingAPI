@@ -4,11 +4,10 @@ import { IUser, UserModel } from "../Models/UserModel";
 import { validationResult } from "express-validator";
 import { UserRole } from "Enums/UserRole";
 import { generateTokenWithRole, isEmail } from "../Utils/authUtils";
-import { Types } from "mongoose";
 import { revokedTokens } from "../Middlewares/AuthMiddleware";
-import * as crypto from 'crypto';
-import { sendPasswordResetEmail } from "../Utils/emailUtils";
 import { IAuthenticatedRequest } from "Types/RequestTypes";
+import * as crypto from "crypto";
+import { sendPasswordResetEmail } from "../Utils/emailUtils";
 
 export class UserController {
     private userService: UserService;
@@ -69,15 +68,9 @@ export class UserController {
                     .status(401)
                     .json({ error: "Invalid email or username" });
             }
-            console.log('User found:', user);
-             console.log('Plain-text password:', password);
             const isPasswordValid = await user.isValidPassword(password);
-            console.log('isPasswordValid:', isPasswordValid);
-            console.log('Stored hashed password:', user.password);
             if (!isPasswordValid) {
-                return res
-                    .status(401)
-                    .json({ error: "Invalid password" });
+                return res.status(401).json({ error: "Invalid password" });
             }
             const role = user.role;
             const token = generateTokenWithRole(res, user, role);
@@ -100,7 +93,7 @@ export class UserController {
         }
     };
 
-    public getAllUsers = async (req: Request, res: Response) => {
+    public getAllUsers = async (_req: Request, res: Response) => {
         try {
             const users = await this.userService.getAllUsers();
             res.status(200).json({ users });
@@ -109,7 +102,10 @@ export class UserController {
         }
     };
 
-    public getUserById = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
+    public getUserById = async (
+        req: IAuthenticatedRequest<IUser>,
+        res: Response,
+    ) => {
         try {
             const role = (req.user as IUser).role;
             if (role !== "admin") {
@@ -169,7 +165,10 @@ export class UserController {
         }
     };
 
-    public updateUser = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
+    public updateUser = async (
+        req: IAuthenticatedRequest<IUser>,
+        res: Response,
+    ) => {
         try {
             const userId = req.params.userId;
             // let user: IUser;
@@ -180,13 +179,11 @@ export class UserController {
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
             }
-            const userIdObject = new Types.ObjectId(userId);
-            if ((req.user as IUser)._id !== userIdObject) {
-                return res
-                    .status(401)
-                    .json({
-                        error: "You can only edit your own user information",
-                    });
+
+            if (req.user._id.toString() !== userId) {
+                return res.status(401).json({
+                    error: "You can only edit your own user information",
+                });
             }
 
             const updates: Partial<IUser> = req.body;
@@ -215,53 +212,69 @@ export class UserController {
             if (!user) {
                 return res.status(404).json({ error: "User not found forgot" });
             }
+
             const originalResetToken = crypto.randomBytes(32).toString("hex");
             user.resetPasswordToken = crypto
-            .createHash("sha256")
-            .update(originalResetToken)
-            .digest("hex");      
-            console.log("token sent: ", user.resetPasswordToken);           
+                .createHash("sha256")
+                .update(originalResetToken)
+                .digest("hex");
             user.resetPasswordExpire = new Date(Date.now() + 600000);
+
             await user.save();
-            await sendPasswordResetEmail(email, originalResetToken);  
-            res.status(200).json({ message: "Password reset token sent to email" });          
+            await sendPasswordResetEmail(email, originalResetToken);
+            res.status(200).json({
+                message: "Password reset token sent to email",
+            });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-    }
+    };
 
     public resetPassword = async (req: Request, res: Response) => {
         try {
             const { resetToken } = req.body;
-            const { NewPassword } = req.body; 
+            const { password } = req.body;
             if (!resetToken) {
-                return res.status(400).json({ error: "Reset token is required" });
-              } 
+                return res
+                    .status(400)
+                    .json({ error: "Reset token is required" });
+            }
             const resetPasswordToken = crypto
-            .createHash("sha256")
-            .update(resetToken)
-            .digest("hex");
-            const user = await this.userService.getUserByResetToken(resetPasswordToken);
+                .createHash("sha256")
+                .update(resetToken)
+                .digest("hex");
+            const user =
+                await this.userService.getUserByResetToken(resetPasswordToken);
             if (!user) {
-                return res.status(404).json({ error: "User not found reset" });
+                return res
+                    .status(404)
+                    .json({
+                        error: "User not found or reset token has expired",
+                    });
             }
 
             if (new Date() > user.resetPasswordExpire!) {
-                return res.status(400).json({ error: "Reset token has expired" });
-              }
-            user.password = NewPassword;
-            //when i set user.password = hashedPassword, the value changed
-            console.log("new password: ",user.password);
+                return res
+                    .status(400)
+                    .json({ error: "Reset token has expired" });
+            }
+
+            user.password = password;
+
             user.resetPasswordToken = null;
             user.resetPasswordExpire = null;
             await user.save();
+
             res.status(200).json({ message: "Password reset successful" });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-    }
+    };
 
-    public deleteUser = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
+    public deleteUser = async (
+        req: IAuthenticatedRequest<IUser>,
+        res: Response,
+    ) => {
         try {
             const userId = req.params.userId;
             if (!userId) {

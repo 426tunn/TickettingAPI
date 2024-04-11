@@ -50,9 +50,11 @@ UserRouter.patch(
     userController.updateUserRole,
 );
 
-UserRouter.delete("/:userId", 
-// authenticateJWT, 
-userController.deleteUser);
+UserRouter.delete(
+    "/:userId",
+    // authenticateJWT,
+    userController.deleteUser,
+);
 
 //TODO: Add forgot password and reset password routes
 //TODO: Add email verification

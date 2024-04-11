@@ -32,10 +32,8 @@ export function checkIfUserIsAdmin(
             .status(401)
             .json({ message: "Unauthorized: You need to be logged in" });
     }
-    if (
-        req.user?.role !== "admin" &&
-        req.user?.role !== "superadmin"
-    ) {
+
+    if (req.user?.role !== "admin" && req.user?.role !== "superadmin") {
         return res
             .status(403)
             .json({ message: "Forbidden: User is not an admin" });
@@ -74,4 +72,5 @@ export const checkRevokedToken = (
             .status(401)
             .json({ error: "Token is revoked: you need to login" });
     }
+    next();
 };
