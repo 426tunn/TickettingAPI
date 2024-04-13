@@ -82,6 +82,27 @@ export class UserController {
         }
     }
 
+    public reverifyUser = async (req: Request, res: Response) => {
+        const { email } = req.body;
+        if (!isEmail(email)) {
+            return res.status(400).json({ error: "Invalid email" });
+        }
+        try {
+            const user = await this.userService.getUserByEmail(email);
+            if (!user) {
+                return res.status(404).json({ error: "User not found" });
+            }
+            if (user.isVerified) {
+                return res.status(400).json({ error: "User already verified" });
+            }
+            await sendVerificationEmail(email, user.verificationToken);
+            user.verificationExpire = new Date(Date.now() + 600000);
+            res.status(200).json({ message: "Verification email sent" });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
     public loginUser = async (req: Request, res: Response) => {
         try {
             const { usernameOrEmail, password } = req.body;
