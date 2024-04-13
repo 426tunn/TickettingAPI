@@ -45,9 +45,8 @@ export const sendVerificationEmail = async (email: string, verificationToken: st
             subject: "Account Verification",
             text: `You are receiving this email because you (or someone else) has requested to verify your account.
             Please click the following link, or paste it into your browser to complete the process:
-        
-        http://${Config.HOST_URL}/users/verify-email?token=${verificationToken}
-        verification: ${verificationToken}`,
+            http://${Config.HOST_URL}/users/verify-email?token=${verificationToken}
+             verification: ${verificationToken}`,
         };
 
         await transporter.sendMail(mailOptions);

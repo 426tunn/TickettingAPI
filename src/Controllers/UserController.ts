@@ -57,7 +57,6 @@ export class UserController {
             );
             await sendVerificationEmail(email, Token);
             user.verificationExpire = new Date(Date.now() + 600000);
-            user.save();
             res.status(201).json({ message: "Signup Successful", user });
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -65,18 +64,18 @@ export class UserController {
     };
 
     public verifyUser = async (req: Request, res: Response) => {
-        const { token } = req.params;
+        const { token } = req.query;
         try {
             const verificationToken = crypto
             .createHash("sha256")
-            .update(token)
+            .update(token as string)
             .digest("hex");
             const user = await this.userService.getUserByVerificationToken(verificationToken);
             if (!user) {
                 return res.status(404).json({ error: "User not found or token expired" });
             }
             await this.userService.verifyUser(user._id.toString());
-            res.status(200).json({ message: "User verified", user });
+            res.status(200).json({ message: "User verified"});
         } catch (error) {
             logger.error('Error verifying user:', error);
             res.status(500).json({ error: error.message });

@@ -75,7 +75,7 @@ export class UserService {
     }
 
     async getUserByVerificationToken(verificationToken: string): Promise<IUser | null> {
-        return await this.userModel.findOne({ verifiedToken: verificationToken });
+        return await this.userModel.findOne({ verificationToken: verificationToken });
     }
 
     async verifyUser(
