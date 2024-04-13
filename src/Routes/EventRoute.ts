@@ -4,6 +4,7 @@ import { body } from "express-validator";
 import {
     authenticateJWT,
     checkIfUserIsAdmin,
+    checkIfUserIsSuperAdmin,
     checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
 
@@ -50,7 +51,7 @@ eventRouter.patch(
 eventRouter.delete(
     "/:eventId",
     authenticateJWT,
-    checkIfUserIsAdmin,
+    checkIfUserIsSuperAdmin,
     checkRevokedToken,
     eventController.deleteEventById,
 );
