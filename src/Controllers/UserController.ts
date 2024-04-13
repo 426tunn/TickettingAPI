@@ -7,7 +7,8 @@ import { generateTokenWithRole, isEmail } from "../Utils/authUtils";
 import { revokedTokens } from "../Middlewares/AuthMiddleware";
 import { IAuthenticatedRequest } from "Types/RequestTypes";
 import * as crypto from "crypto";
-import { sendPasswordResetEmail } from "../Utils/emailUtils";
+import { sendPasswordResetEmail, sendVerificationEmail } from "../Utils/emailUtils";
+import { logger } from "../logging/logger";
 
 export class UserController {
     private userService: UserService;
@@ -40,18 +41,47 @@ export class UserController {
             } else if (userEmailExists) {
                 return res.status(409).json({ error: "email already exists" });
             }
+
+            const Token = crypto.randomBytes(32).toString("hex");
+            const verificationToken = crypto
+            .createHash("sha256")
+            .update(Token)
+            .digest("hex");
             const user = await this.userService.createUser(
                 username,
                 firstname,
                 lastname,
                 email,
                 password,
+                verificationToken,
             );
+            await sendVerificationEmail(email, Token);
+            user.verificationExpire = new Date(Date.now() + 600000);
+            user.save();
             res.status(201).json({ message: "Signup Successful", user });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     };
+
+    public verifyUser = async (req: Request, res: Response) => {
+        const { token } = req.params;
+        try {
+            const verificationToken = crypto
+            .createHash("sha256")
+            .update(token)
+            .digest("hex");
+            const user = await this.userService.getUserByVerificationToken(verificationToken);
+            if (!user) {
+                return res.status(404).json({ error: "User not found or token expired" });
+            }
+            await this.userService.verifyUser(user._id.toString());
+            res.status(200).json({ message: "User verified", user });
+        } catch (error) {
+            logger.error('Error verifying user:', error);
+            res.status(500).json({ error: error.message });
+        }
+    }
 
     public loginUser = async (req: Request, res: Response) => {
         try {
@@ -92,7 +122,7 @@ export class UserController {
             res.status(500).json({ error: error.message });
         }
     };
-
+    
     public getAllUsers = async (_req: Request, res: Response) => {
         try {
             const users = await this.userService.getAllUsers();
@@ -127,13 +157,6 @@ export class UserController {
 
     public updateUserRole = async (req: Request, res: Response) => {
         try {
-            const role = (req.user as IUser).role;
-            if (role !== "admin") {
-                return res
-                    .status(401)
-                    .json({ error: "Only Admin can access this route" });
-            }
-
             const userId = req.params.userId;
             const roleToUpdate = req.body.role as UserRole;
             if (
