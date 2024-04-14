@@ -15,6 +15,7 @@ export class UserService {
         lastname: string,
         email: string,
         password: string,
+        verificationToken?: string,
     ): Promise<IUser> {
         try {
             const newUser = new this.userModel({
@@ -23,6 +24,7 @@ export class UserService {
                 firstname,
                 lastname,
                 password,
+                verificationToken,
             });
             return await newUser.save();
         } catch (error) {
@@ -69,6 +71,18 @@ export class UserService {
     }
 
     async getUserByResetToken(resetToken: string): Promise<IUser | null> {
-        return this.userModel.findOne({ resetPasswordToken: resetToken });
+        return await this.userModel.findOne({ resetPasswordToken: resetToken });
+    }
+
+    async getUserByVerificationToken(verificationToken: string): Promise<IUser | null> {
+        return await this.userModel.findOne({ verificationToken: verificationToken });
+    }
+
+    async verifyUser(
+        userId: string
+    ): Promise<IUser | null> {
+        return await this.userModel
+            .findByIdAndUpdate(userId, { isVerified: true }, { new: true })
+            .exec();
     }
 }

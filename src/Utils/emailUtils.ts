@@ -30,7 +30,27 @@ export const sendPasswordResetEmail = async (
         };
 
         await transporter.sendMail(mailOptions);
-        logger.info("Email sent successfully");
+        logger.info("Password reset email sent successfully");
+    } catch (error) {
+        console.error("Error sending email:", error);
+        throw new Error("Error sending password reset email");
+    }
+};
+
+export const sendVerificationEmail = async (email: string, verificationToken: string) => {
+    try {
+        const mailOptions = {
+            from: Config.EMAIL,
+            to: email,
+            subject: "Account Verification",
+            text: `You are receiving this email because you (or someone else) has requested to verify your account.
+            Please click the following link, or paste it into your browser to complete the process:
+            http://${Config.HOST_URL}/users/verify-email?token=${verificationToken}
+             verification: ${verificationToken}`,
+        };
+
+        await transporter.sendMail(mailOptions);
+        logger.info("Verification email sent successfully");
     } catch (error) {
         console.error("Error sending email:", error);
         throw new Error("Error sending password reset email");

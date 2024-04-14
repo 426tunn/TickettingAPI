@@ -20,9 +20,8 @@ UserRouter.post(
     ],
     userController.registerUser,
 );
-
+UserRouter.get("/verify-email", userController.verifyUser);
 UserRouter.post("/login", userController.loginUser);
-
 UserRouter.post("/logout", userController.logoutUser);
 UserRouter.post("/forgot-password", userController.forgotPassword);
 UserRouter.post("/reset-password", userController.resetPassword);
@@ -55,10 +54,6 @@ UserRouter.delete(
     // authenticateJWT,
     userController.deleteUser,
 );
-
-//TODO: Add forgot password and reset password routes
-//TODO: Add email verification
-//TODO: Add email verification routes
 
 /**
  * @openapi

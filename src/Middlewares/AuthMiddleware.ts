@@ -60,6 +60,24 @@ export function checkIfUserIsSuperAdmin(
     next();
 }
 
+export function checkIfUserIsVerified(
+    req: IAuthenticatedRequest<Partial<IUser>>,
+    res: Response,
+    next: NextFunction,
+) {
+    if (!req.user) {
+        return res
+            .status(401)
+            .json({ message: "Unauthorized: You need to be logged in" });
+    }
+    if (!req.user?.isVerified === true) {
+        return res
+            .status(403)
+            .json({ message: "Forbidden: User is not verified" });
+    }
+    next();
+}
+
 // Middleware to check if the token is revoked
 export const checkRevokedToken = (
     req: Request,

@@ -9,8 +9,10 @@ interface IUser extends Document {
     lastname: string;
     email: string;
     password: string;
-    isAdmin: boolean;
+    isVerified: boolean;
     role: UserRole;
+    verificationToken?: string;
+    verificationExpire?: Date;
     resetPasswordToken?: string;
     resetPasswordExpire?: Date;
     isValidPassword(password: string): Promise<boolean>;
@@ -30,12 +32,14 @@ const userSchema = new Schema<IUser>({
         type: String,
         required: true,
     },
-    email: { type: String, required: true },
+    email: { 
+        type: String,
+        required: true },
     password: {
         type: String,
         required: true,
     },
-    isAdmin: {
+    isVerified: {
         type: Boolean,
         default: false,
     },
@@ -44,6 +48,8 @@ const userSchema = new Schema<IUser>({
         enum: Object.values(UserRole),
         default: UserRole.User,
     },
+    verificationToken: String,
+    verificationExpire: Date,
     resetPasswordToken: String,
     resetPasswordExpire: Date,
 });
