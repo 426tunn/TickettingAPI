@@ -46,6 +46,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
 
+// TODO: add the OPTIONS for each url
 app.use("/api/v1/users", checkRevokedToken, userRoutes);
 app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/event-venues", eventVenueRouter);
