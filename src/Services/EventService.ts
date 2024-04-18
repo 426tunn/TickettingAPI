@@ -1,11 +1,12 @@
 import { IEvent } from "../Models/EventModel";
 import { Model } from "mongoose";
 
-export class EventService {
-    constructor(public eventModel: Model<IEvent>) {}
 
-    async getAllEvents(): Promise<IEvent[] | null> {
-        return this.eventModel.find();
+export class EventService {
+    constructor(public eventModel: Model<IEvent>) { }
+
+    async getAllEvents({ page = 1, perPage = 9 }): Promise<IEvent[] | null> {
+        return this.eventModel.find().limit(perPage).skip((page - 1) * perPage);
     }
 
     async createEvent({

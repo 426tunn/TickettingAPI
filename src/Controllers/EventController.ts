@@ -3,7 +3,7 @@ import { EventModel, IEvent } from "../Models/EventModel";
 import { EventService } from "../Services/EventService";
 import { validationResult } from "express-validator";
 import { IUser } from "../Models/UserModel";
-import { IAuthenticatedRequest } from "Types/RequestTypes";
+import { IAuthenticatedRequest, IPaginationAndSortReq } from "../Types/RequestTypes";
 
 export class EventController {
     private eventService: EventService;
@@ -13,11 +13,17 @@ export class EventController {
     }
 
     public getAllEvents = async (
-        _req: Request,
+        req: Request & IPaginationAndSortReq,
         res: Response,
     ): Promise<Response<IEvent[] | []>> => {
         try {
-            const events = await this.eventService.getAllEvents();
+            // TODO: Implement sorting by latest and popularity
+            const page = parseInt(req.query.page);
+            const perPage = parseInt(req.query.perPage);
+            console.log(page, perPage);
+
+            const events = await this.eventService.getAllEvents({ page, perPage });
+
             return res.status(200).json({ events });
         } catch (error) {
             return res.status(500).json(error);
