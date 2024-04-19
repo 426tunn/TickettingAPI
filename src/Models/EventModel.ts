@@ -85,7 +85,10 @@ const eventSchema = new Schema<IEvent>(
         bannerImageUrl: {
             type: String,
         },
-        totalTickets: Number,
+        totalTickets: {
+            type: Number,
+            default: 0, 
+        },
     },
     { timestamps: true },
 );
