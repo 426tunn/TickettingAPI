@@ -5,6 +5,10 @@ import { Model } from "mongoose";
 export class EventService {
     constructor(public eventModel: Model<IEvent>) {}
 
+    async getAllEventsCount(): Promise<number> {
+        return this.eventModel.countDocuments();
+    }
+
     async getAllEvents({
         page,
         perPage,

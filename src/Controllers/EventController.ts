@@ -20,8 +20,8 @@ export class EventController {
         res: Response,
     ): Promise<Response<IEvent[] | []>> => {
         try {
-            const page = req.query.page || 1;
-            const perPage = req.query.perPage || 9;
+            const page = parseInt(req.query.page) || 1;
+            const perPage = parseInt(req.query.perPage) || 9;
             const { sort, order } = req.query;
 
             let events;
@@ -44,7 +44,11 @@ export class EventController {
                 });
             }
 
-            return res.status(200).json({ events });
+            const totalEvents = await this.eventService.getAllEventsCount();
+            const totalNoOfPages = Math.round(totalEvents / perPage);
+            return res
+                .status(200)
+                .json({ events, currentPage: page, perPage, totalNoOfPages });
         } catch (error) {
             return res.status(500).json(error);
         }

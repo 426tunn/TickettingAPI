@@ -9,7 +9,12 @@ export interface PaginationAndSort {
 }
 
 export interface IPaginationAndSortReq {
-    query: PaginationAndSort;
+    query: {
+        sort?: "latest" | "popularity";
+        order?: SortOrder;
+        page?: string;
+        perPage?: string;
+    };
 }
 
 export interface IAuthenticatedRequest<User> extends Request {
