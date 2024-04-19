@@ -74,13 +74,15 @@ export class UserService {
         return await this.userModel.findOne({ resetPasswordToken: resetToken });
     }
 
-    async getUserByVerificationToken(verificationToken: string): Promise<IUser | null> {
-        return await this.userModel.findOne({ verificationToken: verificationToken });
+    async getUserByVerificationToken(
+        verificationToken: string,
+    ): Promise<IUser | null> {
+        return await this.userModel.findOne({
+            verificationToken: verificationToken,
+        });
     }
 
-    async verifyUser(
-        userId: string
-    ): Promise<IUser | null> {
+    async verifyUser(userId: string): Promise<IUser | null> {
         return await this.userModel
             .findByIdAndUpdate(userId, { isVerified: true }, { new: true })
             .exec();

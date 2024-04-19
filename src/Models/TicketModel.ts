@@ -42,7 +42,7 @@ ticketSchema.post("save", async function (doc) {
     });
 });
 
-ticketSchema.post([ "deleteOne", "findOneAndDelete" ], async function (doc) {
+ticketSchema.post(["deleteOne", "findOneAndDelete"], async function (doc) {
     const totalTickets = await TicketModel.countDocuments({
         eventId: doc.eventId,
     });

@@ -7,7 +7,10 @@ import { generateTokenWithRole, isEmail } from "../Utils/authUtils";
 import { revokedTokens } from "../Middlewares/AuthMiddleware";
 import { IAuthenticatedRequest } from "Types/RequestTypes";
 import * as crypto from "crypto";
-import { sendPasswordResetEmail, sendVerificationEmail } from "../Utils/emailUtils";
+import {
+    sendPasswordResetEmail,
+    sendVerificationEmail,
+} from "../Utils/emailUtils";
 import { logger } from "../logging/logger";
 
 export class UserController {
@@ -44,9 +47,9 @@ export class UserController {
 
             const Token = crypto.randomBytes(32).toString("hex");
             const verificationToken = crypto
-            .createHash("sha256")
-            .update(Token)
-            .digest("hex");
+                .createHash("sha256")
+                .update(Token)
+                .digest("hex");
             const user = await this.userService.createUser(
                 username,
                 firstname,
@@ -67,20 +70,25 @@ export class UserController {
         const { token } = req.query;
         try {
             const verificationToken = crypto
-            .createHash("sha256")
-            .update(token as string)
-            .digest("hex");
-            const user = await this.userService.getUserByVerificationToken(verificationToken);
+                .createHash("sha256")
+                .update(token as string)
+                .digest("hex");
+            const user =
+                await this.userService.getUserByVerificationToken(
+                    verificationToken,
+                );
             if (!user) {
-                return res.status(404).json({ error: "User not found or token expired" });
+                return res
+                    .status(404)
+                    .json({ error: "User not found or token expired" });
             }
             await this.userService.verifyUser(user._id.toString());
-            res.status(200).json({ message: "User verified"});
+            res.status(200).json({ message: "User verified" });
         } catch (error) {
-            logger.error('Error verifying user:', error);
+            logger.error("Error verifying user:", error);
             res.status(500).json({ error: error.message });
         }
-    }
+    };
 
     public reverifyUser = async (req: Request, res: Response) => {
         const { email } = req.body;
@@ -101,7 +109,7 @@ export class UserController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-    }
+    };
 
     public loginUser = async (req: Request, res: Response) => {
         try {
@@ -142,7 +150,7 @@ export class UserController {
             res.status(500).json({ error: error.message });
         }
     };
-    
+
     public getAllUsers = async (_req: Request, res: Response) => {
         try {
             const users = await this.userService.getAllUsers();
@@ -289,11 +297,9 @@ export class UserController {
             const user =
                 await this.userService.getUserByResetToken(resetPasswordToken);
             if (!user) {
-                return res
-                    .status(404)
-                    .json({
-                        error: "User not found or reset token has expired",
-                    });
+                return res.status(404).json({
+                    error: "User not found or reset token has expired",
+                });
             }
 
             if (new Date() > user.resetPasswordExpire!) {
