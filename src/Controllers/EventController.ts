@@ -7,6 +7,7 @@ import {
     IAuthenticatedRequest,
     IPaginationAndSortReq,
 } from "../Types/RequestTypes";
+import { UserRole } from "../Enums/UserRole";
 
 export class EventController {
     private eventService: EventService;
@@ -45,7 +46,7 @@ export class EventController {
             }
 
             const totalEvents = await this.eventService.getAllEventsCount();
-            const totalNoOfPages = Math.round(totalEvents / perPage);
+            const totalNoOfPages = Math.ceil(totalEvents / perPage);
             return res
                 .status(200)
                 .json({ page, perPage, totalNoOfPages, events });
@@ -91,7 +92,7 @@ export class EventController {
     };
 
     public updateEventById = async (
-        req: Request,
+        req: IAuthenticatedRequest<IUser>,
         res: Response,
     ): Promise<Response<Event | null>> => {
         try {
@@ -100,6 +101,15 @@ export class EventController {
             const event = await this.eventService.getEventById(eventId);
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
+            }
+
+            if (
+                req.user.id !== event.organizerId ||
+                req.user.role !== UserRole.SuperAdmin
+            ) {
+                return res.status(403).json({
+                    error: "Only the event organizers and admins can update the event",
+                });
             }
 
             const eventUpdate = req.body;
