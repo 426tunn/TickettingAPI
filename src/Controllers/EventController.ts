@@ -20,8 +20,8 @@ export class EventController {
         res: Response,
     ): Promise<Response<IEvent[] | []>> => {
         try {
-            const page = req.query.page;
-            const perPage = req.query.perPage;
+            const page = req.query.page || 1;
+            const perPage = req.query.perPage || 9;
             const { sort, order } = req.query;
 
             let events;

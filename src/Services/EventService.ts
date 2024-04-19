@@ -6,8 +6,8 @@ export class EventService {
     constructor(public eventModel: Model<IEvent>) {}
 
     async getAllEvents({
-        page = 1,
-        perPage = 9,
+        page,
+        perPage,
     }: PaginationAndSort): Promise<IEvent[] | null> {
         return this.eventModel
             .find()
@@ -47,8 +47,8 @@ export class EventService {
 
     async getAllLatestEvents({
         order = "desc",
-        page = 1,
-        perPage = 9,
+        page,
+        perPage,
     }: PaginationAndSort): Promise<IEvent[] | null> {
         return this.eventModel
             .find({})
@@ -59,8 +59,8 @@ export class EventService {
 
     async getAllPopularEvents({
         order = "desc",
-        page = 1,
-        perPage = 9,
+        page,
+        perPage,
     }: PaginationAndSort): Promise<IEvent[] | null> {
         const events = await this.eventModel
             .find()
