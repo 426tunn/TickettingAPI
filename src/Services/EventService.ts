@@ -1,12 +1,18 @@
+import { PaginationAndSort } from "../Types/RequestTypes";
 import { IEvent } from "../Models/EventModel";
 import { Model } from "mongoose";
 
-
 export class EventService {
-    constructor(public eventModel: Model<IEvent>) { }
+    constructor(public eventModel: Model<IEvent>) {}
 
-    async getAllEvents({ page = 1, perPage = 9 }): Promise<IEvent[] | null> {
-        return this.eventModel.find().limit(perPage).skip((page - 1) * perPage);
+    async getAllEvents({
+        page = 1,
+        perPage = 9,
+    }: PaginationAndSort): Promise<IEvent[] | null> {
+        return this.eventModel
+            .find()
+            .limit(perPage)
+            .skip((page - 1) * perPage);
     }
 
     async createEvent({
@@ -37,6 +43,33 @@ export class EventService {
             endDate,
             bannerImageUrl,
         });
+    }
+
+    async getAllLatestEvents({
+        order = "desc",
+        page,
+        perPage,
+    }: PaginationAndSort): Promise<IEvent[] | null> {
+        return this.eventModel
+            .find({})
+            .sort({ createdAt: order })
+            .limit(perPage)
+            .skip((page - 1) * perPage);
+    }
+
+    async getAllPopularEvents({
+        order = "desc",
+        page,
+        perPage,
+    }: PaginationAndSort): Promise<IEvent[] | null> {
+        const events = await this.eventModel
+            .find()
+            .sort({
+                totalTickets: order,
+            })
+            .limit(perPage)
+            .skip((page - 1) * perPage);
+        return events;
     }
 
     async getEventById(eventId: string): Promise<IEvent | null> {

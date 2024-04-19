@@ -3,7 +3,10 @@ import { EventModel, IEvent } from "../Models/EventModel";
 import { EventService } from "../Services/EventService";
 import { validationResult } from "express-validator";
 import { IUser } from "../Models/UserModel";
-import { IAuthenticatedRequest, IPaginationAndSortReq } from "../Types/RequestTypes";
+import {
+    IAuthenticatedRequest,
+    IPaginationAndSortReq,
+} from "../Types/RequestTypes";
 
 export class EventController {
     private eventService: EventService;
@@ -17,15 +20,33 @@ export class EventController {
         res: Response,
     ): Promise<Response<IEvent[] | []>> => {
         try {
-            // TODO: Implement sorting by latest and popularity
-            const page = parseInt(req.query.page);
-            const perPage = parseInt(req.query.perPage);
-            console.log(page, perPage);
+            const page = req.query.page;
+            const perPage = req.query.perPage;
+            const { sort, order } = req.query;
 
-            const events = await this.eventService.getAllEvents({ page, perPage });
+            let events;
+            if (sort === "latest") {
+                events = await this.eventService.getAllLatestEvents({
+                    order,
+                    page,
+                    perPage,
+                });
+            } else if (sort === "popularity") {
+                events = await this.eventService.getAllPopularEvents({
+                    order,
+                    page,
+                    perPage,
+                });
+            } else {
+                events = await this.eventService.getAllEvents({
+                    page,
+                    perPage,
+                });
+            }
 
             return res.status(200).json({ events });
         } catch (error) {
+            console.log(error.message);
             return res.status(500).json(error);
         }
     };
