@@ -48,7 +48,7 @@ export class EventController {
             const totalNoOfPages = Math.round(totalEvents / perPage);
             return res
                 .status(200)
-                .json({ events, currentPage: page, perPage, totalNoOfPages });
+                .json({ page, perPage, totalNoOfPages, events });
         } catch (error) {
             return res.status(500).json(error);
         }
