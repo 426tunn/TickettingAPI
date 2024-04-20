@@ -24,7 +24,7 @@ UserRouter.post(
     userController.registerUser,
 );
 UserRouter.get(
-    "/token",
+    "/get-token-user",
     authenticateJWT,
     checkRevokedToken,
     userController.getUserByToken,
