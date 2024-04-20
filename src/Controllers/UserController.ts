@@ -58,6 +58,7 @@ export class UserController {
                 password,
                 verificationToken,
             );
+            delete user.password;
             await sendVerificationEmail(email, Token);
             user.verificationExpire = new Date(Date.now() + 600000);
             res.status(201).json({ message: "Signup Successful", user });

@@ -1,6 +1,6 @@
 import { Model } from "mongoose";
 import { IUser } from "../Models/UserModel";
-import { UserRole } from "Enums/UserRole";
+import { UserRole } from "../Enums/UserRole";
 
 export class UserService {
     private userModel: Model<IUser>;
@@ -18,7 +18,7 @@ export class UserService {
         verificationToken?: string,
     ): Promise<IUser> {
         try {
-            const newUser = new this.userModel({
+            return await this.userModel.create({
                 username,
                 email,
                 firstname,
@@ -26,7 +26,6 @@ export class UserService {
                 password,
                 verificationToken,
             });
-            return await newUser.save();
         } catch (error) {
             throw new Error(`Error creating user: ${error.message}`);
         }
@@ -50,6 +49,7 @@ export class UserService {
     ): Promise<IUser | null> {
         return await this.userModel
             .findByIdAndUpdate(userId, { role }, { new: true })
+            .select("-password")
             .exec();
     }
 
@@ -59,11 +59,12 @@ export class UserService {
     ): Promise<IUser | null> {
         return await this.userModel
             .findByIdAndUpdate(userId, updates, { new: true })
+            .select("-password")
             .exec();
     }
 
     async getAllUsers(): Promise<IUser[]> {
-        return await this.userModel.find().exec();
+        return await this.userModel.find().select("-password").exec();
     }
 
     async deleteUser(userId: string): Promise<IUser | null> {
@@ -71,20 +72,25 @@ export class UserService {
     }
 
     async getUserByResetToken(resetToken: string): Promise<IUser | null> {
-        return await this.userModel.findOne({ resetPasswordToken: resetToken });
+        return await this.userModel
+            .findOne({ resetPasswordToken: resetToken })
+            .select("-password");
     }
 
     async getUserByVerificationToken(
         verificationToken: string,
     ): Promise<IUser | null> {
-        return await this.userModel.findOne({
-            verificationToken: verificationToken,
-        });
+        return await this.userModel
+            .findOne({
+                verificationToken: verificationToken,
+            })
+            .select("-password");
     }
 
     async verifyUser(userId: string): Promise<IUser | null> {
         return await this.userModel
             .findByIdAndUpdate(userId, { isVerified: true }, { new: true })
+            .select("-password")
             .exec();
     }
 }
