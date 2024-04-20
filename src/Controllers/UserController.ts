@@ -133,7 +133,7 @@ export class UserController {
             }
             const role = user.role;
             const token = generateTokenWithRole(res, user, role);
-            res.status(200).json({ message: "Login successful", token });
+            res.status(200).json({ message: "Login successful", token, userID: user.id });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
