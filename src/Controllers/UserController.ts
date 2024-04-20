@@ -133,7 +133,7 @@ export class UserController {
             }
             const role = user.role;
             const token = generateTokenWithRole(res, user, role);
-            res.status(200).json({ message: "Login successful", token, userID: user.id });
+            res.status(200).json({ message: "Login successful", token });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -156,6 +156,17 @@ export class UserController {
         try {
             const users = await this.userService.getAllUsers();
             res.status(200).json({ users });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    };
+
+    public getUserByToken = async (
+        req: IAuthenticatedRequest<IUser>,
+        res: Response,
+    ) => {
+        try {
+            res.status(200).json({ user: req.user });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
