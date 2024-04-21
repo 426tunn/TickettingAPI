@@ -15,9 +15,12 @@ import { authenticateJWT } from "./Utils/authUtils";
 import { checkRevokedToken } from "./Middlewares/AuthMiddleware";
 import cookieParser from "cookie-parser";
 import eventTicketTypeRouter from "./Routes/EventTicketTypeRoute";
+import cors from 'cors';
 
 const SECRET = Config.SESSION_SECRET;
 const app = express();
+
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
