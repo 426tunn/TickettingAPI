@@ -9,16 +9,18 @@ import userRoutes from "./Routes/UserRoute";
 import eventRoutes from "./Routes/EventRoute";
 import ticketRoutes from "./Routes/TicketRoute";
 import "./Config/PassportConfig";
-import eventVenueRouter from "./Routes/EventVenueRoute";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./Config/swaggerConfig";
 import { authenticateJWT } from "./Utils/authUtils";
 import { checkRevokedToken } from "./Middlewares/AuthMiddleware";
 import cookieParser from "cookie-parser";
 import eventTicketTypeRouter from "./Routes/EventTicketTypeRoute";
+import cors from 'cors';
 
 const SECRET = Config.SESSION_SECRET;
 const app = express();
+
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -46,9 +48,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
 
+// TODO: add the OPTIONS for each url
 app.use("/api/v1/users", checkRevokedToken, userRoutes);
 app.use("/api/v1/events", eventRoutes);
-app.use("/api/v1/event-venues", eventVenueRouter);
 app.use("/api/v1/tickets", authenticateJWT, ticketRoutes);
 app.use("/api/v1/ticket-types", authenticateJWT, eventTicketTypeRouter);
 

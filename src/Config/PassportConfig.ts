@@ -18,6 +18,7 @@ passport.use(
         },
         async (payload, done) => {
             try {
+                delete payload.user.password;
                 return done(null, payload.user); //it does 'req.user = payload.user
             } catch (error) {
                 done(error);
@@ -50,6 +51,8 @@ passport.use(
                 if (!isPasswordValid) {
                     return done(null, false);
                 }
+
+                delete user.password;
                 return done(null, user, {
                     message: "User logged in successfully",
                 });
@@ -79,6 +82,7 @@ passport.use(
                     email,
                     hashedPassword,
                 );
+                delete user.password;
                 return done(null, user);
             } catch (error) {
                 return done(error);
@@ -94,6 +98,8 @@ passport.serializeUser((user: IUser, done) => {
 passport.deserializeUser(async (userId: string, done) => {
     try {
         const user = await userService.getUserById(userId);
+        delete user.password;
+        console.log("deserialized:", user);
         done(null, user);
     } catch (error) {
         done(error);

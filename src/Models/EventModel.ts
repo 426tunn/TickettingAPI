@@ -3,7 +3,6 @@ import { EventTypes } from "../Enums/EventTypes";
 import { EventVisibility } from "../Enums/EventVisibility";
 import { LocationTypes } from "../Enums/LocationTypes";
 import { IUser } from "./UserModel";
-import { IEventVenue } from "./EventVenueModel";
 import { IEventTicketType } from "./EventTicketTypeModel";
 import mongoose, { Schema, Document } from "mongoose";
 
@@ -13,13 +12,14 @@ interface IEvent extends Document {
     status: EventStatus;
     visibility: EventVisibility;
     type: EventTypes;
-    venue: IEventVenue;
+    venue: string;
     location: LocationTypes;
     ticketTypes: IEventTicketType[];
     organizerId: IUser;
     startDate: Date;
     endDate: Date;
     bannerImageUrl?: string | null;
+    totalTickets: number;
 }
 
 const eventSchema = new Schema<IEvent>(
@@ -51,8 +51,7 @@ const eventSchema = new Schema<IEvent>(
             required: true,
         },
         venue: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "EventVenue",
+            type: String,
             required: true,
         },
         ticketTypes: [
@@ -83,6 +82,10 @@ const eventSchema = new Schema<IEvent>(
         },
         bannerImageUrl: {
             type: String,
+        },
+        totalTickets: {
+            type: Number,
+            default: 0,
         },
     },
     { timestamps: true },

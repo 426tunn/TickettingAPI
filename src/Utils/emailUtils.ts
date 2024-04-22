@@ -37,7 +37,10 @@ export const sendPasswordResetEmail = async (
     }
 };
 
-export const sendVerificationEmail = async (email: string, verificationToken: string) => {
+export const sendVerificationEmail = async (
+    email: string,
+    verificationToken: string,
+) => {
     try {
         const mailOptions = {
             from: Config.EMAIL,

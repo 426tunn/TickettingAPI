@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { UserController } from "../Controllers/UserController";
 import { check } from "express-validator";
-import { authenticateJWT, checkIfUserIsSuperAdmin } from "../Middlewares/AuthMiddleware";
+import {
+    authenticateJWT,
+    checkRevokedToken,
+} from "../Middlewares/AuthMiddleware";
+import { checkIfUserIsSuperAdmin } from "../Middlewares/AuthMiddleware";
 
 const UserRouter = Router();
 const userController = new UserController();
@@ -18,6 +22,12 @@ UserRouter.post(
             .withMessage("Password must be at least 6 characters long"),
     ],
     userController.registerUser,
+);
+UserRouter.get(
+    "/get-token-user",
+    authenticateJWT,
+    checkRevokedToken,
+    userController.getUserByToken,
 );
 UserRouter.get("/verify-email", userController.verifyUser);
 

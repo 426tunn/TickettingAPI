@@ -32,9 +32,10 @@ const userSchema = new Schema<IUser>({
         type: String,
         required: true,
     },
-    email: { 
+    email: {
         type: String,
-        required: true },
+        required: true,
+    },
     password: {
         type: String,
         required: true,
