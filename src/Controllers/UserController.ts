@@ -177,7 +177,11 @@ export class UserController {
 
     public updateUserRole = async (req: Request, res: Response) => {
         try {
-            const userId = req.params.userId;
+            const userIdToUpdate = req.body;
+            const userExists = await this.userService.getUserById(userIdToUpdate);
+            if (!userExists) {
+                return res.status(404).json({ error: "This User does not exist"})
+            }
             const roleToUpdate = req.body.role as UserRole;
             if (
                 roleToUpdate !== "admin" &&
@@ -186,14 +190,11 @@ export class UserController {
             ) {
                 return res.status(400).json({ error: "Invalid role" });
             }
-            if (!userId) {
-                return res.status(400).json({ error: "User ID is required" });
-            }
             if (!roleToUpdate) {
                 return res.status(400).json({ error: "Role is required" });
             }
             const updatedUser = await this.userService.updateUserRole(
-                userId,
+                userIdToUpdate,
                 roleToUpdate,
             );
             if (!updatedUser) {
@@ -201,7 +202,7 @@ export class UserController {
             }
             res.status(200).json({
                 message: "User role updated successfully",
-                user: updatedUser,
+                user: updatedUser, //update this part
             });
         } catch (error) {
             res.status(500).json({ error: error.message });

@@ -1,8 +1,7 @@
 import { Router } from "express";
 import { UserController } from "../Controllers/UserController";
 import { check } from "express-validator";
-import { authenticateJWT } from "../Middlewares/AuthMiddleware";
-import { checkIfUserIsAdmin } from "../Middlewares/AuthMiddleware";
+import { authenticateJWT, checkIfUserIsSuperAdmin } from "../Middlewares/AuthMiddleware";
 
 const UserRouter = Router();
 const userController = new UserController();
@@ -21,6 +20,13 @@ UserRouter.post(
     userController.registerUser,
 );
 UserRouter.get("/verify-email", userController.verifyUser);
+
+UserRouter.post(
+    "/resend-verification-email", 
+    authenticateJWT,
+    userController.reverifyUser
+);
+
 UserRouter.post("/login", userController.loginUser);
 UserRouter.post("/logout", userController.logoutUser);
 UserRouter.post("/forgot-password", userController.forgotPassword);
@@ -29,14 +35,14 @@ UserRouter.post("/reset-password", userController.resetPassword);
 UserRouter.get(
     "/",
     // authenticateJWT,
-    // checkIfUserIsAdmin,
+    // checkIfUserIsSuperAdmin,
     userController.getAllUsers,
 );
 
 UserRouter.get(
     "/:userId",
     authenticateJWT,
-    checkIfUserIsAdmin,
+    checkIfUserIsSuperAdmin,
     userController.getUserById,
 );
 
@@ -45,13 +51,13 @@ UserRouter.patch("/:userId", authenticateJWT, userController.updateUser);
 UserRouter.patch(
     "/role/:userId",
     authenticateJWT,
-    checkIfUserIsAdmin,
+    // checkIfUserIsSuperAdmin,
     userController.updateUserRole,
 );
 
 UserRouter.delete(
     "/:userId",
-    // authenticateJWT,
+    authenticateJWT,
     userController.deleteUser,
 );
 
