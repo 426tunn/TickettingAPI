@@ -20,6 +20,7 @@ interface IEvent extends Document {
     endDate: Date;
     bannerImageUrl?: string | null;
     totalTickets: number;
+    verified: boolean;
 }
 
 const eventSchema = new Schema<IEvent>(
@@ -86,6 +87,10 @@ const eventSchema = new Schema<IEvent>(
         totalTickets: {
             type: Number,
             default: 0,
+        },
+        verified: {
+            type: Boolean,
+            default: false,
         },
     },
     { timestamps: true },
