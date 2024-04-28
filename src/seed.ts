@@ -40,7 +40,7 @@ for (let i = 0; i < 10; i++) {
 }
 
 const events = [] as Partial<IEvent>[];
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 50; i++) {
     events.push({
         name: faker.word.words({ count: { min: 2, max: 10 } }),
         description: faker.word.words({ count: { min: 20, max: 200 } }),
