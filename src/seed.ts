@@ -4,7 +4,7 @@ import { EventStatus } from "./Enums/EventStatus";
 import { EventTypes } from "./Enums/EventTypes";
 import { EventVisibility } from "./Enums/EventVisibility";
 import { EventModel, IEvent } from "./Models/EventModel";
-import { IUser } from "./Models/UserModel";
+import { IUser, UserModel } from "./Models/UserModel";
 import { UserRole } from "Enums/UserRole";
 import mongoose, { Types } from "mongoose";
 import {
@@ -63,6 +63,7 @@ for (let i = 0; i < 50; i++) {
 
 (async () => {
     connectToDB();
+    await UserModel.create(users);
     await EventTicketTypeModel.create(eventTicketTypes);
     await EventModel.create(events);
     console.log("Database seeded with:");
