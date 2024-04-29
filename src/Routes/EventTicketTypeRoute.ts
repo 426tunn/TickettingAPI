@@ -34,7 +34,6 @@ eventTicketTypeRouter.get(
 eventTicketTypeRouter.patch(
     "/:eventTicketTypeId",
     authenticateJWT,
-    checkIfUserIsSuperAdmin,
     checkRevokedToken,
     eventTicketTypeController.updateEventTicketTypeById,
 );

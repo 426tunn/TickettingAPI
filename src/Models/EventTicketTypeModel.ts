@@ -1,10 +1,12 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { TicketTypes } from "../Enums/TicketTypes";
+import { IEvent } from "./EventModel";
 
 interface IEventTicketType extends Document {
     name: TicketTypes;
     price: number;
     noOfTickets: number;
+    eventId: IEvent;
 }
 
 const eventTicketTypeSchema = new Schema<IEventTicketType>(
@@ -21,6 +23,11 @@ const eventTicketTypeSchema = new Schema<IEventTicketType>(
         },
         noOfTickets: {
             type: Number,
+            required: true,
+        },
+        eventId: {
+            type: Schema.Types.ObjectId,
+            ref: "Event",
             required: true,
         },
     },
