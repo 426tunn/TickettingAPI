@@ -3,7 +3,6 @@ import { EventTypes } from "../Enums/EventTypes";
 import { EventVisibility } from "../Enums/EventVisibility";
 import { LocationTypes } from "../Enums/LocationTypes";
 import { IUser } from "./UserModel";
-import { IEventTicketType } from "./EventTicketTypeModel";
 import mongoose, { Schema, Document } from "mongoose";
 
 interface IEvent extends Document {
@@ -14,7 +13,6 @@ interface IEvent extends Document {
     type: EventTypes;
     venue: string;
     location: LocationTypes;
-    ticketTypes: IEventTicketType[];
     organizerId: IUser;
     startDate: Date;
     endDate: Date;
@@ -55,13 +53,6 @@ const eventSchema = new Schema<IEvent>(
             type: String,
             required: true,
         },
-        ticketTypes: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "EventTicketType",
-                required: true,
-            },
-        ],
         location: {
             type: String,
             enum: Object.values(LocationTypes),

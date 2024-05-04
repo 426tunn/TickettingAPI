@@ -28,7 +28,6 @@ eventRouter.post(
         body("type").notEmpty().withMessage("Event type is required"),
         body("venue").notEmpty().withMessage("Event venue is required"),
         body("location").notEmpty().withMessage("Event location is required"),
-        body("ticketTypes").notEmpty().withMessage("Event tickets is required"),
         body("startDate")
             .notEmpty()
             .isDate()
