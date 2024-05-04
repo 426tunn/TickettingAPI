@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { Config } from "./Config/config";
+import { Config } from "../Config/config";
 
-import { logger } from "./logging/logger";
+import { logger } from "../logging/logger";
 const DBURL = Config.DBURL;
 
 export const connectToDB = (): void => {

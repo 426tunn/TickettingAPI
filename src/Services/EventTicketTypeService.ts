@@ -18,8 +18,14 @@ export class EventTicketTypeService {
             name,
             price,
             noOfTickets,
-            eventId
+            eventId,
         });
+    }
+
+    async getTicketTypesByEventId(
+        eventId: string,
+    ): Promise<IEventTicketType[] | null> {
+        return this.eventTicketTypeModel.find({ eventId });
     }
 
     async getEventTicketTypeById(

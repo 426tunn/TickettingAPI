@@ -6,9 +6,9 @@ import {
 import { EventTicketTypeService } from "../Services/EventTicketTypeService";
 import { validationResult } from "express-validator";
 import { EventService } from "../Services/EventService";
-import { EventModel } from "../Models/EventModel";
-import { IAuthenticatedRequest } from "Types/RequestTypes";
-import { IUser } from "Models/UserModel";
+import { EventModel, IEvent } from "../Models/EventModel";
+import { IAuthenticatedRequest } from "../Types/RequestTypes";
+import { IUser } from "../Models/UserModel";
 
 export class EventTicketTypeController {
     private eventTicketTypeService: EventTicketTypeService;
@@ -55,6 +55,21 @@ export class EventTicketTypeController {
         }
     };
 
+    public getTicketTypesByEventId = async (
+        req: Request,
+        res: Response,
+    ): Promise<Response<IEvent | null>> => {
+        const { eventId } = req.params;
+        const event = await this.eventService.getEventById(eventId);
+        if (event == null) {
+            return res.status(404).json({ error: "Event not found" });
+        }
+
+        const ticketTypes =
+            await this.eventTicketTypeService.getTicketTypesByEventId(eventId);
+        return res.status(200).json(ticketTypes);
+    };
+
     public getEventTicketTypeById = async (
         req: Request,
         res: Response,
@@ -93,10 +108,9 @@ export class EventTicketTypeController {
                     .json({ error: "EventTicketType does not exists" });
             }
 
-            const event =
-                await this.eventService.getEventById(
-                    eventTicketType.eventId.toString()
-                );
+            const event = await this.eventService.getEventById(
+                eventTicketType.eventId.toString(),
+            );
             if (event.organizerId.toString() !== req.user._id.toString()) {
                 return res.status(403).json({
                     error: "EventTicketType can only be modified by event owner",
@@ -133,10 +147,9 @@ export class EventTicketTypeController {
                 });
             }
 
-            const event =
-                await this.eventService.getEventById(
-                    eventTicketType.eventId.toString(),
-                );
+            const event = await this.eventService.getEventById(
+                eventTicketType.eventId.toString(),
+            );
             if (event.organizerId.toString() !== req.user._id.toString()) {
                 return res.status(403).json({
                     error: "EventTicketType can only be deleted by event owner",

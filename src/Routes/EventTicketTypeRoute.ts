@@ -31,6 +31,11 @@ eventTicketTypeRouter.get(
     eventTicketTypeController.getEventTicketTypeById,
 );
 
+eventTicketTypeRouter.get(
+    "/event/:eventId",
+    eventTicketTypeController.getTicketTypesByEventId,
+);
+
 eventTicketTypeRouter.patch(
     "/:eventTicketTypeId",
     authenticateJWT,
