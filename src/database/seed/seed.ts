@@ -1,11 +1,11 @@
 // To seed data for project development
 import { faker } from "@faker-js/faker";
-import { EventStatus } from "./Enums/EventStatus";
-import { EventTypes } from "./Enums/EventTypes";
-import { EventVisibility } from "./Enums/EventVisibility";
-import { EventModel, IEvent } from "./Models/EventModel";
-import { IUser, UserModel } from "./Models/UserModel";
-import { UserRole } from "Enums/UserRole";
+import { EventStatus } from "../../Enums/EventStatus";
+import { EventTypes } from "../../Enums/EventTypes";
+import { EventVisibility } from "../../Enums/EventVisibility";
+import { EventModel, IEvent } from "../../Models/EventModel";
+import { IUser, UserModel } from "../../Models/UserModel";
+import { UserRole } from "../../Enums/UserRole";
 import mongoose, { Types } from "mongoose";
 import {
     EventTicketTypeModel,
