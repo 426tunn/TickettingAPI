@@ -1,11 +1,11 @@
 // To seed data for project development
 import { faker } from "@faker-js/faker";
-import { EventStatus } from "./Enums/EventStatus";
-import { EventTypes } from "./Enums/EventTypes";
-import { EventVisibility } from "./Enums/EventVisibility";
-import { EventModel, IEvent } from "./Models/EventModel";
-import { IUser, UserModel } from "./Models/UserModel";
-import { UserRole } from "Enums/UserRole";
+import { EventStatus } from "../../Enums/EventStatus";
+import { EventTypes } from "../../Enums/EventTypes";
+import { EventVisibility } from "../../Enums/EventVisibility";
+import { EventModel, IEvent } from "../../Models/EventModel";
+import { IUser, UserModel } from "../../Models/UserModel";
+import { UserRole } from "../../Enums/UserRole";
 import mongoose, { Types } from "mongoose";
 import {
     EventTicketTypeModel,
@@ -49,9 +49,6 @@ for (let i = 0; i < 50; i++) {
         type: faker.helpers.enumValue(EventTypes),
         venue: faker.location.streetAddress(),
         location: faker.helpers.enumValue(LocationTypes),
-        ticketTypes: faker.helpers.arrayElements(
-            eventTicketTypes,
-        ) as IEventTicketType[],
         organizerId: faker.helpers.arrayElement(users) as IUser,
         startDate: faker.date.soon(),
         endDate: faker.date.future(),
