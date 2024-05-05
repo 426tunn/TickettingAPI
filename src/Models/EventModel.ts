@@ -1,3 +1,4 @@
+import { EventCategory } from "../Enums/EventCategory";
 import { EventStatus } from "../Enums/EventStatus";
 import { EventTypes } from "../Enums/EventTypes";
 import { EventVisibility } from "../Enums/EventVisibility";
@@ -20,6 +21,7 @@ interface IEvent extends Document {
     totalTickets: number;
     verified: boolean;
     tags: string[];
+    category: EventCategory;
 }
 
 const eventSchema = new Schema<IEvent>(
@@ -30,6 +32,11 @@ const eventSchema = new Schema<IEvent>(
         },
         description: {
             type: String,
+            required: true,
+        },
+        category: {
+            type: String,
+            enum: Object.values(EventCategory),
             required: true,
         },
         status: {

@@ -8,6 +8,7 @@ import {
     IPaginationAndSortReq,
 } from "../Types/RequestTypes";
 import { UserRole } from "../Enums/UserRole";
+import { EventCategory } from "../Enums/EventCategory";
 
 export class EventController {
     private eventService: EventService;
@@ -15,6 +16,16 @@ export class EventController {
     constructor() {
         this.eventService = new EventService(EventModel);
     }
+
+    public getCategories = async (req: Request, res: Response) => {
+        try {
+            return res
+                .status(200)
+                .json({ eventCategories: Object.keys(EventCategory) });
+        } catch (error) {
+            return res.status(500).json(error);
+        }
+    };
 
     public getAllEvents = async (
         req: Request & IPaginationAndSortReq,

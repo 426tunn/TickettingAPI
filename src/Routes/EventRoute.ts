@@ -11,6 +11,7 @@ import {
 const eventRouter: Router = router();
 const eventController = new EventController();
 
+eventRouter.get("/categories", eventController.getCategories);
 eventRouter.get("/", eventController.getAllEvents);
 eventRouter.post(
     "/",
