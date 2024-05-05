@@ -49,9 +49,6 @@ for (let i = 0; i < 50; i++) {
         type: faker.helpers.enumValue(EventTypes),
         venue: faker.location.streetAddress(),
         location: faker.helpers.enumValue(LocationTypes),
-        ticketTypes: faker.helpers.arrayElements(
-            eventTicketTypes,
-        ) as IEventTicketType[],
         organizerId: faker.helpers.arrayElement(users) as IUser,
         startDate: faker.date.soon(),
         endDate: faker.date.future(),
