@@ -36,6 +36,10 @@ eventRouter.post(
             .notEmpty()
             .isDate()
             .withMessage("Event end date is required"),
+        body("tags")
+            .optional()
+            .isArray()
+            .withMessage("Event Tags should be an array of strings"),
     ],
     eventController.createEvent,
 );

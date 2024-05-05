@@ -31,6 +31,7 @@ export class EventService {
         startDate,
         endDate,
         bannerImageUrl,
+        tags,
     }: IEvent): Promise<IEvent> {
         return this.eventModel.create({
             name,
@@ -44,6 +45,7 @@ export class EventService {
             startDate,
             endDate,
             bannerImageUrl,
+            tags,
         });
     }
 

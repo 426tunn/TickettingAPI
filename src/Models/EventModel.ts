@@ -19,6 +19,7 @@ interface IEvent extends Document {
     bannerImageUrl?: string | null;
     totalTickets: number;
     verified: boolean;
+    tags: string[];
 }
 
 const eventSchema = new Schema<IEvent>(
@@ -34,19 +35,16 @@ const eventSchema = new Schema<IEvent>(
         status: {
             type: String,
             enum: Object.values(EventStatus),
-            // default: EventStatus.Pending,
             required: true,
         },
         visibility: {
             type: String,
             enum: Object.values(EventVisibility),
-            // default: EventVisibility.Public,
             required: true,
         },
         type: {
             type: String,
             enum: Object.values(EventTypes),
-            // default: EventTypes.Free,
             required: true,
         },
         venue: {
@@ -56,7 +54,6 @@ const eventSchema = new Schema<IEvent>(
         location: {
             type: String,
             enum: Object.values(LocationTypes),
-            // default: LocationTypes.Online,
             required: true,
         },
         organizerId: {
@@ -83,6 +80,7 @@ const eventSchema = new Schema<IEvent>(
             type: Boolean,
             default: false,
         },
+        tags: [String],
     },
     { timestamps: true },
 );
