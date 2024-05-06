@@ -1,70 +1,54 @@
 // To seed data for project development
 import { faker } from "@faker-js/faker";
-import { EventStatus } from "../../Enums/EventStatus";
-import { EventTypes } from "../../Enums/EventTypes";
-import { EventVisibility } from "../../Enums/EventVisibility";
-import { EventModel, IEvent } from "../../Models/EventModel";
-import { IUser, UserModel } from "../../Models/UserModel";
-import { UserRole } from "../../Enums/UserRole";
+import { EventModel } from "../../Models/EventModel";
 import mongoose, { Types } from "mongoose";
+import { connectToDB } from "database";
+import { events as eventToSeed, ISeedEvent } from "./data/events";
 import {
     EventTicketTypeModel,
     IEventTicketType,
-} from "Models/EventTicketTypeModel";
-import { TicketTypes } from "Enums/TicketTypes";
-import { connectToDB } from "database";
-import { LocationTypes } from "Enums/LocationTypes";
+} from "../../Models/EventTicketTypeModel";
+import { UserRole } from "../../Enums/UserRole";
+import { IUser, UserModel } from "../../Models/UserModel";
 
+const noOfUsers = 5;
 const users = [] as Partial<IUser>[];
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < noOfUsers; i++) {
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
     users.push({
         _id: new Types.ObjectId(faker.database.mongodbObjectId()),
         username: faker.word.verb(),
-        firstname: faker.person.firstName(),
-        lastname: faker.person.lastName(),
-        email: faker.internet.email(),
+        firstname: firstName,
+        lastname: lastName,
+        email: faker.internet.email({ firstName, lastName }),
         password: faker.internet.password(),
         isVerified: faker.datatype.boolean(),
         role: faker.helpers.enumValue(UserRole),
     });
 }
 
-const eventTicketTypes = [] as Partial<IEventTicketType>[];
-for (let i = 0; i < 10; i++) {
-    eventTicketTypes.push({
-        _id: new Types.ObjectId(faker.database.mongodbObjectId()),
-        name: faker.helpers.enumValue(TicketTypes),
-        price: faker.number.int({ min: 1, max: 10000 }),
-        noOfTickets: faker.number.int({ min: 1, max: 10000 }),
-    });
-}
+const events: ISeedEvent[] = eventToSeed;
+const ticketTypes: IEventTicketType[] = [];
+for (const event of events) {
+    event._id = new Types.ObjectId(faker.database.mongodbObjectId());
+    event.organizerId = users[Math.floor(Math.random() * 100) % noOfUsers];
 
-const events = [] as Partial<IEvent>[];
-for (let i = 0; i < 50; i++) {
-    events.push({
-        name: faker.word.words({ count: { min: 2, max: 10 } }),
-        description: faker.word.words({ count: { min: 20, max: 200 } }),
-        status: faker.helpers.enumValue(EventStatus),
-        visibility: faker.helpers.enumValue(EventVisibility),
-        type: faker.helpers.enumValue(EventTypes),
-        venue: faker.location.streetAddress(),
-        location: faker.helpers.enumValue(LocationTypes),
-        organizerId: faker.helpers.arrayElement(users) as IUser,
-        startDate: faker.date.soon(),
-        endDate: faker.date.future(),
-        bannerImageUrl: faker.image.url(),
-        totalTickets: faker.number.int({ min: 1, max: 10000 }),
-        verified: faker.datatype.boolean(),
-    });
+    for (const ticketType of event.ticketTypes) {
+        ticketType.eventId = event._id;
+        ticketTypes.push(ticketType);
+    }
 }
 
 (async () => {
-    connectToDB();
-    await UserModel.create(users);
-    await EventTicketTypeModel.create(eventTicketTypes);
-    await EventModel.create(events);
-    console.log("Database seeded with:");
-    console.log(eventTicketTypes.length, "Event Ticket Types");
-    console.log(events.length, "Events");
-    await mongoose.disconnect();
+    try {
+        connectToDB();
+        await UserModel.create(users);
+        await EventModel.create(events);
+        await EventTicketTypeModel.create(ticketTypes);
+        console.log("Data Seeded Successfully.");
+        mongoose.disconnect();
+    } catch (error) {
+        process.exit();
+    }
 })();

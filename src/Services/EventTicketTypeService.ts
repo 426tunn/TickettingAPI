@@ -11,13 +11,13 @@ export class EventTicketTypeService {
     async createEventTicketType({
         name,
         price,
-        noOfTickets,
+        quantity,
         eventId,
     }: IEventTicketType): Promise<IEventTicketType> {
         return this.eventTicketTypeModel.create({
             name,
             price,
-            noOfTickets,
+            quantity,
             eventId,
         });
     }

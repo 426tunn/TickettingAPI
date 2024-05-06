@@ -21,7 +21,7 @@ eventTicketTypeRouter.post(
     [
         body("name").notEmpty().withMessage("Ticket type name is required"),
         body("price").notEmpty().withMessage("Ticket type price is required"),
-        body("noOfTickets").notEmpty().withMessage("No of tickets is required"),
+        body("quantity").notEmpty().withMessage("No of tickets is required"),
     ],
     eventTicketTypeController.createEventTicketType,
 );

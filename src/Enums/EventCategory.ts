@@ -1,6 +1,9 @@
 export enum EventCategory {
     Festival = "festival",
     Music = "music",
+    Corporate = "corporate",
+    Holiday = "holiday",
+    Entertainment = "entertainment",
     ProductLaunch = "product-launch",
     SportingEvent = "sporting-event",
     Concert = "concert",

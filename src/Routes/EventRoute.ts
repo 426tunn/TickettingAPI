@@ -22,13 +22,14 @@ eventRouter.post(
         body("description")
             .notEmpty()
             .withMessage("Event description is required"),
+        body("category").notEmpty().withMessage("Event category is required"),
         body("status").notEmpty().withMessage("Event status is required"),
         body("visibility")
             .notEmpty()
             .withMessage("Event visibility is required"),
         body("type").notEmpty().withMessage("Event type is required"),
-        body("venue").notEmpty().withMessage("Event venue is required"),
         body("location").notEmpty().withMessage("Event location is required"),
+        body("venueType").notEmpty().withMessage("Event venueType is required"),
         body("startDate")
             .notEmpty()
             .isDate()
