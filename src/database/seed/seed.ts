@@ -47,6 +47,11 @@ for (const event of events) {
 (async () => {
     try {
         connectToDB();
+
+        await UserModel.deleteMany({});
+        await EventModel.deleteMany({});
+        await EventTicketTypeModel.deleteMany({});
+
         await UserModel.create(users);
         await EventModel.create(events);
         await EventTicketTypeModel.create(ticketTypes);
