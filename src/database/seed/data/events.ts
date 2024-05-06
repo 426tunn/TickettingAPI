@@ -6,7 +6,7 @@ import { VenueType } from "../../../Enums/VenueType";
 import { IEvent } from "../../../Models/EventModel";
 import { EventVisibility } from "../../../Enums/EventVisibility";
 
-export interface ISeedEvent extends Partial<IEvent> {
+export interface ISeedEvent extends IEvent {
     ticketTypes: {
         name: string;
         quantity: number;

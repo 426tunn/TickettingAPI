@@ -4,10 +4,7 @@ import { EventModel } from "../../Models/EventModel";
 import mongoose, { Types } from "mongoose";
 import { connectToDB } from "database";
 import { events as eventToSeed, ISeedEvent } from "./data/events";
-import {
-    EventTicketTypeModel,
-    IEventTicketType,
-} from "../../Models/EventTicketTypeModel";
+import { EventTicketTypeModel } from "../../Models/EventTicketTypeModel";
 import { UserRole } from "../../Enums/UserRole";
 import { IUser, UserModel } from "../../Models/UserModel";
 
@@ -29,10 +26,17 @@ for (let i = 0; i < noOfUsers; i++) {
 }
 
 const events: ISeedEvent[] = eventToSeed;
-const ticketTypes: IEventTicketType[] = [];
+const ticketTypes: Array<{
+    name: string;
+    quantity: number;
+    price: number;
+    eventId?: string;
+}> = [];
 for (const event of events) {
     event._id = new Types.ObjectId(faker.database.mongodbObjectId());
-    event.organizerId = users[Math.floor(Math.random() * 100) % noOfUsers];
+    event.organizerId = users[
+        Math.floor(Math.random() * 100) % noOfUsers
+    ] as IUser;
 
     for (const ticketType of event.ticketTypes) {
         ticketType.eventId = event._id;
