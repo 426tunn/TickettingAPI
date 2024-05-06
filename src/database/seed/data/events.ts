@@ -7,12 +7,12 @@ import { IEvent } from "../../../Models/EventModel";
 import { EventVisibility } from "../../../Enums/EventVisibility";
 
 export interface ISeedEvent extends IEvent {
-    ticketTypes: {
+    ticketTypes: Array<{
         name: string;
         quantity: number;
         price: number;
         eventId?: string;
-    }[];
+    }>;
 }
 
 export const events = [

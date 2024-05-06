@@ -25,7 +25,7 @@ for (let i = 0; i < noOfUsers; i++) {
     });
 }
 
-const events: ISeedEvent[] = eventToSeed;
+const events = eventToSeed as ISeedEvent[];
 const ticketTypes: Array<{
     name: string;
     quantity: number;
