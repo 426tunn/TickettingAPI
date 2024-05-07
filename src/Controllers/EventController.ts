@@ -5,7 +5,7 @@ import { validationResult } from "express-validator";
 import { IUser } from "../Models/UserModel";
 import {
     IAuthenticatedRequest,
-    IPaginationAndSortReq,
+    IEventPaginationAndSortReq,
 } from "../Types/RequestTypes";
 import { UserRole } from "../Enums/UserRole";
 import { EventCategory } from "../Enums/EventCategory";
@@ -28,7 +28,7 @@ export class EventController {
     };
 
     public getAllEvents = async (
-        req: Request & IPaginationAndSortReq,
+        req: Request & IEventPaginationAndSortReq,
         res: Response,
     ): Promise<Response<IEvent[] | []>> => {
         try {
@@ -36,28 +36,14 @@ export class EventController {
             const perPage = parseInt(req.query.perPage) || 9;
             const { sort, order } = req.query;
 
-            let events;
-            if (sort === "latest") {
-                events = await this.eventService.getAllLatestEvents({
-                    order,
-                    page,
-                    perPage,
-                });
-            } else if (sort === "popularity") {
-                events = await this.eventService.getAllPopularEvents({
-                    order,
-                    page,
-                    perPage,
-                });
-            } else {
-                events = await this.eventService.getAllEvents({
-                    page,
-                    perPage,
-                });
-            }
+            const events = await this.eventService.getAllEvents({
+                sort,
+                order,
+                page,
+                perPage,
+            });
 
-            const totalEvents = await this.eventService.getAllEventsCount();
-            const totalNoOfPages = Math.ceil(totalEvents / perPage);
+            const totalNoOfPages = Math.ceil(events.length / perPage);
             return res
                 .status(200)
                 .json({ page, perPage, totalNoOfPages, events });

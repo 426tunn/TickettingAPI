@@ -1,14 +1,16 @@
+import { EventStatus } from "../Enums/EventStatus";
 import { Request } from "express";
 import { SortOrder } from "mongoose";
 
-export interface PaginationAndSort {
+export interface IEventPaginationAndSort {
     sort?: "latest" | "popularity";
     order?: SortOrder;
     page?: number;
     perPage?: number;
+    status?: EventStatus;
 }
 
-export interface IPaginationAndSortReq {
+export interface IEventPaginationAndSortReq {
     query: {
         sort?: "latest" | "popularity";
         order?: SortOrder;
