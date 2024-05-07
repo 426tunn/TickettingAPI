@@ -52,7 +52,7 @@ app.use(cookieParser());
 app.use("/api/v1/users", checkRevokedToken, userRoutes);
 app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/tickets", authenticateJWT, ticketRoutes);
-app.use("/api/v1/ticket-types", authenticateJWT, eventTicketTypeRouter);
+app.use("/api/v1/ticket-types", eventTicketTypeRouter);
 
 app.get("/", (_req, res) => {
     logger.info("WELCOME");

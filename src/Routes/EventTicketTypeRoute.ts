@@ -32,7 +32,7 @@ eventTicketTypeRouter.get(
 );
 
 eventTicketTypeRouter.get(
-    "/event/:eventId",
+    "/events/:eventId",
     eventTicketTypeController.getTicketTypesByEventId,
 );
 
