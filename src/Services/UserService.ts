@@ -16,6 +16,7 @@ export class UserService {
         email: string,
         password: string,
         verificationToken?: string,
+        verificationExpire?: Date,
     ): Promise<IUser> {
         try {
             return await this.userModel.create({
@@ -25,6 +26,7 @@ export class UserService {
                 lastname,
                 password,
                 verificationToken,
+                verificationExpire,
             });
         } catch (error) {
             throw new Error(`Error creating user: ${error.message}`);
@@ -49,7 +51,7 @@ export class UserService {
     ): Promise<IUser | null> {
         return await this.userModel
             .findByIdAndUpdate(userId, { role }, { new: true })
-            .select("-password")
+            .select("-password -verificationToken -verificationExpire")
             .exec();
     }
 
@@ -59,12 +61,14 @@ export class UserService {
     ): Promise<IUser | null> {
         return await this.userModel
             .findByIdAndUpdate(userId, updates, { new: true })
-            .select("-password")
+            .select("-password -verificationToken -verificationExpire")
             .exec();
     }
 
     async getAllUsers(): Promise<IUser[]> {
-        return await this.userModel.find().select("-password").exec();
+        return await this.userModel.find()
+        .select("-password -verificationToken -verificationExpire")
+        .exec();
     }
 
     async deleteUser(userId: string): Promise<IUser | null> {
@@ -74,7 +78,7 @@ export class UserService {
     async getUserByResetToken(resetToken: string): Promise<IUser | null> {
         return await this.userModel
             .findOne({ resetPasswordToken: resetToken })
-            .select("-password");
+            .select("-password -verificationToken -verificationExpire");
     }
 
     async getUserByVerificationToken(
@@ -84,13 +88,13 @@ export class UserService {
             .findOne({
                 verificationToken: verificationToken,
             })
-            .select("-password");
+            .select("-password -verificationToken -verificationExpire");
     }
 
     async verifyUser(userId: string): Promise<IUser | null> {
         return await this.userModel
             .findByIdAndUpdate(userId, { isVerified: true }, { new: true })
-            .select("-password")
+            .select("-password -verificationToken -verificationExpire")
             .exec();
     }
 }

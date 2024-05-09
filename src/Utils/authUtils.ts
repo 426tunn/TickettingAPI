@@ -4,14 +4,9 @@ import { Request, Response, NextFunction } from "express";
 import passport from "passport";
 import { IUser } from "../Models/UserModel";
 
-export function generateTokenWithRole(
-    res: Response,
-    user: IUser,
-    role: string,
-) {
+export function generateTokenWithRole(res: Response, user: IUser) {
     const payload = {
         user: user,
-        role: role,
     };
 
     const token = jwt.sign(payload, Config.JWTSecret, { expiresIn: "1h" });
