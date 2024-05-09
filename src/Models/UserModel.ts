@@ -2,6 +2,11 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 import bcrypt from "bcrypt";
 import { UserRole } from "../Enums/UserRole";
 
+const passwordValidator = (value: string) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+    return passwordRegex.test(value);
+};
+
 interface IUser extends Document {
     _id: Types.ObjectId;
     username: string;
@@ -39,6 +44,11 @@ const userSchema = new Schema<IUser>({
     password: {
         type: String,
         required: true,
+        validate: {
+            validator: passwordValidator,
+            message:
+                "Password must be at least 8 characters long and contain at least one uppercase letter and one number",
+        },
     },
     isVerified: {
         type: Boolean,
