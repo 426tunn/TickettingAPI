@@ -5,6 +5,7 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { logger } from "./logging/logger";
 import session from "express-session";
+import { requiresAuth } from 'express-openid-connect';
 import userRoutes from "./Routes/UserRoute";
 import eventRoutes from "./Routes/EventRoute";
 import ticketRoutes from "./Routes/TicketRoute";
@@ -15,12 +16,13 @@ import { authenticateJWT } from "./Utils/authUtils";
 import { checkRevokedToken } from "./Middlewares/AuthMiddleware";
 import cookieParser from "cookie-parser";
 import eventTicketTypeRouter from "./Routes/EventTicketTypeRoute";
-import cors from 'cors';
+import cors from "cors";
 
+// import {auth0Config} from "./Config/auth0Config";
 const SECRET = Config.SESSION_SECRET;
 const app = express();
 
-app.use(cors())
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -34,6 +36,7 @@ const limiter = rateLimit({
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(helmet());
 app.use(limiter);
+
 
 app.use(
     session({
@@ -49,14 +52,15 @@ app.use(passport.session());
 app.use(cookieParser());
 
 // TODO: add the OPTIONS for each url
-app.use("/api/v1/users", checkRevokedToken, userRoutes);
-app.use("/api/v1/events", eventRoutes);
+app.use("/api/v1/users", requiresAuth(), checkRevokedToken, userRoutes);
+app.use("/api/v1/events",  eventRoutes);
 app.use("/api/v1/tickets", authenticateJWT, ticketRoutes);
 app.use("/api/v1/ticket-types", authenticateJWT, eventTicketTypeRouter);
 
 app.get("/", (_req, res) => {
     logger.info("WELCOME");
     res.status(200).send({
+        // user: _req.oidc.user,
         message: "Welcome!!",
     });
 });

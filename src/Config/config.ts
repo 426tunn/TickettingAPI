@@ -16,6 +16,10 @@ const getConfig = function () {
         HOST_URL: String(process.env.HOST_URL),
         EMAIL: String(process.env.EMAIL),
         EMAIL_PASSWORD: String(process.env.EMAIL_PASSWORD),
+        AUTH0_CLIENT_SECRET: String(process.env.AUTH0_CLIENT_SECRET),
+        AUTH0_CLIENT_ID: String(process.env.AUTH0_CLIENT_ID),
+        AUTH0_DOMAIN: String(process.env.AUTH0_DOMAIN),
+        AUTH0_CALLBACK_URL: String(process.env.AUTH0_CALLBACK_URL),
     };
 };
 

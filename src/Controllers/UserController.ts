@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { UserService } from "../Services/UserService";
 import { IUser, UserModel } from "../Models/UserModel";
 import { validationResult } from "express-validator";
@@ -12,6 +12,7 @@ import {
     sendVerificationEmail,
 } from "../Utils/emailUtils";
 import { logger } from "../logging/logger";
+import passport from "passport";
 
 export class UserController {
     private userService: UserService;
@@ -46,6 +47,7 @@ export class UserController {
             }
 
             const Token = crypto.randomBytes(32).toString("hex");
+            const verificationExpire = new Date(Date.now() + 300000);
             const verificationToken = crypto
                 .createHash("sha256")
                 .update(Token)
@@ -57,15 +59,17 @@ export class UserController {
                 email,
                 password,
                 verificationToken,
+                verificationExpire,
             );
-            delete user.password;
+            const newUser = { ...user.toObject(), password: undefined };
             await sendVerificationEmail(email, Token);
-            user.verificationExpire = new Date(Date.now() + 600000);
-            res.status(201).json({ message: "Signup Successful", user });
+            res.status(201).json({ message: "Signup Successful", newUser });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     };
+
+    // implement 0Auth
 
     public verifyUser = async (req: Request, res: Response) => {
         const { token } = req.query;
@@ -112,7 +116,7 @@ export class UserController {
         }
     };
 
-    public loginUser = async (req: Request, res: Response) => {
+    public loginUser = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { usernameOrEmail, password } = req.body;
             let user: IUser;
@@ -131,9 +135,36 @@ export class UserController {
             if (!isPasswordValid) {
                 return res.status(401).json({ error: "Invalid password" });
             }
-            const role = user.role;
-            const token = generateTokenWithRole(res, user, role);
+
+            const token = generateTokenWithRole(res, user);
             res.status(200).json({ message: "Login successful", token });
+
+            passport.authenticate(
+                'auth0',
+             async (error : Error, auth0User: IUser) => {
+                try {
+                    if (error) {
+                        throw error;
+                    }
+
+                    if (!auth0User) {
+                        return res.status(401).json({ error: 'Invalid credentials' });
+                    }
+
+                    // Log in the user using Auth0 strategy
+                    req.logIn(auth0User, (error) => {
+                        if (error) {
+                            throw new Error(error);
+                        }
+                        
+                        // Generate JWT token for the user
+                        const token = generateTokenWithRole(res, auth0User);
+                        return res.status(200).json({ message: "Auth0 login successful", token });
+                    });
+                } catch (error) {
+                    return res.status(500).json({ error: error.message });
+                }
+            })(req, res, next);
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -177,13 +208,6 @@ export class UserController {
         res: Response,
     ) => {
         try {
-            const role = (req.user as IUser).role;
-            if (role !== "admin") {
-                return res
-                    .status(401)
-                    .json({ error: "Only Admin can access this route" });
-            }
-
             const userId = req.params.userId;
             if (!userId) {
                 return res.status(400).json({ error: "User ID is required" });
@@ -197,10 +221,14 @@ export class UserController {
 
     public updateUserRole = async (req: Request, res: Response) => {
         try {
-            const userIdToUpdate = req.body;
-            const userExists = await this.userService.getUserById(userIdToUpdate);
+            const { userId } = req.params;
+            const userExists = await this.userService.getUserById(userId);
+            console.log(userId);
+            console.log(userExists);
             if (!userExists) {
-                return res.status(404).json({ error: "This User does not exist"})
+                return res
+                    .status(404)
+                    .json({ error: "This User does not exist" });
             }
             const roleToUpdate = req.body.role as UserRole;
             if (
@@ -214,7 +242,7 @@ export class UserController {
                 return res.status(400).json({ error: "Role is required" });
             }
             const updatedUser = await this.userService.updateUserRole(
-                userIdToUpdate,
+                userId,
                 roleToUpdate,
             );
             if (!updatedUser) {
@@ -282,8 +310,7 @@ export class UserController {
                 .createHash("sha256")
                 .update(originalResetToken)
                 .digest("hex");
-            user.resetPasswordExpire = new Date(Date.now() + 600000);
-
+            user.resetPasswordExpire = new Date(Date.now() + 300000);
             await user.save();
             await sendPasswordResetEmail(email, originalResetToken);
             res.status(200).json({
@@ -311,7 +338,7 @@ export class UserController {
                 await this.userService.getUserByResetToken(resetPasswordToken);
             if (!user) {
                 return res.status(404).json({
-                    error: "User not found or reset token has expired",
+                    error: "User not found",
                 });
             }
 
@@ -320,9 +347,7 @@ export class UserController {
                     .status(400)
                     .json({ error: "Reset token has expired" });
             }
-
             user.password = password;
-
             user.resetPasswordToken = null;
             user.resetPasswordExpire = null;
             await user.save();
