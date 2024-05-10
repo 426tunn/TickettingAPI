@@ -1,6 +1,7 @@
-import { PaginationAndSort } from "../Types/RequestTypes";
+import { IEventPaginationAndSort } from "../Types/RequestTypes";
 import { IEvent } from "../Models/EventModel";
 import { Model } from "mongoose";
+import { EventStatus } from "../Enums/EventStatus";
 
 export class EventService {
     constructor(public eventModel: Model<IEvent>) {}
@@ -12,62 +13,75 @@ export class EventService {
     async getAllEvents({
         page,
         perPage,
-    }: PaginationAndSort): Promise<IEvent[] | null> {
-        return this.eventModel
-            .find()
-            .limit(perPage)
-            .skip((page - 1) * perPage);
+        sort,
+        order,
+        status = EventStatus.Approved,
+    }: IEventPaginationAndSort): Promise<IEvent[] | null> {
+        if (sort === "latest") {
+            return this.getAllLatestEvents({ order, page, perPage, status });
+        } else if (sort === "popularity") {
+            return this.getAllPopularEvents({ order, page, perPage, status });
+        } else {
+            return this.eventModel
+                .find({ status })
+                .limit(perPage)
+                .skip((page - 1) * perPage);
+        }
     }
 
     async createEvent({
         name,
         description,
+        category,
         status,
         visibility,
         type,
-        venue,
-        ticketTypes,
         location,
+        venueType,
         organizerId,
         startDate,
         endDate,
-        bannerImageUrl,
+        media,
+        tags,
     }: IEvent): Promise<IEvent> {
         return this.eventModel.create({
             name,
             description,
+            category,
             status,
             visibility,
             type,
-            venue,
-            ticketTypes,
             location,
+            venueType,
             organizerId,
             startDate,
             endDate,
-            bannerImageUrl,
+            media,
+            tags,
         });
     }
 
-    async getAllLatestEvents({
+    getAllLatestEvents({
         order = "desc",
         page,
         perPage,
-    }: PaginationAndSort): Promise<IEvent[] | null> {
+        status,
+    }: IEventPaginationAndSort): Promise<IEvent[] | null> {
         return this.eventModel
-            .find({})
+            .find({ status })
             .sort({ createdAt: order })
             .limit(perPage)
             .skip((page - 1) * perPage);
     }
 
-    async getAllPopularEvents({
+    getAllPopularEvents({
         order = "desc",
         page,
         perPage,
-    }: PaginationAndSort): Promise<IEvent[] | null> {
-        const events = await this.eventModel
-            .find()
+        status,
+    }: IEventPaginationAndSort): Promise<IEvent[] | null> {
+        const events = this.eventModel
+            .find({ status })
             .sort({
                 totalTickets: order,
             })

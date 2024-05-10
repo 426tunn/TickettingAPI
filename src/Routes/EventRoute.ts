@@ -11,6 +11,7 @@ import {
 const eventRouter: Router = router();
 const eventController = new EventController();
 
+eventRouter.get("/categories", eventController.getCategories);
 eventRouter.get("/", eventController.getAllEvents);
 eventRouter.post(
     "/",
@@ -21,14 +22,14 @@ eventRouter.post(
         body("description")
             .notEmpty()
             .withMessage("Event description is required"),
+        body("category").notEmpty().withMessage("Event category is required"),
         body("status").notEmpty().withMessage("Event status is required"),
         body("visibility")
             .notEmpty()
             .withMessage("Event visibility is required"),
         body("type").notEmpty().withMessage("Event type is required"),
-        body("venue").notEmpty().withMessage("Event venue is required"),
         body("location").notEmpty().withMessage("Event location is required"),
-        body("ticketTypes").notEmpty().withMessage("Event tickets is required"),
+        body("venueType").notEmpty().withMessage("Event venueType is required"),
         body("startDate")
             .notEmpty()
             .isDate()
@@ -37,6 +38,10 @@ eventRouter.post(
             .notEmpty()
             .isDate()
             .withMessage("Event end date is required"),
+        body("tags")
+            .optional()
+            .isArray()
+            .withMessage("Event Tags should be an array of strings"),
     ],
     eventController.createEvent,
 );

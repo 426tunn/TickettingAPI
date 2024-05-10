@@ -1,17 +1,19 @@
 import mongoose, { Schema, Document } from "mongoose";
 import { TicketTypes } from "../Enums/TicketTypes";
+import { IEvent } from "./EventModel";
 
 interface IEventTicketType extends Document {
-    name: TicketTypes;
+    name: string;
     price: number;
-    noOfTickets: number;
+    quantity: number;
+    eventId: IEvent;
 }
 
 const eventTicketTypeSchema = new Schema<IEventTicketType>(
     {
         name: {
             type: String,
-            enum: Object.values(TicketTypes),
+            // enum: Object.values(TicketTypes),
             // default: TicketTypes.Standard,
             required: true,
         },
@@ -19,8 +21,13 @@ const eventTicketTypeSchema = new Schema<IEventTicketType>(
             type: Number,
             required: true,
         },
-        noOfTickets: {
+        quantity: {
             type: Number,
+            required: true,
+        },
+        eventId: {
+            type: Schema.Types.ObjectId,
+            ref: "Event",
             required: true,
         },
     },

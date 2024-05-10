@@ -1,4 +1,4 @@
-import { IEventTicketType } from "Models/EventTicketTypeModel";
+import { IEventTicketType } from "../Models/EventTicketTypeModel";
 import { Model } from "mongoose";
 
 export class EventTicketTypeService {
@@ -11,13 +11,21 @@ export class EventTicketTypeService {
     async createEventTicketType({
         name,
         price,
-        noOfTickets,
+        quantity,
+        eventId,
     }: IEventTicketType): Promise<IEventTicketType> {
         return this.eventTicketTypeModel.create({
             name,
             price,
-            noOfTickets,
+            quantity,
+            eventId,
         });
+    }
+
+    async getTicketTypesByEventId(
+        eventId: string,
+    ): Promise<IEventTicketType[] | null> {
+        return this.eventTicketTypeModel.find({ eventId });
     }
 
     async getEventTicketTypeById(

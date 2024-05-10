@@ -1,4 +1,4 @@
-export enum EventTypes {
+export enum EventType {
     Free = "Free",
     Paid = "Paid",
 }

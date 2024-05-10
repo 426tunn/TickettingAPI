@@ -1,26 +1,67 @@
+import { EventCategory } from "../Enums/EventCategory";
 import { EventStatus } from "../Enums/EventStatus";
-import { EventTypes } from "../Enums/EventTypes";
+import { EventType } from "../Enums/EventType";
 import { EventVisibility } from "../Enums/EventVisibility";
-import { LocationTypes } from "../Enums/LocationTypes";
+import { VenueType } from "../Enums/VenueType";
 import { IUser } from "./UserModel";
-import { IEventTicketType } from "./EventTicketTypeModel";
 import mongoose, { Schema, Document } from "mongoose";
+
+interface ILocation {
+    venue: string;
+    city: string;
+    state: string;
+    address: string;
+}
+
+interface IMedia {
+    bannerImage: {
+        imgType: string;
+        src: string;
+    };
+    mobilePreviewImage: {
+        imgType: string;
+        src: string;
+    };
+}
 
 interface IEvent extends Document {
     name: string;
     description: string;
+    category: EventCategory;
     status: EventStatus;
     visibility: EventVisibility;
-    type: EventTypes;
-    venue: string;
-    location: LocationTypes;
-    ticketTypes: IEventTicketType[];
+    type: EventType;
+    location: ILocation;
+    venueType: VenueType;
     organizerId: IUser;
     startDate: Date;
     endDate: Date;
-    bannerImageUrl?: string | null;
+    media?: IMedia;
     totalTickets: number;
+    tags: string[];
 }
+
+const locationSchema = new Schema<ILocation>({
+    venue: String,
+    city: String,
+    state: String,
+    address: String,
+});
+
+const mediaSchema = new Schema<IMedia>({
+    bannerImage: {
+        type: {
+            imgType: String,
+            src: String,
+        },
+    },
+    mobilePreviewImage: {
+        type: {
+            imgType: String,
+            src: String,
+        },
+    },
+});
 
 const eventSchema = new Schema<IEvent>(
     {
@@ -32,39 +73,33 @@ const eventSchema = new Schema<IEvent>(
             type: String,
             required: true,
         },
+        category: {
+            type: String,
+            enum: Object.values(EventCategory),
+            required: true,
+        },
         status: {
             type: String,
             enum: Object.values(EventStatus),
-            // default: EventStatus.Pending,
             required: true,
         },
         visibility: {
             type: String,
             enum: Object.values(EventVisibility),
-            // default: EventVisibility.Public,
             required: true,
         },
         type: {
             type: String,
-            enum: Object.values(EventTypes),
-            // default: EventTypes.Free,
+            enum: Object.values(EventType),
             required: true,
         },
-        venue: {
-            type: String,
-            required: true,
-        },
-        ticketTypes: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "EventTicketType",
-                required: true,
-            },
-        ],
         location: {
+            type: locationSchema,
+            required: true,
+        },
+        venueType: {
             type: String,
-            enum: Object.values(LocationTypes),
-            // default: LocationTypes.Online,
+            enum: Object.values(VenueType),
             required: true,
         },
         organizerId: {
@@ -80,9 +115,10 @@ const eventSchema = new Schema<IEvent>(
             type: Date,
             required: true,
         },
-        bannerImageUrl: {
-            type: String,
+        media: {
+            type: mediaSchema,
         },
+        tags: [String],
         totalTickets: {
             type: Number,
             default: 0,
