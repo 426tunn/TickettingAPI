@@ -2,44 +2,12 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { UserService } from "../Services/UserService";
 import { Strategy as JWTStrategy, ExtractJwt } from "passport-jwt";
-import { Strategy as Auth0Strategy } from 'passport-auth0';
 import { UserModel } from "../Models/UserModel";
 // import bcrypt from "bcrypt";
 import { Config } from "./config";
 
 const userService = new UserService(UserModel);
 const JWT_SECRET = Config.JWTSecret;
-const auth0Config = {
-    domain: Config.AUTH0_DOMAIN,
-    clientID: Config.AUTH0_CLIENT_ID,
-    clientSecret: Config.AUTH0_CLIENT_SECRET,
-    callbackURL: Config.AUTH0_CALLBACK_URL,
-}
-passport.use(
-    "auth0",
-    new Auth0Strategy(
-        auth0Config, 
-        async (accessToken, refreshToken, extraParams, profile, done) => {
-        try {
-            let user = await userService.getUserByEmail(profile.emails && profile.emails[0].value);
-        
-            if (!user) {
-                user = await UserModel.create({
-                    auth0Id: profile.id,
-                    username: profile.displayName || profile.username || 'Anonymous',
-                    firstname: profile.name.givenName || '',
-                    lastname: profile.name.familyName || '',
-                    email: profile.emails && profile.emails[0].value,
-                });
-            }
-
-                // Return the user to Passport
-            return done(null, user);
-        } catch (error) {
-        // If an error occurs, pass it to Passport
-        return done(error);
-        }
-}));
 
 passport.use(
     "jwt",

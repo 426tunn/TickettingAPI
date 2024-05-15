@@ -5,7 +5,7 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { logger } from "./logging/logger";
 import session from "express-session";
-import { requiresAuth } from 'express-openid-connect';
+// import { requiresAuth } from 'express-openid-connect';
 import userRoutes from "./Routes/UserRoute";
 import eventRoutes from "./Routes/EventRoute";
 import ticketRoutes from "./Routes/TicketRoute";
@@ -52,7 +52,7 @@ app.use(passport.session());
 app.use(cookieParser());
 
 // TODO: add the OPTIONS for each url
-app.use("/api/v1/users", requiresAuth(), checkRevokedToken, userRoutes);
+app.use("/api/v1/users", checkRevokedToken, userRoutes);
 app.use("/api/v1/events",  eventRoutes);
 app.use("/api/v1/tickets", authenticateJWT, ticketRoutes);
 app.use("/api/v1/ticket-types", eventTicketTypeRouter);

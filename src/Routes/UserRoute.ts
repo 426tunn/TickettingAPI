@@ -44,7 +44,7 @@ UserRouter.post("/reset-password", userController.resetPassword);
 
 UserRouter.get(
     "/",
-    // authenticateJWT,
+    authenticateJWT,
     // checkIfUserIsSuperAdmin,
     userController.getAllUsers,
 );
