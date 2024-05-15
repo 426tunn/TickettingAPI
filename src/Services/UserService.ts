@@ -66,9 +66,10 @@ export class UserService {
     }
 
     async getAllUsers(): Promise<IUser[]> {
-        return await this.userModel.find()
-        .select("-password -verificationToken -verificationExpire")
-        .exec();
+        return await this.userModel
+            .find()
+            .select("-password -verificationToken -verificationExpire")
+            .exec();
     }
 
     async deleteUser(userId: string): Promise<IUser | null> {

@@ -33,9 +33,9 @@ UserRouter.get(
 UserRouter.get("/verify-email", userController.verifyUser);
 
 UserRouter.post(
-    "/resend-verification-email", 
+    "/resend-verification-email",
     authenticateJWT,
-    userController.reverifyUser
+    userController.reverifyUser,
 );
 
 UserRouter.post("/login", userController.loginUser);
@@ -44,14 +44,11 @@ UserRouter.post("/forgot-password", userController.forgotPassword);
 UserRouter.post("/reset-password", userController.resetPassword);
 UserRouter.post(
     "/change-password",
-     authenticateJWT,
-     userController.changePassword);
-
-UserRouter.get(
-    "/",
     authenticateJWT,
-    userController.getAllUsers,
+    userController.changePassword,
 );
+
+UserRouter.get("/", authenticateJWT, userController.getAllUsers);
 
 UserRouter.get(
     "/:userId",
@@ -69,11 +66,7 @@ UserRouter.patch(
     userController.updateUserRole,
 );
 
-UserRouter.delete(
-    "/:userId",
-    authenticateJWT,
-    userController.deleteUser,
-);
+UserRouter.delete("/:userId", authenticateJWT, userController.deleteUser);
 
 /**
  * @openapi

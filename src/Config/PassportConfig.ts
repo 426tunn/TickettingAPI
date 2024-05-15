@@ -18,7 +18,7 @@ passport.use(
         },
         async (payload, done) => {
             try {
-                // delete payload.user.password; 
+                // delete payload.user.password;
                 return done(null, payload.user); //it does 'req.user = payload.user
             } catch (error) {
                 done(error);

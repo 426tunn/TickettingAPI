@@ -192,11 +192,16 @@ export class UserController {
         }
     };
 
-    public updateUserRole = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
+    public updateUserRole = async (
+        req: IAuthenticatedRequest<IUser>,
+        res: Response,
+    ) => {
         try {
             const admin = req.user.role === "superadmin";
             if (!admin) {
-                return res.status(403).json({ error: "Forbidden: User is not an admin" });
+                return res
+                    .status(403)
+                    .json({ error: "Forbidden: User is not an admin" });
             }
             const { userId } = req.params;
             if (!userId) {
@@ -224,7 +229,9 @@ export class UserController {
                 roleToUpdate,
             );
             if (!updatedUser) {
-                return res.status(404).json({ error: "Error updating user role" });
+                return res
+                    .status(404)
+                    .json({ error: "Error updating user role" });
             }
             res.status(200).json({
                 message: "User role updated successfully",
@@ -336,16 +343,12 @@ export class UserController {
         }
     };
 
-
     public changePassword = async (
         req: IAuthenticatedRequest<IUser>,
         res: Response,
     ) => {
         try {
-            const {
-                CurrentPassword, 
-                NewPassword, 
-                ConfirmPassword} = req.body
+            const { CurrentPassword, NewPassword, ConfirmPassword } = req.body;
             const a = req.user._id.toString();
             if (!CurrentPassword || !NewPassword || !ConfirmPassword) {
                 return res
@@ -356,7 +359,7 @@ export class UserController {
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
             }
-           const validPassword = await user.isValidPassword(CurrentPassword);
+            const validPassword = await user.isValidPassword(CurrentPassword);
             if (!validPassword) {
                 return res
                     .status(400)
@@ -374,14 +377,10 @@ export class UserController {
             }
             user.password = NewPassword;
             await user.save();
-        
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     };
-
-
-    
 
     public deleteUser = async (
         req: IAuthenticatedRequest<IUser>,
