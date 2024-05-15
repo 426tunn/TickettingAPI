@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { UserService } from "../Services/UserService";
 import { IUser, UserModel } from "../Models/UserModel";
 import { validationResult } from "express-validator";
 import { UserRole } from "Enums/UserRole";
+// import bcrypt from "bcrypt";
 import { generateTokenWithRole, isEmail } from "../Utils/authUtils";
 import { revokedTokens } from "../Middlewares/AuthMiddleware";
 import { IAuthenticatedRequest } from "Types/RequestTypes";
@@ -12,7 +13,6 @@ import {
     sendVerificationEmail,
 } from "../Utils/emailUtils";
 import { logger } from "../logging/logger";
-import passport from "passport";
 
 export class UserController {
     private userService: UserService;
@@ -116,7 +116,7 @@ export class UserController {
         }
     };
 
-    public loginUser = async (req: Request, res: Response, next: NextFunction) => {
+    public loginUser = async (req: Request, res: Response) => {
         try {
             const { usernameOrEmail, password } = req.body;
             let user: IUser;
@@ -138,33 +138,6 @@ export class UserController {
 
             const token = generateTokenWithRole(res, user);
             res.status(200).json({ message: "Login successful", token });
-
-            passport.authenticate(
-                'auth0',
-             async (error : Error, auth0User: IUser) => {
-                try {
-                    if (error) {
-                        throw error;
-                    }
-
-                    if (!auth0User) {
-                        return res.status(401).json({ error: 'Invalid credentials' });
-                    }
-
-                    // Log in the user using Auth0 strategy
-                    req.logIn(auth0User, (error) => {
-                        if (error) {
-                            throw new Error(error);
-                        }
-                        
-                        // Generate JWT token for the user
-                        const token = generateTokenWithRole(res, auth0User);
-                        return res.status(200).json({ message: "Auth0 login successful", token });
-                    });
-                } catch (error) {
-                    return res.status(500).json({ error: error.message });
-                }
-            })(req, res, next);
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -219,12 +192,17 @@ export class UserController {
         }
     };
 
-    public updateUserRole = async (req: Request, res: Response) => {
+    public updateUserRole = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
         try {
+            const admin = req.user.role === "superadmin";
+            if (!admin) {
+                return res.status(403).json({ error: "Forbidden: User is not an admin" });
+            }
             const { userId } = req.params;
+            if (!userId) {
+                return res.status(400).json({ error: "User ID is required" });
+            }
             const userExists = await this.userService.getUserById(userId);
-            console.log(userId);
-            console.log(userExists);
             if (!userExists) {
                 return res
                     .status(404)
@@ -246,7 +224,7 @@ export class UserController {
                 roleToUpdate,
             );
             if (!updatedUser) {
-                return res.status(404).json({ error: "User not found" });
+                return res.status(404).json({ error: "Error updating user role" });
             }
             res.status(200).json({
                 message: "User role updated successfully",
@@ -357,6 +335,53 @@ export class UserController {
             res.status(500).json({ error: error.message });
         }
     };
+
+
+    public changePassword = async (
+        req: IAuthenticatedRequest<IUser>,
+        res: Response,
+    ) => {
+        try {
+            const {
+                CurrentPassword, 
+                NewPassword, 
+                ConfirmPassword} = req.body
+            const a = req.user._id.toString();
+            if (!CurrentPassword || !NewPassword || !ConfirmPassword) {
+                return res
+                    .status(400)
+                    .json({ error: "All fields are required" });
+            }
+            const user = await this.userService.getUserById(a);
+            if (!user) {
+                return res.status(404).json({ error: "User not found" });
+            }
+           const validPassword = await user.isValidPassword(CurrentPassword);
+            if (!validPassword) {
+                return res
+                    .status(400)
+                    .json({ error: "Current password is incorrect" });
+            }
+            if (CurrentPassword === NewPassword) {
+                return res
+                    .status(400)
+                    .json({ error: "New password must be different" });
+            }
+            if (NewPassword !== ConfirmPassword) {
+                return res
+                    .status(400)
+                    .json({ error: "Passwords do not match" });
+            }
+            user.password = NewPassword;
+            await user.save();
+        
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    };
+
+
+    
 
     public deleteUser = async (
         req: IAuthenticatedRequest<IUser>,

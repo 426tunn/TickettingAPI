@@ -34,7 +34,7 @@ export class UserService {
     }
 
     async getUserById(userId: string): Promise<IUser | null> {
-        return await this.userModel.findById(userId).select("-password").exec();
+        return await this.userModel.findById(userId).exec();
     }
 
     async getUserByEmail(email: string): Promise<IUser | null> {
