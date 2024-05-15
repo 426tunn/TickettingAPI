@@ -57,6 +57,11 @@ export class EventController {
         res: Response,
     ): Promise<Response<IEvent>> => {
         try {
+            if (!req.user.isVerified) {
+                return res
+                    .status(403)
+                    .json({ error: "User email not verified" });
+            }
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return res.status(400).json({ errors: errors.array() });

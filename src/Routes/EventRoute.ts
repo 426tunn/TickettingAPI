@@ -16,7 +16,6 @@ eventRouter.get("/", eventController.getAllEvents);
 eventRouter.post(
     "/",
     authenticateJWT,
-    checkIfUserIsAdmin,
     [
         body("name").notEmpty().withMessage("Event name is required"),
         body("description")
@@ -32,11 +31,11 @@ eventRouter.post(
         body("venueType").notEmpty().withMessage("Event venueType is required"),
         body("startDate")
             .notEmpty()
-            .isDate()
+            .toDate()
             .withMessage("Event start date is required"),
         body("endDate")
             .notEmpty()
-            .isDate()
+            .toDate()
             .withMessage("Event end date is required"),
         body("tags")
             .optional()

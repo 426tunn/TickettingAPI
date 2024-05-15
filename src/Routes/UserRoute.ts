@@ -3,6 +3,7 @@ import { UserController } from "../Controllers/UserController";
 import { check } from "express-validator";
 import {
     authenticateJWT,
+    checkIfUserIsAdmin,
     checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
 import { checkIfUserIsSuperAdmin } from "../Middlewares/AuthMiddleware";
@@ -45,7 +46,7 @@ UserRouter.post("/reset-password", userController.resetPassword);
 UserRouter.get(
     "/",
     authenticateJWT,
-    // checkIfUserIsSuperAdmin,
+    checkIfUserIsAdmin,
     userController.getAllUsers,
 );
 
