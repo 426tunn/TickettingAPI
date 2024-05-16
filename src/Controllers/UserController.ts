@@ -95,8 +95,9 @@ export class UserController {
         }
     };
 
-    public reverifyUser = async (req: Request, res: Response) => {
-        const { email } = req.body;
+
+    public reverifyUser = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
+        const { email } = req.user;
         if (!isEmail(email)) {
             return res.status(400).json({ error: "Invalid email" });
         }
@@ -110,11 +111,13 @@ export class UserController {
             }
             await sendVerificationEmail(email, user.verificationToken);
             user.verificationExpire = new Date(Date.now() + 600000);
+            await user.save(); 
             res.status(200).json({ message: "Verification email sent" });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     };
+    
 
     public loginUser = async (req: Request, res: Response) => {
         try {
