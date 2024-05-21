@@ -5,7 +5,8 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { logger } from "./logging/logger";
 import session from "express-session";
-// import { requiresAuth } from 'express-openid-connect';
+import {auth0MW} from "./Config/auth0Config";
+import { requiresAuth } from 'express-openid-connect';
 import userRoutes from "./Routes/UserRoute";
 import eventRoutes from "./Routes/EventRoute";
 import ticketRoutes from "./Routes/TicketRoute";
@@ -18,7 +19,7 @@ import cookieParser from "cookie-parser";
 import eventTicketTypeRouter from "./Routes/EventTicketTypeRoute";
 import cors from "cors";
 
-// import {auth0Config} from "./Config/auth0Config";
+
 const SECRET = Config.SESSION_SECRET;
 const app = express();
 
@@ -45,21 +46,19 @@ app.use(
         cookie: { secure: false, httpOnly: true, maxAge: 3600000 },
     }),
 );
-
+app.use(auth0MW);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
 
-// TODO: add the OPTIONS for each url
 app.use("/api/v1/users", checkRevokedToken, userRoutes);
 app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/tickets", authenticateJWT, ticketRoutes);
 app.use("/api/v1/ticket-types", eventTicketTypeRouter);
 
-app.get("/", (_req, res) => {
+app.get("/", requiresAuth(), (_req, res) => {
     logger.info("WELCOME");
     res.status(200).send({
-        // user: _req.oidc.user,
         message: "Welcome!!",
     });
 });
