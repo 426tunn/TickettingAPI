@@ -5,8 +5,6 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { logger } from "./logging/logger";
 import session from "express-session";
-import {auth0MW} from "./Config/auth0Config";
-import { requiresAuth } from 'express-openid-connect';
 import userRoutes from "./Routes/UserRoute";
 import eventRoutes from "./Routes/EventRoute";
 import ticketRoutes from "./Routes/TicketRoute";
@@ -18,6 +16,7 @@ import { checkRevokedToken } from "./Middlewares/AuthMiddleware";
 import cookieParser from "cookie-parser";
 import eventTicketTypeRouter from "./Routes/EventTicketTypeRoute";
 import cors from "cors";
+import { authRouter } from "./Routes/authRouter";
 
 
 const SECRET = Config.SESSION_SECRET;
@@ -42,21 +41,21 @@ app.use(
     session({
         secret: SECRET,
         resave: false,
-        saveUninitialized: false,
+        saveUninitialized: true,
         cookie: { secure: false, httpOnly: true, maxAge: 3600000 },
     }),
 );
-app.use(auth0MW);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cookieParser());
 
 app.use("/api/v1/users", checkRevokedToken, userRoutes);
+app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/tickets", authenticateJWT, ticketRoutes);
 app.use("/api/v1/ticket-types", eventTicketTypeRouter);
 
-app.get("/", requiresAuth(), (_req, res) => {
+app.get("/home", authenticateJWT, (_req, res) => {
     logger.info("WELCOME");
     res.status(200).send({
         message: "Welcome!!",

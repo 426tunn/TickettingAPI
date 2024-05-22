@@ -9,11 +9,12 @@ const passwordValidator = (value: string) => {
 
 interface IUser extends Document {
     _id: Types.ObjectId;
-    username: string;
+    googleId?: string;
+    username?: string;
     firstname: string;
     lastname: string;
     email: string;
-    password: string;
+    password?: string;
     isVerified: boolean;
     role: UserRole;
     verificationToken?: string;
@@ -24,9 +25,15 @@ interface IUser extends Document {
 }
 
 const userSchema = new Schema<IUser>({
+    googleId: {
+        type: String,
+        required: false,
+    },
     username: {
         type: String,
-        required: true,
+        required: function() {
+            return !this.googleId;
+        },
         maxlength: 50,
     },
     firstname: {
@@ -43,7 +50,9 @@ const userSchema = new Schema<IUser>({
     },
     password: {
         type: String,
-        required: true,
+        required: function() {
+            return !this.googleId;
+        },
         validate: {
             validator: passwordValidator,
             message:

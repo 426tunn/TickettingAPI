@@ -16,6 +16,10 @@ export function authenticateJWT(
             if (err || !user) {
                 return res.status(401).json({ message: "Unauthorized" });
             }
+            const token = req.headers.authorization?.split(" ")[1];
+            if (token && revokedTokens.has(token)) {
+                return res.status(401).json({ message: "Token revoked: Unauthorized" });
+            }
             req.user = user;
             next();
         },

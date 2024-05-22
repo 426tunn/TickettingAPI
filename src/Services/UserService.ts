@@ -1,6 +1,8 @@
 import { Model } from "mongoose";
+import { Profile } from "passport-google-oauth20";
 import { IUser } from "../Models/UserModel";
 import { UserRole } from "../Enums/UserRole";
+import { generateSecurePassword } from "../Utils/authUtils";
 
 export class UserService {
     private userModel: Model<IUser>;
@@ -33,14 +35,32 @@ export class UserService {
         }
     }
 
+    async createUserWithGoogle(profile: Profile): Promise<IUser> {
+        const securedPassword = generateSecurePassword();
+        const newUser = new this.userModel({
+            googleId: profile.id,
+            firstname: profile.name.givenName,
+            lastname: profile.name.familyName,
+            email: profile.emails[0].value,
+            username: profile.emails[0].value.split('@')[0],
+            password: securedPassword,
+            isVerified: true,
+        });
+        return newUser.save();
+    }
+
     async getUserById(userId: string): Promise<IUser | null> {
         return await this.userModel.findById(userId).exec();
+    }
+
+   async getUserByGoogleId(googleId: string): Promise<IUser | null> {
+        return this.userModel.findOne({ googleId });
     }
 
     async getUserByEmail(email: string): Promise<IUser | null> {
         return await this.userModel.findOne({ email }).exec();
     }
-
+  
     async getUserByUsername(username: string): Promise<IUser | null> {
         return await this.userModel.findOne({ username }).exec();
     }

@@ -69,7 +69,6 @@ export class UserController {
         }
     };
 
-    // implement 0Auth
 
     public verifyUser = async (req: Request, res: Response) => {
         const { token } = req.query;
@@ -123,6 +122,11 @@ export class UserController {
         try {
             const { usernameOrEmail, password } = req.body;
             let user: IUser;
+            
+            if (revokedTokens.size > 0) {
+                revokedTokens.clear();
+            }
+
             if (usernameOrEmail.includes("@")) {
                 user = await this.userService.getUserByEmail(usernameOrEmail);
             } else {
@@ -148,7 +152,7 @@ export class UserController {
 
     public logoutUser = async (req: Request, res: Response) => {
         try {
-            const token = req.cookies.jwt_token;
+            const token = req.headers.authorization?.split(" ")[1] || req.cookies.jwt_token;
             if (token) {
                 revokedTokens.add(token);
             }
