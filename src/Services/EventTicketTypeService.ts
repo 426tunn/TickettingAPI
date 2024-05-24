@@ -22,6 +22,16 @@ export class EventTicketTypeService {
         });
     }
 
+    async createEventTicketTypes(
+        ticketTypes: IEventTicketType[],
+        eventId: string,
+    ): Promise<IEventTicketType[]> {
+        const ticketTypeWithEventId = ticketTypes.map((ticketType) => {
+            return { eventId, ...ticketType };
+        });
+        return this.eventTicketTypeModel.create(ticketTypeWithEventId);
+    }
+
     async getTicketTypesByEventId(
         eventId: string,
     ): Promise<IEventTicketType[] | null> {
