@@ -9,12 +9,18 @@ import {
 } from "../Types/RequestTypes";
 import { UserRole } from "../Enums/UserRole";
 import { EventCategory } from "../Enums/EventCategory";
+import { EventTicketTypeService } from "../Services/EventTicketTypeService";
+import { EventTicketTypeModel } from "../Models/EventTicketTypeModel";
 
 export class EventController {
     private eventService: EventService;
+    private ticketTypeService: EventTicketTypeService;
 
     constructor() {
         this.eventService = new EventService(EventModel);
+        this.ticketTypeService = new EventTicketTypeService(
+            EventTicketTypeModel,
+        );
     }
 
     public getCategories = async (req: Request, res: Response) => {
@@ -69,8 +75,13 @@ export class EventController {
 
             const organizerId = req.user._id;
             const eventData = { ...req.body, organizerId };
+            const ticketTypes = eventData.ticketTypes;
 
             const newEvent = await this.eventService.createEvent(eventData);
+            await this.ticketTypeService.createEventTicketTypes(
+                ticketTypes,
+                newEvent._id,
+            );
             res.status(201).json({ event: newEvent });
         } catch (error) {
             res.status(500).json(error);
