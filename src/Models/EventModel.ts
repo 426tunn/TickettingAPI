@@ -72,6 +72,7 @@ const eventSchema = new Schema<IEvent>(
         description: {
             type: String,
             required: true,
+            maxLength: 500,
         },
         category: {
             type: String,
