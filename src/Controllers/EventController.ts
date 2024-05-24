@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { EventModel, IEvent } from "../Models/EventModel";
 import { EventService } from "../Services/EventService";
-import { validationResult } from "express-validator";
+import { matchedData, validationResult } from "express-validator";
 import { IUser } from "../Models/UserModel";
 import {
     IAuthenticatedRequest,
@@ -10,7 +10,10 @@ import {
 import { UserRole } from "../Enums/UserRole";
 import { EventCategory } from "../Enums/EventCategory";
 import { EventTicketTypeService } from "../Services/EventTicketTypeService";
-import { EventTicketTypeModel } from "../Models/EventTicketTypeModel";
+import {
+    EventTicketTypeModel,
+    IEventTicketType,
+} from "../Models/EventTicketTypeModel";
 
 export class EventController {
     private eventService: EventService;
@@ -73,16 +76,18 @@ export class EventController {
                 return res.status(400).json({ errors: errors.array() });
             }
 
-            const organizerId = req.user._id;
-            const eventData = { ...req.body, organizerId };
-            const ticketTypes = eventData.ticketTypes;
+            const data = matchedData(req);
+            const { ticketTypes, ...eventData } = data;
 
-            const newEvent = await this.eventService.createEvent(eventData);
+            eventData.organizerId = req.user._id;
+            const newEvent = await this.eventService.createEvent(
+                eventData as IEvent,
+            );
             await this.ticketTypeService.createEventTicketTypes(
                 ticketTypes,
                 newEvent._id,
             );
-            res.status(201).json({ event: newEvent });
+            return res.status(201).json({ event: newEvent });
         } catch (error) {
             res.status(500).json(error);
         }

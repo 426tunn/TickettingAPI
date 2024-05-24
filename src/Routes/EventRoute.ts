@@ -20,15 +20,21 @@ eventRouter.post(
         body("name").notEmpty().withMessage("Event name is required"),
         body("description")
             .notEmpty()
-            .withMessage("Event description is required"),
+            .withMessage("Event description is required")
+            .isLength({ max: 500 })
+            .withMessage(
+                "Event description should be less than 500 characters long",
+            ),
         body("category").notEmpty().withMessage("Event category is required"),
-        body("status").notEmpty().withMessage("Event status is required"),
         body("visibility")
             .notEmpty()
             .withMessage("Event visibility is required"),
         body("type").notEmpty().withMessage("Event type is required"),
-        body("location").notEmpty().withMessage("Event location is required"),
         body("venueType").notEmpty().withMessage("Event venueType is required"),
+        body("tags")
+            .optional()
+            .isArray()
+            .withMessage("Event Tags should be an array of strings"),
         body("startDate")
             .notEmpty()
             .toDate()
@@ -37,10 +43,11 @@ eventRouter.post(
             .notEmpty()
             .toDate()
             .withMessage("Event end date is required"),
-        body("tags")
-            .optional()
-            .isArray()
-            .withMessage("Event Tags should be an array of strings"),
+        body("location").notEmpty().withMessage("Event location is required"),
+        body("media"),
+        body("ticketTypes")
+            .notEmpty()
+            .withMessage("Event ticket types is required"),
     ],
     eventController.createEvent,
 );
