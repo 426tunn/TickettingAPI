@@ -47,7 +47,13 @@ UserRouter.post(
     userController.changePassword,
 );
 
-UserRouter.get("/", authenticateJWT, userController.getAllUsers);
+UserRouter.get(
+    "/",
+    authenticateJWT,
+    checkRevokedToken,
+    checkIfUserIsAdmin,
+    userController.getAllUsers,
+);
 
 UserRouter.get(
     "/:userId",

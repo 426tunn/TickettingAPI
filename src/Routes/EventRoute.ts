@@ -15,6 +15,7 @@ eventRouter.get("/", eventController.getAllEvents);
 eventRouter.post(
     "/",
     authenticateJWT,
+    checkRevokedToken,
     checkIfUserIsVerified,
     [
         body("name").notEmpty().withMessage("Event name is required"),
@@ -56,16 +57,16 @@ eventRouter.get("/:eventId", eventController.getEventById);
 eventRouter.patch(
     "/:eventId",
     authenticateJWT,
-    checkIfUserIsVerified,
     checkRevokedToken,
+    checkIfUserIsVerified,
     eventController.updateEventById,
 );
 
 eventRouter.delete(
     "/:eventId",
     authenticateJWT,
-    checkIfUserIsVerified,
     checkRevokedToken,
+    checkIfUserIsVerified,
     eventController.deleteEventById,
 );
 

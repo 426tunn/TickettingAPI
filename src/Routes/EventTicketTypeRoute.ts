@@ -3,6 +3,7 @@ import { EventTicketTypeController } from "../Controllers/EventTicketTypeControl
 import { body } from "express-validator";
 import {
     authenticateJWT,
+    checkIfUserIsVerified,
     checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
 
@@ -17,6 +18,7 @@ eventTicketTypeRouter.post(
     "/",
     authenticateJWT,
     checkRevokedToken,
+    checkIfUserIsVerified,
     [
         body("name").notEmpty().withMessage("Ticket type name is required"),
         body("price").notEmpty().withMessage("Ticket type price is required"),
@@ -39,6 +41,7 @@ eventTicketTypeRouter.patch(
     "/:eventTicketTypeId",
     authenticateJWT,
     checkRevokedToken,
+    checkIfUserIsVerified,
     eventTicketTypeController.updateEventTicketTypeById,
 );
 
@@ -46,6 +49,7 @@ eventTicketTypeRouter.delete(
     "/:eventTicketTypeId",
     authenticateJWT,
     checkRevokedToken,
+    checkIfUserIsVerified,
     eventTicketTypeController.deleteEventTicketTypeById,
 );
 
