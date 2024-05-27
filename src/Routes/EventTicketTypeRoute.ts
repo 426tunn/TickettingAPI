@@ -3,8 +3,6 @@ import { EventTicketTypeController } from "../Controllers/EventTicketTypeControl
 import { body } from "express-validator";
 import {
     authenticateJWT,
-    checkIfUserIsAdmin,
-    checkIfUserIsSuperAdmin,
     checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
 
@@ -17,7 +15,8 @@ eventTicketTypeRouter.get(
 );
 eventTicketTypeRouter.post(
     "/",
-    checkIfUserIsAdmin,
+    authenticateJWT,
+    checkRevokedToken,
     [
         body("name").notEmpty().withMessage("Ticket type name is required"),
         body("price").notEmpty().withMessage("Ticket type price is required"),
@@ -46,7 +45,6 @@ eventTicketTypeRouter.patch(
 eventTicketTypeRouter.delete(
     "/:eventTicketTypeId",
     authenticateJWT,
-    checkIfUserIsSuperAdmin,
     checkRevokedToken,
     eventTicketTypeController.deleteEventTicketTypeById,
 );

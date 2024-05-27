@@ -18,7 +18,9 @@ export function authenticateJWT(
             }
             const token = req.headers.authorization?.split(" ")[1];
             if (token && revokedTokens.has(token)) {
-                return res.status(401).json({ message: "Token revoked: Unauthorized" });
+                return res
+                    .status(401)
+                    .json({ message: "Token revoked: Unauthorized" });
             }
             req.user = user;
             next();
@@ -37,29 +39,10 @@ export function checkIfUserIsAdmin(
             .json({ message: "Unauthorized: You need to be logged in" });
     }
 
-    if (req.user?.role !== "admin" && req.user?.role !== "superadmin") {
+    if (req.user?.role !== "admin") {
         return res
             .status(403)
             .json({ message: "Forbidden: User is not an admin" });
-    }
-    next();
-}
-
-export function checkIfUserIsSuperAdmin(
-    req: IAuthenticatedRequest<Partial<IUser>>,
-    res: Response,
-    next: NextFunction,
-) {
-    if (!req.user) {
-        return res
-            .status(401)
-            .json({ message: "Unauthorized: You need to be logged in" });
-    }
-
-    if (req?.user?.role !== "superadmin") {
-        return res
-            .status(403)
-            .json({ message: "Forbidden: User is not a super admin" });
     }
     next();
 }

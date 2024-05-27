@@ -3,10 +3,9 @@ import { UserController } from "../Controllers/UserController";
 import { check } from "express-validator";
 import {
     authenticateJWT,
-    // checkIfUserIsAdmin,
+    checkIfUserIsAdmin,
     checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
-import { checkIfUserIsSuperAdmin } from "../Middlewares/AuthMiddleware";
 
 const UserRouter = Router();
 const userController = new UserController();
@@ -53,7 +52,7 @@ UserRouter.get("/", authenticateJWT, userController.getAllUsers);
 UserRouter.get(
     "/:userId",
     authenticateJWT,
-    checkIfUserIsSuperAdmin,
+    checkIfUserIsAdmin,
     userController.getUserById,
 );
 
@@ -62,7 +61,7 @@ UserRouter.patch("/:userId", authenticateJWT, userController.updateUser);
 UserRouter.patch(
     "/role/:userId",
     authenticateJWT,
-    // checkIfUserIsSuperAdmin,
+    checkIfUserIsAdmin,
     userController.updateUserRole,
 );
 

@@ -4,7 +4,6 @@ import { body } from "express-validator";
 import {
     authenticateJWT,
     checkIfUserIsAdmin,
-    checkIfUserIsSuperAdmin,
     checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
 
@@ -52,6 +51,8 @@ eventRouter.post(
     eventController.createEvent,
 );
 eventRouter.get("/:eventId", eventController.getEventById);
+
+// FIX: normal verified users should be able to update their verified events
 eventRouter.patch(
     "/:eventId",
     authenticateJWT,
@@ -59,10 +60,11 @@ eventRouter.patch(
     checkRevokedToken,
     eventController.updateEventById,
 );
+// FIX: normal verified users should be able to delete their verified events
 eventRouter.delete(
     "/:eventId",
     authenticateJWT,
-    checkIfUserIsSuperAdmin,
+    checkIfUserIsAdmin,
     checkRevokedToken,
     eventController.deleteEventById,
 );

@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import { UserService } from "../Services/UserService";
 import { IUser, UserModel } from "../Models/UserModel";
 import { validationResult } from "express-validator";
-import { UserRole } from "Enums/UserRole";
+import { UserRole } from "../Enums/UserRole";
 // import bcrypt from "bcrypt";
 import { generateTokenWithRole, isEmail } from "../Utils/authUtils";
 import { revokedTokens } from "../Middlewares/AuthMiddleware";
-import { IAuthenticatedRequest } from "Types/RequestTypes";
+import { IAuthenticatedRequest } from "../Types/RequestTypes";
 import * as crypto from "crypto";
 import {
     sendPasswordResetEmail,
@@ -69,7 +69,6 @@ export class UserController {
         }
     };
 
-
     public verifyUser = async (req: Request, res: Response) => {
         const { token } = req.query;
         try {
@@ -94,8 +93,10 @@ export class UserController {
         }
     };
 
-
-    public reverifyUser = async (req: IAuthenticatedRequest<IUser>, res: Response) => {
+    public reverifyUser = async (
+        req: IAuthenticatedRequest<IUser>,
+        res: Response,
+    ) => {
         const { email } = req.user;
         if (!isEmail(email)) {
             return res.status(400).json({ error: "Invalid email" });
@@ -110,19 +111,18 @@ export class UserController {
             }
             await sendVerificationEmail(email, user.verificationToken);
             user.verificationExpire = new Date(Date.now() + 600000);
-            await user.save(); 
+            await user.save();
             res.status(200).json({ message: "Verification email sent" });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     };
-    
 
     public loginUser = async (req: Request, res: Response) => {
         try {
             const { usernameOrEmail, password } = req.body;
             let user: IUser;
-            
+
             if (revokedTokens.size > 0) {
                 revokedTokens.clear();
             }
@@ -152,7 +152,9 @@ export class UserController {
 
     public logoutUser = async (req: Request, res: Response) => {
         try {
-            const token = req.headers.authorization?.split(" ")[1] || req.cookies.jwt_token;
+            const token =
+                req.headers.authorization?.split(" ")[1] ||
+                req.cookies.jwt_token;
             if (token) {
                 revokedTokens.add(token);
             }
@@ -204,7 +206,7 @@ export class UserController {
         res: Response,
     ) => {
         try {
-            const admin = req.user.role === "superadmin";
+            const admin = req.user.role === UserRole.Admin;
             if (!admin) {
                 return res
                     .status(403)
@@ -220,12 +222,8 @@ export class UserController {
                     .status(404)
                     .json({ error: "This User does not exist" });
             }
-            const roleToUpdate = req.body.role as UserRole;
-            if (
-                roleToUpdate !== "admin" &&
-                roleToUpdate !== "user" &&
-                roleToUpdate !== "superadmin"
-            ) {
+            const roleToUpdate = req.body.role.toLowerCase() as UserRole;
+            if (!Object.values(UserRole).includes(roleToUpdate)) {
                 return res.status(400).json({ error: "Invalid role" });
             }
             if (!roleToUpdate) {

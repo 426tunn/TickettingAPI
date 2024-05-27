@@ -123,7 +123,7 @@ export class EventController {
 
             if (
                 req.user.id !== event.organizerId ||
-                req.user.role !== UserRole.SuperAdmin
+                req.user.role !== UserRole.Admin
             ) {
                 return res.status(403).json({
                     error: "Only the event organizers and admins can update the event",

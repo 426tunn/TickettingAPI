@@ -18,7 +18,6 @@ import eventTicketTypeRouter from "./Routes/EventTicketTypeRoute";
 import cors from "cors";
 import { authRouter } from "./Routes/authRouter";
 
-
 const SECRET = Config.SESSION_SECRET;
 const app = express();
 
