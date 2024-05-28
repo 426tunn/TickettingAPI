@@ -23,13 +23,24 @@ UserRouter.post(
     ],
     userController.registerUser,
 );
+
+UserRouter.post(
+    "/login",
+     userController.loginUser
+);
+
+UserRouter.post("/logout", userController.logoutUser);
+
 UserRouter.get(
     "/get-token-user",
     authenticateJWT,
     checkRevokedToken,
     userController.getUserByToken,
 );
-UserRouter.get("/verify-email", userController.verifyUser);
+UserRouter.get(
+    "/verify-email", 
+    userController.verifyUser
+);
 
 UserRouter.post(
     "/resend-verification-email",
@@ -37,10 +48,15 @@ UserRouter.post(
     userController.reverifyUser,
 );
 
-UserRouter.post("/login", userController.loginUser);
-UserRouter.post("/logout", userController.logoutUser);
-UserRouter.post("/forgot-password", userController.forgotPassword);
-UserRouter.post("/reset-password", userController.resetPassword);
+UserRouter.post(
+    "/forgot-password", 
+    userController.forgotPassword);
+
+UserRouter.post(
+    "/reset-password", 
+    userController.resetPassword
+);
+
 UserRouter.post(
     "/change-password",
     authenticateJWT,
@@ -62,7 +78,11 @@ UserRouter.get(
     userController.getUserById,
 );
 
-UserRouter.patch("/:userId", authenticateJWT, userController.updateUser);
+UserRouter.patch(
+    "/:userId", 
+    authenticateJWT, 
+    userController.updateUser
+);
 
 UserRouter.patch(
     "/role/:userId",
@@ -71,12 +91,18 @@ UserRouter.patch(
     userController.updateUserRole,
 );
 
-UserRouter.delete("/:userId", authenticateJWT, userController.deleteUser);
+UserRouter.delete(
+    "/:userId", 
+    authenticateJWT,
+    checkIfUserIsAdmin,
+    userController.deleteUser);
 
 /**
  * @openapi
  * /api/v1/users/register:
  *   post:
+ *     tags:
+ *       - User Management
  *     summary: Register a new user
  *     requestBody:
  *       required: true
@@ -114,6 +140,8 @@ UserRouter.delete("/:userId", authenticateJWT, userController.deleteUser);
  * @openapi
  * /api/v1/users/login:
  *   post:
+ *     tags:
+ *       - User Management
  *     summary: Login user
  *     requestBody:
  *       required: true
@@ -142,8 +170,29 @@ UserRouter.delete("/:userId", authenticateJWT, userController.deleteUser);
 
 /**
  * @openapi
+ * /api/v1/users/logout:
+ *   post:
+ *     tags:
+ *       - User Management
+ *     summary: Logout user
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Successful logout
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @openapi
  * /api/v1/users:
  *   get:
+ *     tags:
+ *       - User Management
  *     summary: Get all users
  *     security: [{ bearerAuth: [] }]
  *     responses:
@@ -159,6 +208,8 @@ UserRouter.delete("/:userId", authenticateJWT, userController.deleteUser);
  * @openapi
  *   /api/v1/users/{userId}:
  *    get:
+ *     tags:
+ *       - User Management
  *     summary: Get user by id
  *     security: [{ bearerAuth: [] }]
  *     parameters:
@@ -181,8 +232,115 @@ UserRouter.delete("/:userId", authenticateJWT, userController.deleteUser);
 
 /**
  * @openapi
+ * /api/v1/users/get-token-user:
+ *   get:
+ *     tags:
+ *       - User Management
+ *     summary: Get user by token
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Successful get user by token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @openapi
+ * /api/v1/users/verify-email:
+ *   get:
+ *     tags:
+ *       - User Management
+ *     summary: Verify user
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Successful verification
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       409:
+ *         description: User already verified
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @openapi
+ * /api/v1/users/resend-verification-email:
+ *   post:
+ *     tags:
+ *       - User Management
+ *     summary: Resend verification email
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Successful resend verification email
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @openapi
+ * /api/v1/users/forgot-password:
+ *   post:
+ *     tags:
+ *       - User Management
+ *     summary: Forgot password
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *               oldPassword:
+ *                 type: string
+ *             example:
+ *               email: example@example.com
+ *               password: password123
+ *               oldPassword: password123
+ *     responses:
+ *       200:
+ *         description: Successful forgot password email
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       409:
+ *         description: User doesn't exist or wrong password
+ *       500:
+ *         description: Internal server error
+ */
+
+
+/**
+ * @openapi
  *   /api/v1/users/{userId}:
  *    patch:
+ *     tags:
+ *       - User Management
  *     summary: Update user by id
  *     security: [{ bearerAuth: [] }]
  *     parameters:
@@ -228,18 +386,15 @@ UserRouter.delete("/:userId", authenticateJWT, userController.deleteUser);
  *         description: Internal server error
  */
 
+
 /**
  * @openapi
- *   /api/v1/users/role/{userId}:
- *    put:
- *     summary: Update user role by id
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *         description: The users id
+ * /api/v1/users/reset-password:
+ *   patch:
+ *     tags:
+ *       - User Management
+ *     summary: Reset password
+ *     security: [{ bearerAuth: [] }]
  *     requestBody:
  *       required: true
  *       content:
@@ -247,27 +402,114 @@ UserRouter.delete("/:userId", authenticateJWT, userController.deleteUser);
  *           schema:
  *             type: object
  *             properties:
- *               role:
+ *               password:
  *                 type: string
- *                 enum: [admin, user]
+ *               oldPassword:
+ *                 type: string
  *             example:
- *               role: admin
+ *               password: newpassword123
+ *               oldPassword: password123
  *     responses:
  *       200:
- *         description: Successful update user role by id
+ *         description: Successful reset password
+ *       400:
+ *         description: Bad request
  *       401:
  *         description: Unauthorized
- *       404:
- *         description: User not found
+ *       409:
+ *         description: Wrong old password
  *       500:
  *         description: Internal server error
  */
 
 /**
  * @openapi
+ * /api/v1/users/change-password:
+ *   patch:
+ *     tags:
+ *       - User Management
+ *     summary: Change password
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               password:
+ *                 type: string
+ *               oldPassword:
+ *                 type: string
+ *             example:
+ *               password: newpassword123
+ *               oldPassword: password123
+ *     responses:
+ *       200:
+ *         description: Successful change password
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       409:
+ *         description: Wrong old password
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @openapi
+ * /api/v1/users/role/:userId:
+ *   patch:
+ *     tags:
+ *       - User Management
+ *     summary: Update user role
+ *     security: [{ bearerAuth: [] }]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: body
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 role:
+ *                   type: string
+ *                   enum: ["superadmin", "admin", "user"]
+ *               example:
+ *                   role: user
+ *     responses:
+ *       200:
+ *         description: Successful update user role
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: User not found
+ *       409:
+ *         description: User already has the specified role
+ *       500:
+ *         description: Internal server error
+ */
+
+
+
+/**
+ * @openapi
  *   /api/v1/users/{userId}:
  *    delete:
+ *     tags:
+ *       - User Management
  *     summary: Delete user by id
+ *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path
  *         name: userId
