@@ -7,9 +7,9 @@ const options: swaggerJsdoc.Options = {
     definition: {
         openapi: "3.0.0",
         info: {
-            title: "Ticketting API",
+            title: "Teeket.Africa API",
             version: "1.0.0",
-            description: "API documentation for BlackHole",
+            description: "API documentation for Teeket.Africa",
         },
         components: {
             securitySchemes: {

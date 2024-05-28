@@ -25,4 +25,43 @@ authRouter.get(
     }
 );
 
+
+/**
+ * @openapi
+ * /auth/google:
+ *   get:
+ *     tags:
+ *       - Google OAuth2
+ *     summary: Initiate Google OAuth2 authentication
+ *     description: Redirect to Google's OAuth2 page for authentication
+ *     responses:
+ *       302:
+ *         description: Redirect to Google's OAuth2 page for authentication
+ *       400:
+ *         description: Invalid request
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @openapi
+ * /auth/google/callback:
+ *   get:
+ *     tags:
+ *       - Google OAuth2
+ *     summary: Complete Google OAuth2 authentication
+ *     description: Complete Google OAuth2 authentication and generate JWT token
+ *     responses:
+ *       200:
+ *         description: JWT token generated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiResponse'
+ *       401:
+ *         description: User authentication failed
+ *       500:
+ *         description: Internal server error
+ */
+
 export { authRouter };
