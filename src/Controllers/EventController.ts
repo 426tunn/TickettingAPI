@@ -10,10 +10,7 @@ import {
 import { UserRole } from "../Enums/UserRole";
 import { EventCategory } from "../Enums/EventCategory";
 import { EventTicketTypeService } from "../Services/EventTicketTypeService";
-import {
-    EventTicketTypeModel,
-    IEventTicketType,
-} from "../Models/EventTicketTypeModel";
+import { EventTicketTypeModel } from "../Models/EventTicketTypeModel";
 
 export class EventController {
     private eventService: EventService;
@@ -44,12 +41,52 @@ export class EventController {
             const page = parseInt(req.query.page) || 1;
             const perPage = parseInt(req.query.perPage) || 9;
             const { sort, order } = req.query;
+            const { organizerId } = req.params;
 
             const events = await this.eventService.getAllEvents({
                 sort,
                 order,
                 page,
                 perPage,
+                organizerId,
+            });
+
+            const totalNoOfPages = Math.ceil(events.length / perPage);
+            return res
+                .status(200)
+                .json({ page, perPage, totalNoOfPages, events });
+        } catch (error) {
+            return res.status(500).json(error);
+        }
+    };
+
+    public getOrganizerEvents = async (
+        req: IAuthenticatedRequest<IUser> & IEventPaginationAndSortReq,
+        res: Response,
+    ): Promise<Response<IEvent[] | []>> => {
+        try {
+            const page = parseInt(req.query.page) || 1;
+            const perPage = parseInt(req.query.perPage) || 9;
+            const { sort, order } = req.query;
+            const { organizerId } = req.params;
+
+            if (
+                req.user.id !== organizerId ||
+                req.user.role !== UserRole.Admin
+            ) {
+                return res.status(403).json({
+                    error: "Only the event organizers and admins can access this endpoint",
+                });
+            }
+
+            const events = await this.eventService.getAllEvents({
+                sort,
+                order,
+                page,
+                perPage,
+                organizerId,
+                fieldsToSelect:
+                    "id name location startDate endDate media status",
             });
 
             const totalNoOfPages = Math.ceil(events.length / perPage);
