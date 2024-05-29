@@ -68,6 +68,7 @@ export class EventController {
         res: Response,
     ): Promise<Response<IEvent[] | []>> => {
         try {
+            // TODO: implement logic to add tickets details (total, sold, available) on each event
             const page = parseInt(req.query.page) || 1;
             const perPage = parseInt(req.query.perPage) || 9;
             const { sort, order } = req.query;
