@@ -9,7 +9,7 @@ export interface IEventPaginationAndSort {
     perPage?: number;
     status?: EventStatus;
     organizerId?: string;
-    attributesToSelect?: string;
+    fieldsToSelect?: string;
 }
 
 export interface IEventPaginationAndSortReq {

@@ -79,7 +79,8 @@ export class EventController {
                 page,
                 perPage,
                 organizerId,
-                attributesToSelect : "id name location startDate endDate media status",
+                fieldsToSelect:
+                    "id name location startDate endDate media status",
             });
 
             const totalNoOfPages = Math.ceil(events.length / perPage);
