@@ -10,6 +10,13 @@ interface ITicket extends Document {
     eventId: IEvent;
 }
 
+export interface ITicketGroupedByType {
+    _id: mongoose.Types.ObjectId;
+    tickets: ITicket[];
+    ticketType: IEventTicketType;
+    totalTicketsSold: number;
+}
+
 const ticketSchema = new Schema<ITicket>(
     {
         eventTicketTypeId: {

@@ -11,16 +11,19 @@ import { UserRole } from "../Enums/UserRole";
 import { EventCategory } from "../Enums/EventCategory";
 import { EventTicketTypeService } from "../Services/EventTicketTypeService";
 import { EventTicketTypeModel } from "../Models/EventTicketTypeModel";
+import { TicketService } from "../Services/TicketService";
+import { TicketModel, type ITicketGroupedByType } from "../Models/TicketModel";
 
 export class EventController {
     private eventService: EventService;
-    private ticketTypeService: EventTicketTypeService;
-
+    private eventTicketTypeService: EventTicketTypeService;
+    private ticketService: TicketService;
     constructor() {
         this.eventService = new EventService(EventModel);
-        this.ticketTypeService = new EventTicketTypeService(
+        this.eventTicketTypeService = new EventTicketTypeService(
             EventTicketTypeModel,
         );
+        this.ticketService = new TicketService(TicketModel);
     }
 
     public getCategories = async (req: Request, res: Response) => {
@@ -84,7 +87,7 @@ export class EventController {
                 order,
                 page,
                 perPage,
-                organizerId,
+                organizerId: req.user._id.toString(),
                 fieldsToSelect:
                     "id name location startDate endDate media status",
             });
@@ -120,7 +123,7 @@ export class EventController {
             const newEvent = await this.eventService.createEvent(
                 eventData as IEvent,
             );
-            await this.ticketTypeService.createEventTicketTypes(
+            await this.eventTicketTypeService.createEventTicketTypes(
                 ticketTypes,
                 newEvent._id,
             );
@@ -142,6 +145,84 @@ export class EventController {
             }
             return res.status(200).json(event);
         } catch (error) {
+            return res.status(500).json(error);
+        }
+    };
+
+    public getEventDetailsById = async (
+        req: IAuthenticatedRequest<IUser>,
+        res: Response,
+    ): Promise<Response<IEvent | null>> => {
+        try {
+            const eventId = req.params.eventId;
+            const event = await this.eventService.getEventById(eventId);
+            const organizerId =
+                event?.organizerId?.toString() as unknown as string;
+
+            if (organizerId !== req.user._id.toString()) {
+                return res.status(403).json({
+                    error: "Only the event organizers and admins can access this endpoint",
+                });
+            }
+
+            if (event == null) {
+                return res.status(404).json({ error: "Event does not exists" });
+            }
+
+            const ticketTypes =
+                await this.eventTicketTypeService.getTicketTypesByEventId(
+                    eventId,
+                );
+
+            const totalRevenue = ticketTypes.reduce(
+                (total, currentTicketType) => {
+                    return (
+                        total +
+                        currentTicketType.price * currentTicketType.quantity
+                    );
+                },
+                0,
+            );
+
+            const ticketsGroupedByType =
+                (await this.ticketService.getEventTicketsGroupedByTicketType(
+                    eventId,
+                )) as unknown as ITicketGroupedByType[];
+
+            const salesByTicketType = ticketsGroupedByType.map(
+                (groupedType) => {
+                    return {
+                        id: groupedType._id,
+                        ticketType: groupedType.ticketType.name,
+                        price: groupedType.ticketType.price,
+                        sold: groupedType.tickets.length,
+                        total: groupedType.ticketType.quantity,
+                    };
+                },
+            );
+
+            const [totalTicketsSold, totalTickets] = salesByTicketType.reduce(
+                (totalTicketsSoldAndTotalTickets, currentTicketTypeGroup) => {
+                    return [
+                        totalTicketsSoldAndTotalTickets[0] +
+                            currentTicketTypeGroup.sold,
+                        totalTicketsSoldAndTotalTickets[1] +
+                            currentTicketTypeGroup.total,
+                    ];
+                },
+                [0, 0],
+            );
+
+            return res.status(200).json({
+                ...event.toJSON(),
+                ticketTypes,
+                totalRevenue,
+                totalTicketsSold,
+                totalTickets,
+                salesByTicketType,
+            });
+        } catch (error) {
+            console.log("yeah");
             return res.status(500).json(error);
         }
     };

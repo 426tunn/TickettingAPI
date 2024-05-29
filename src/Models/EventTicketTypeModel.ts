@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { TicketTypes } from "../Enums/TicketTypes";
 import { IEvent } from "./EventModel";
 
 interface IEventTicketType extends Document {
@@ -9,6 +8,7 @@ interface IEventTicketType extends Document {
     eventId: IEvent;
 }
 
+//TODO: make sure all ticket & ticket type prices are in 2 decimal places
 const eventTicketTypeSchema = new Schema<IEventTicketType>(
     {
         name: {

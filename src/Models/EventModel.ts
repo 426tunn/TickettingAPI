@@ -3,6 +3,7 @@ import { EventStatus } from "../Enums/EventStatus";
 import { EventType } from "../Enums/EventType";
 import { EventVisibility } from "../Enums/EventVisibility";
 import { VenueType } from "../Enums/VenueType";
+import { EventTicketTypeModel } from "./EventTicketTypeModel";
 import { IUser } from "./UserModel";
 import mongoose, { Schema, Document } from "mongoose";
 

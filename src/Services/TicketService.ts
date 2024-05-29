@@ -1,5 +1,5 @@
 import { ITicket } from "../Models/TicketModel";
-import { Model } from "mongoose";
+import mongoose, { Model } from "mongoose";
 
 export class TicketService {
     constructor(public ticketModel: Model<ITicket>) {}
@@ -14,6 +14,35 @@ export class TicketService {
 
     async getEventTickets(eventId: string): Promise<ITicket[] | null> {
         return this.ticketModel.find({ eventId });
+    }
+
+    async getEventTicketsGroupedByTicketType(
+        eventId: string,
+    ): Promise<ITicket[] | null> {
+        return this.ticketModel.aggregate([
+            {
+                $match: { eventId: new mongoose.Types.ObjectId(eventId) },
+            },
+            {
+                $lookup: {
+                    from: "eventtickettypes",
+                    localField: "eventTicketTypeId",
+                    foreignField: "_id",
+                    as: "ticketType",
+                },
+            },
+            {
+                $unwind: "$ticketType",
+            },
+            {
+                $group: {
+                    _id: "$ticketType._id",
+                    ticketType: { $first: "$ticketType" },
+                    tickets: { $push: "$$ROOT" },
+                    totalTicketsSold: { $sum: 1 },
+                },
+            },
+        ]);
     }
 
     async getUserEventTicket(
