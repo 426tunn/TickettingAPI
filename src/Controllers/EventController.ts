@@ -71,7 +71,7 @@ export class EventController {
             const { organizerId } = req.params;
 
             if (
-                req.user.id !== organizerId ||
+                req.user._id.toString() !== organizerId ||
                 req.user.role !== UserRole.Admin
             ) {
                 return res.status(403).json({
