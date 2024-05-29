@@ -10,10 +10,7 @@ import {
 import { UserRole } from "../Enums/UserRole";
 import { EventCategory } from "../Enums/EventCategory";
 import { EventTicketTypeService } from "../Services/EventTicketTypeService";
-import {
-    EventTicketTypeModel,
-    IEventTicketType,
-} from "../Models/EventTicketTypeModel";
+import { EventTicketTypeModel } from "../Models/EventTicketTypeModel";
 
 export class EventController {
     private eventService: EventService;
@@ -64,7 +61,7 @@ export class EventController {
     };
 
     public getOrganizerEvents = async (
-        req: Request & IEventPaginationAndSortReq,
+        req: IAuthenticatedRequest<IUser> & IEventPaginationAndSortReq,
         res: Response,
     ): Promise<Response<IEvent[] | []>> => {
         try {
@@ -72,6 +69,15 @@ export class EventController {
             const perPage = parseInt(req.query.perPage) || 9;
             const { sort, order } = req.query;
             const { organizerId } = req.params;
+
+            if (
+                req.user.id !== organizerId ||
+                req.user.role !== UserRole.Admin
+            ) {
+                return res.status(403).json({
+                    error: "Only the event organizers and admins can access this endpoint",
+                });
+            }
 
             const events = await this.eventService.getAllEvents({
                 sort,
