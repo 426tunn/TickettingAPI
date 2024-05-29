@@ -11,15 +11,24 @@ const eventRouter: Router = router();
 const eventController = new EventController();
 
 eventRouter.get("/categories", eventController.getCategories);
+
 eventRouter.get("/", eventController.getAllEvents);
 
-// TODO: create middleware to handle checking if user is organizers and remove logic in controllers for the middleware
 eventRouter.get(
-    "/organizer/:organizerId",
+    "/organizer-view/",
     authenticateJWT,
     checkIfUserIsVerified,
     eventController.getOrganizerEvents,
 );
+
+eventRouter.get(
+    "/:eventId/organizer-view",
+    authenticateJWT,
+    checkRevokedToken,
+    checkIfUserIsVerified,
+    eventController.getEventDetailsById,
+);
+
 eventRouter.post(
     "/",
     authenticateJWT,
@@ -60,6 +69,7 @@ eventRouter.post(
     ],
     eventController.createEvent,
 );
+
 eventRouter.get("/:eventId", eventController.getEventById);
 
 eventRouter.patch(
