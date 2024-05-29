@@ -16,17 +16,44 @@ export class EventService {
         sort,
         order,
         status = EventStatus.Approved,
+        organizerId,
+        attributesToSelect,
     }: IEventPaginationAndSort): Promise<IEvent[] | null> {
         if (sort === "latest") {
-            return this.getAllLatestEvents({ order, page, perPage, status });
-        } else if (sort === "popularity") {
-            return this.getAllPopularEvents({ order, page, perPage, status });
-        } else {
+            return this.getAllLatestEvents({
+                order,
+                page,
+                perPage,
+                status,
+                organizerId,
+                attributesToSelect,
+            });
+        }
+
+        if (sort === "popularity") {
+            return this.getAllPopularEvents({
+                order,
+                page,
+                perPage,
+                status,
+                organizerId,
+                attributesToSelect,
+            });
+        }
+
+        if (organizerId) {
             return this.eventModel
-                .find({ status })
+                .find({ status, organizerId })
+                .select(attributesToSelect)
                 .limit(perPage)
                 .skip((page - 1) * perPage);
         }
+
+        return this.eventModel
+            .find({ status })
+            .select(attributesToSelect)
+            .limit(perPage)
+            .skip((page - 1) * perPage);
     }
 
     async createEvent({
@@ -66,7 +93,17 @@ export class EventService {
         page,
         perPage,
         status,
+        organizerId,
+        attributesToSelect,
     }: IEventPaginationAndSort): Promise<IEvent[] | null> {
+        if (organizerId) {
+            return this.eventModel
+                .find({ status, organizerId })
+                .select(attributesToSelect)
+                .sort({ createdAt: order })
+                .limit(perPage)
+                .skip((page - 1) * perPage);
+        }
         return this.eventModel
             .find({ status })
             .sort({ createdAt: order })
@@ -79,7 +116,20 @@ export class EventService {
         page,
         perPage,
         status,
+        organizerId,
+        attributesToSelect,
     }: IEventPaginationAndSort): Promise<IEvent[] | null> {
+        if (organizerId) {
+            return this.eventModel
+                .find({ status, organizerId })
+                .select(attributesToSelect)
+                .sort({
+                    totalTickets: order,
+                })
+                .limit(perPage)
+                .skip((page - 1) * perPage);
+        }
+
         const events = this.eventModel
             .find({ status })
             .sort({

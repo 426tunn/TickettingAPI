@@ -12,6 +12,12 @@ const eventController = new EventController();
 
 eventRouter.get("/categories", eventController.getCategories);
 eventRouter.get("/", eventController.getAllEvents);
+eventRouter.get(
+    "/organizer/:organizerId",
+    authenticateJWT,
+    checkIfUserIsVerified,
+    eventController.getOrganizerEvents,
+);
 eventRouter.post(
     "/",
     authenticateJWT,

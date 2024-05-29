@@ -44,12 +44,42 @@ export class EventController {
             const page = parseInt(req.query.page) || 1;
             const perPage = parseInt(req.query.perPage) || 9;
             const { sort, order } = req.query;
+            const { organizerId } = req.params;
 
             const events = await this.eventService.getAllEvents({
                 sort,
                 order,
                 page,
                 perPage,
+                organizerId,
+            });
+
+            const totalNoOfPages = Math.ceil(events.length / perPage);
+            return res
+                .status(200)
+                .json({ page, perPage, totalNoOfPages, events });
+        } catch (error) {
+            return res.status(500).json(error);
+        }
+    };
+
+    public getOrganizerEvents = async (
+        req: Request & IEventPaginationAndSortReq,
+        res: Response,
+    ): Promise<Response<IEvent[] | []>> => {
+        try {
+            const page = parseInt(req.query.page) || 1;
+            const perPage = parseInt(req.query.perPage) || 9;
+            const { sort, order } = req.query;
+            const { organizerId } = req.params;
+
+            const events = await this.eventService.getAllEvents({
+                sort,
+                order,
+                page,
+                perPage,
+                organizerId,
+                attributesToSelect : "id name location startDate endDate media status",
             });
 
             const totalNoOfPages = Math.ceil(events.length / perPage);

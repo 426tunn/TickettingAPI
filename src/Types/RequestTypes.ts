@@ -8,6 +8,8 @@ export interface IEventPaginationAndSort {
     page?: number;
     perPage?: number;
     status?: EventStatus;
+    organizerId?: string;
+    attributesToSelect?: string;
 }
 
 export interface IEventPaginationAndSortReq {
@@ -16,6 +18,7 @@ export interface IEventPaginationAndSortReq {
         order?: SortOrder;
         page?: string;
         perPage?: string;
+        organizerId: string;
     };
 }
 
