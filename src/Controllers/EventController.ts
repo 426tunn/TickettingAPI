@@ -72,16 +72,6 @@ export class EventController {
             const page = parseInt(req.query.page) || 1;
             const perPage = parseInt(req.query.perPage) || 9;
             const { sort, order } = req.query;
-            const { organizerId } = req.params;
-
-            if (
-                req.user._id.toString() !== organizerId ||
-                req.user.role !== UserRole.Admin
-            ) {
-                return res.status(403).json({
-                    error: "Only the event organizers and admins can access this endpoint",
-                });
-            }
 
             const events = await this.eventService.getAllEvents({
                 sort,
@@ -223,7 +213,6 @@ export class EventController {
                 salesByTicketType,
             });
         } catch (error) {
-            console.log("yeah");
             return res.status(500).json(error);
         }
     };
