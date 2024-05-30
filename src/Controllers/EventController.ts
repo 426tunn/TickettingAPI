@@ -83,10 +83,31 @@ export class EventController {
                     "id name location startDate endDate media status",
             });
 
+            const eventWithTicketDetails = events.map(async (event) => {
+                const { totalTickets, totalTicketsSold } =
+                    await this.ticketService.getTicketSalesDetailsForEvent(
+                        event.id,
+                    );
+
+                const availableTickets =
+                    totalTickets - totalTicketsSold >= 0
+                        ? totalTickets - totalTicketsSold
+                        : 0;
+                return {
+                    ...event.toJSON(),
+                    totalTickets,
+                    totalTicketsSold,
+                    availableTickets,
+                };
+            });
+
             const totalNoOfPages = Math.ceil(events.length / perPage);
-            return res
-                .status(200)
-                .json({ page, perPage, totalNoOfPages, events });
+            return res.status(200).json({
+                page,
+                perPage,
+                totalNoOfPages,
+                events: await Promise.all(eventWithTicketDetails),
+            });
         } catch (error) {
             return res.status(500).json(error);
         }
