@@ -215,7 +215,7 @@ export class EventController {
             );
 
             return res.status(200).json({
-                ...event.toJSON(),
+                event: event.toJSON(),
                 ticketTypes,
                 totalRevenue,
                 totalTicketsSold,
