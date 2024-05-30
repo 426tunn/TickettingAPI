@@ -1,4 +1,4 @@
-import { ITicket } from "../Models/TicketModel";
+import { ITicket, ITicketGroupedByType } from "../Models/TicketModel";
 import mongoose, { Model } from "mongoose";
 
 export class TicketService {
@@ -43,6 +43,37 @@ export class TicketService {
                 },
             },
         ]);
+    }
+
+    async getTicketSalesDetailsForEvent(eventId: string) {
+        const ticketsGroupedByType =
+            (await this.getEventTicketsGroupedByTicketType(
+                eventId,
+            )) as unknown as ITicketGroupedByType[];
+
+        const salesByTicketType = ticketsGroupedByType.map((groupedType) => {
+            return {
+                id: groupedType._id,
+                ticketType: groupedType.ticketType.name,
+                price: groupedType.ticketType.price,
+                sold: groupedType.tickets.length,
+                total: groupedType.ticketType.quantity,
+            };
+        });
+
+        const [totalTicketsSold, totalTickets] = salesByTicketType.reduce(
+            (totalTicketsSoldAndTotalTickets, currentTicketTypeGroup) => {
+                return [
+                    totalTicketsSoldAndTotalTickets[0] +
+                        currentTicketTypeGroup.sold,
+                    totalTicketsSoldAndTotalTickets[1] +
+                        currentTicketTypeGroup.total,
+                ];
+            },
+            [0, 0],
+        );
+
+        return { totalTickets, totalTicketsSold, salesByTicketType };
     }
 
     async getUserEventTicket(

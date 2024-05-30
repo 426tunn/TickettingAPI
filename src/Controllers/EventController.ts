@@ -175,34 +175,8 @@ export class EventController {
                 0,
             );
 
-            const ticketsGroupedByType =
-                (await this.ticketService.getEventTicketsGroupedByTicketType(
-                    eventId,
-                )) as unknown as ITicketGroupedByType[];
-
-            const salesByTicketType = ticketsGroupedByType.map(
-                (groupedType) => {
-                    return {
-                        id: groupedType._id,
-                        ticketType: groupedType.ticketType.name,
-                        price: groupedType.ticketType.price,
-                        sold: groupedType.tickets.length,
-                        total: groupedType.ticketType.quantity,
-                    };
-                },
-            );
-
-            const [totalTicketsSold, totalTickets] = salesByTicketType.reduce(
-                (totalTicketsSoldAndTotalTickets, currentTicketTypeGroup) => {
-                    return [
-                        totalTicketsSoldAndTotalTickets[0] +
-                            currentTicketTypeGroup.sold,
-                        totalTicketsSoldAndTotalTickets[1] +
-                            currentTicketTypeGroup.total,
-                    ];
-                },
-                [0, 0],
-            );
+            const { salesByTicketType, totalTicketsSold, totalTickets } =
+                await this.ticketService.getTicketSalesDetailsForEvent(eventId);
 
             return res.status(200).json({
                 event: event.toJSON(),
