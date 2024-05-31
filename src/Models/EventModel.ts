@@ -83,7 +83,7 @@ const eventSchema = new Schema<IEvent>(
         status: {
             type: String,
             enum: Object.values(EventStatus),
-            required: true,
+            default: EventStatus.Pending,
         },
         visibility: {
             type: String,
