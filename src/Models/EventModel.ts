@@ -3,7 +3,6 @@ import { EventStatus } from "../Enums/EventStatus";
 import { EventType } from "../Enums/EventType";
 import { EventVisibility } from "../Enums/EventVisibility";
 import { VenueType } from "../Enums/VenueType";
-import { EventTicketTypeModel } from "./EventTicketTypeModel";
 import { IUser } from "./UserModel";
 import mongoose, { Schema, Document } from "mongoose";
 
@@ -15,14 +14,8 @@ interface ILocation {
 }
 
 interface IMedia {
-    bannerImage: {
-        imgType: string;
-        src: string;
-    };
-    mobilePreviewImage: {
-        imgType: string;
-        src: string;
-    };
+    bannerImageURL: string;
+    mobilePreviewImageURL: string;
 }
 
 interface IEvent extends Document {
@@ -50,18 +43,8 @@ const locationSchema = new Schema<ILocation>({
 });
 
 const mediaSchema = new Schema<IMedia>({
-    bannerImage: {
-        type: {
-            imgType: String,
-            src: String,
-        },
-    },
-    mobilePreviewImage: {
-        type: {
-            imgType: String,
-            src: String,
-        },
-    },
+    bannerImageURL: String,
+    mobilePreviewImageURL: String,
 });
 
 const eventSchema = new Schema<IEvent>(

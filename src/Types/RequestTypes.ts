@@ -7,7 +7,7 @@ export interface IEventPaginationAndSort {
     order?: SortOrder;
     page?: number;
     perPage?: number;
-    status?: EventStatus;
+    status?: EventStatus | EventStatus[];
     organizerId?: string;
     fieldsToSelect?: string;
 }

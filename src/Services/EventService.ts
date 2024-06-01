@@ -3,6 +3,7 @@ import { IEvent } from "../Models/EventModel";
 import { Model, Query } from "mongoose";
 import { EventStatus } from "../Enums/EventStatus";
 
+// TODO: delete event ticket types on deleting event
 export class EventService {
     constructor(public eventModel: Model<IEvent>) {}
 
@@ -48,7 +49,7 @@ export class EventService {
         return events.select(fieldsToSelect);
     }
 
-    async createEvent({
+    createEvent({
         name,
         description,
         category,
@@ -62,8 +63,8 @@ export class EventService {
         endDate,
         media,
         tags,
-    }: IEvent): Promise<IEvent> {
-        return this.eventModel.create({
+    }: IEvent): IEvent {
+        return new this.eventModel({
             name,
             description,
             category,
