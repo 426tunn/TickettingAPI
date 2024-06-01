@@ -61,7 +61,8 @@ export class UserController {
                 verificationExpire,
             );
             const newUser = { ...user.toObject(), password: undefined };
-            await sendVerificationEmail(email, Token);
+            console.log(verificationToken)
+            await sendVerificationEmail(email, verificationToken);
             res.status(201).json({ message: "Signup Successful", newUser });
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -71,15 +72,11 @@ export class UserController {
     public verifyUser = async (req: Request, res: Response) => {
         const { token } = req.query;
         try {
-            const verificationToken = crypto
-                .createHash("sha256")
-                .update(token as string)
-                .digest("hex");
             const user =
                 await this.userService.getUserByVerificationToken(
-                    verificationToken,
+                    token as string,
                 );
-            if (!user) {
+            if (!user && user.verificationExpire < new Date()) {
                 return res
                     .status(404)
                     .json({ error: "User not found or token expired" });
@@ -205,12 +202,6 @@ export class UserController {
         res: Response,
     ) => {
         try {
-            const admin = req.user.role === UserRole.Admin;
-            if (!admin) {
-                return res
-                    .status(403)
-                    .json({ error: "Forbidden: User is not an admin" });
-            }
             const { userId } = req.params;
             if (!userId) {
                 return res.status(400).json({ error: "User ID is required" });
