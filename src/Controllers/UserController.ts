@@ -3,7 +3,6 @@ import { UserService } from "../Services/UserService";
 import { IUser, UserModel } from "../Models/UserModel";
 import { validationResult } from "express-validator";
 import { UserRole } from "../Enums/UserRole";
-// import bcrypt from "bcrypt";
 import { generateTokenWithRole, isEmail } from "../Utils/authUtils";
 import { revokedTokens } from "../Middlewares/AuthMiddleware";
 import { IAuthenticatedRequest } from "../Types/RequestTypes";
