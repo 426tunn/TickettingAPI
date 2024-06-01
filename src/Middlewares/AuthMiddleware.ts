@@ -1,3 +1,4 @@
+import { UserRole } from "Enums/UserRole";
 import { IUser } from "Models/UserModel";
 import { IAuthenticatedRequest } from "Types/RequestTypes";
 import { Request, Response, NextFunction } from "express";
@@ -39,7 +40,7 @@ export function checkIfUserIsAdmin(
             .json({ message: "Unauthorized: You need to be logged in" });
     }
 
-    if (req.user?.role !== "admin") {
+    if (req.user?.role as UserRole !== "admin" && req.user?.role as UserRole !== "superadmin") {
         return res
             .status(403)
             .json({ message: "Forbidden: User is not an admin" });
