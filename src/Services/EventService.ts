@@ -2,10 +2,16 @@ import { IEventPaginationAndSort } from "../Types/RequestTypes";
 import { IEvent } from "../Models/EventModel";
 import { Model, Query } from "mongoose";
 import { EventStatus } from "../Enums/EventStatus";
+import { EventTicketTypeService } from "./EventTicketTypeService";
+import { EventTicketTypeModel } from "../Models/EventTicketTypeModel";
 
-// TODO: delete event ticket types on deleting event
 export class EventService {
-    constructor(public eventModel: Model<IEvent>) {}
+    private eventTicketTypeService: EventTicketTypeService;
+    constructor(public eventModel: Model<IEvent>) {
+        this.eventTicketTypeService = new EventTicketTypeService(
+            EventTicketTypeModel,
+        );
+    }
 
     async getAllEventsCount(): Promise<number> {
         return this.eventModel.countDocuments();
@@ -123,6 +129,9 @@ export class EventService {
     }
 
     async deleteEventById(eventId: string): Promise<null> {
+        await this.eventTicketTypeService.deleteEventTicketTypesByEventId(
+            eventId,
+        );
         return this.eventModel.findByIdAndDelete(eventId);
     }
 }
