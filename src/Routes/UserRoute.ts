@@ -67,7 +67,7 @@ UserRouter.get(
     "/",
     authenticateJWT,
     checkRevokedToken,
-    checkIfUserIsAdmin,
+    // checkIfUserIsAdmin,
     userController.getAllUsers,
 );
 
@@ -94,7 +94,7 @@ UserRouter.patch(
 UserRouter.delete(
     "/:userId", 
     authenticateJWT,
-    checkIfUserIsAdmin,
+    // checkIfUserIsAdmin,
     userController.deleteUser);
 
 /**

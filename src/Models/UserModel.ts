@@ -2,9 +2,9 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 import bcrypt from "bcrypt";
 import { UserRole } from "../Enums/UserRole";
 
-const passwordValidator = (value: string) => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-    return passwordRegex.test(value);
+const passwordValidator = (password: string) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$%&+,:;<=>?@^_`{|}~-])[a-zA-Z\d#$%&+,:;<=>?@^_`{|}~-]{8,}$/;
+    return passwordRegex.test(password);
 };
 
 interface IUser extends Document {
@@ -52,6 +52,7 @@ const userSchema = new Schema<IUser>({
         type: String,
         required: function() {
             return !this.googleId;
+            
         },
         validate: {
             validator: passwordValidator,
