@@ -58,4 +58,8 @@ export class EventTicketTypeService {
     async deleteEventTicketTypeById(eventTicketTypeId: string): Promise<null> {
         return this.eventTicketTypeModel.findByIdAndDelete(eventTicketTypeId);
     }
+
+    async deleteEventTicketTypesByEventId(eventId: string) {
+        return this.eventTicketTypeModel.deleteMany({ eventId });
+    }
 }

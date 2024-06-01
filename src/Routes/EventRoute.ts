@@ -17,6 +17,7 @@ eventRouter.get("/", eventController.getAllEvents);
 eventRouter.get(
     "/organizer-view/",
     authenticateJWT,
+    checkRevokedToken,
     checkIfUserIsVerified,
     eventController.getOrganizerEvents,
 );
@@ -29,6 +30,7 @@ eventRouter.get(
     eventController.getEventDetailsById,
 );
 
+// FIX: check why unknown category works
 eventRouter.post(
     "/",
     authenticateJWT,
@@ -91,84 +93,83 @@ eventRouter.delete(
 /**
  * @openapi
  * /api/v1/events:
-*   post:
-*     tags:
-*       - Events Management
-*     summary: Create a new event
-*     security: [{ bearerAuth: [] }]
-*     requestBody:
-*       required: true
-*       content:
-*         application/json:
-*           schema:
-*             type: object
-*             properties:
-*               name:
-*                 type: string
-*                 description: Name of the event
-*               description:
-*                 type: string
-*                 description: Description of the event
-*               category:
-*                 type: string
-*                 description: Category of the event
-*               visibility:
-*                 type: string
-*                 description: Visibility of the event
-*               type:
-*                 type: string
-*                 description: Type of the event
-*               venueType:
-*                 type: string
-*                 description: Venue type of the event
-*               tags:
-*                 type: array
-*                 description: Tags of the event
-*               startDate:
-*                 type: string
-*                 description: Start date of the event
-*               endDate:
-*                 type: string
-*                 description: End date of the event
-*               location:
-*                 type: string
-*                 description: Location of the event
-*               media:
-*                 type: array
-*                 description: Media of the event
-*               ticketTypes:
-*                 type: array
-*                 description: Ticket types of the event
-*           example:
-*             name: Art Exhibition Opening
-*             description: Opening night of a new art exhibition featuring local artists
-*             category: Art
-*             visibility: public
-*             type: in-person
-*             venueType: indoor
-*             tags: ["Art", "Opening"]
-*             startDate: "2023-07-15T19:00:00Z"
-*             endDate: "2023-07-15T22:00:00Z"
-*             location: "123 Main St, City, State"
-*             media: []
-*             ticketTypes:
-*               - type: General Admission
-*                 price: 10
-*               - type: VIP
-*                 price: 25
-*     responses:
-*       201:
-*         description: Event created successfully
-*       400:
-*         description: Bad request
-*       401:
-*         description: Unauthorized
-*       403:
-*         description: Forbidden
-*       500:
-*         description: Internal server error
-*/
-
+ *   post:
+ *     tags:
+ *       - Events Management
+ *     summary: Create a new event
+ *     security: [{ bearerAuth: [] }]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Name of the event
+ *               description:
+ *                 type: string
+ *                 description: Description of the event
+ *               category:
+ *                 type: string
+ *                 description: Category of the event
+ *               visibility:
+ *                 type: string
+ *                 description: Visibility of the event
+ *               type:
+ *                 type: string
+ *                 description: Type of the event
+ *               venueType:
+ *                 type: string
+ *                 description: Venue type of the event
+ *               tags:
+ *                 type: array
+ *                 description: Tags of the event
+ *               startDate:
+ *                 type: string
+ *                 description: Start date of the event
+ *               endDate:
+ *                 type: string
+ *                 description: End date of the event
+ *               location:
+ *                 type: string
+ *                 description: Location of the event
+ *               media:
+ *                 type: array
+ *                 description: Media of the event
+ *               ticketTypes:
+ *                 type: array
+ *                 description: Ticket types of the event
+ *           example:
+ *             name: Art Exhibition Opening
+ *             description: Opening night of a new art exhibition featuring local artists
+ *             category: Art
+ *             visibility: public
+ *             type: in-person
+ *             venueType: indoor
+ *             tags: ["Art", "Opening"]
+ *             startDate: "2023-07-15T19:00:00Z"
+ *             endDate: "2023-07-15T22:00:00Z"
+ *             location: "123 Main St, City, State"
+ *             media: []
+ *             ticketTypes:
+ *               - type: General Admission
+ *                 price: 10
+ *               - type: VIP
+ *                 price: 25
+ *     responses:
+ *       201:
+ *         description: Event created successfully
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       500:
+ *         description: Internal server error
+ */
 
 /**
  * @openapi
@@ -203,7 +204,6 @@ eventRouter.delete(
  *       500:
  *         description: Internal server error
  */
-
 
 /**
  * @openapi
@@ -338,8 +338,5 @@ eventRouter.delete(
  *       500:
  *         description: Internal server error
  */
-
-
-
 
 export default eventRouter;

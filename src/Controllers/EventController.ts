@@ -12,7 +12,9 @@ import { EventCategory } from "../Enums/EventCategory";
 import { EventTicketTypeService } from "../Services/EventTicketTypeService";
 import { EventTicketTypeModel } from "../Models/EventTicketTypeModel";
 import { TicketService } from "../Services/TicketService";
-import { TicketModel, type ITicketGroupedByType } from "../Models/TicketModel";
+import { TicketModel } from "../Models/TicketModel";
+import cloudinary from "../Config/cloudinaryConfig";
+import { EventStatus } from "../Enums/EventStatus";
 
 export class EventController {
     private eventService: EventService;
@@ -68,12 +70,12 @@ export class EventController {
         res: Response,
     ): Promise<Response<IEvent[] | []>> => {
         try {
-            // TODO: implement logic to add tickets details (total, sold, available) on each event
             const page = parseInt(req.query.page) || 1;
             const perPage = parseInt(req.query.perPage) || 9;
             const { sort, order } = req.query;
 
             const events = await this.eventService.getAllEvents({
+                status: Object.values(EventStatus),
                 sort,
                 order,
                 page,
@@ -130,11 +132,30 @@ export class EventController {
 
             const data = matchedData(req);
             const { ticketTypes, ...eventData } = data;
-
             eventData.organizerId = req.user._id;
-            const newEvent = await this.eventService.createEvent(
-                eventData as IEvent,
+
+            const newEvent = this.eventService.createEvent(eventData as IEvent);
+            // TODO: look into maximum file constraint
+            const { url: bannerURL } = await cloudinary.uploader.upload(
+                `${eventData.media.bannerImage}`,
+                {
+                    public_id: `${newEvent.id}`,
+                    resource_type: "image",
+                    folder: "teeket/event-image/banner/",
+                },
             );
+            const { url: mobilePreviewURL } = await cloudinary.uploader.upload(
+                `${eventData.media.mobilePreviewImage}`,
+                {
+                    public_id: `${newEvent.id}`,
+                    resource_type: "image",
+                    folder: "teeket/event-image/mobile/",
+                },
+            );
+            newEvent.media.bannerImageURL = bannerURL;
+            newEvent.media.mobilePreviewImageURL = mobilePreviewURL;
+            newEvent.save();
+
             await this.eventTicketTypeService.createEventTicketTypes(
                 ticketTypes,
                 newEvent._id,
@@ -167,18 +188,21 @@ export class EventController {
     ): Promise<Response<IEvent | null>> => {
         try {
             const eventId = req.params.eventId;
+
             const event = await this.eventService.getEventById(eventId);
+            if (event == null) {
+                return res.status(404).json({ error: "Event does not exists" });
+            }
+
             const organizerId =
                 event?.organizerId?.toString() as unknown as string;
-
-            if (organizerId !== req.user._id.toString()) {
+            if (
+                organizerId !== req.user._id.toString() ||
+                req.user.role === UserRole.Admin
+            ) {
                 return res.status(403).json({
                     error: "Only the event organizers and admins can access this endpoint",
                 });
-            }
-
-            if (event == null) {
-                return res.status(404).json({ error: "Event does not exists" });
             }
 
             const ticketTypes =
