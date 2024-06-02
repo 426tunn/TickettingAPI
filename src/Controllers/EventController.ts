@@ -153,7 +153,7 @@ export class EventController {
 
             await this.eventTicketTypeService.createEventTicketTypes(
                 ticketTypes,
-                newEvent._id,
+                newEvent._id as string,
             );
             return res.status(201).json({ event: newEvent });
         } catch (error) {
