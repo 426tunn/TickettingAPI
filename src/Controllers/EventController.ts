@@ -189,8 +189,7 @@ export class EventController {
                 return res.status(404).json({ error: "Event does not exists" });
             }
 
-            const organizerId =
-                event?.organizerId?.toString() as unknown as string;
+            const organizerId = event?.organizerId?.toString();
             if (
                 organizerId !== req.user._id.toString() ||
                 req.user.role === UserRole.Admin
