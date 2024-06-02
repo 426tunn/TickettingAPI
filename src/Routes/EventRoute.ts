@@ -35,7 +35,6 @@ eventRouter.post(
     "/",
     authenticateJWT,
     checkRevokedToken,
-    checkIfUserIsVerified,
     [
         body("name").notEmpty().withMessage("Event name is required"),
         body("description")
@@ -82,6 +81,7 @@ eventRouter.patch(
     eventController.updateEventById,
 );
 
+// FIX: delete event image when event is deleted
 eventRouter.delete(
     "/:eventId",
     authenticateJWT,
