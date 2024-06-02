@@ -28,7 +28,7 @@ export class EventController {
         this.ticketService = new TicketService(TicketModel);
     }
 
-    public getCategories = async (req: Request, res: Response) => {
+    public getCategories = async (_req: Request, res: Response) => {
         try {
             return res
                 .status(200)
@@ -43,8 +43,8 @@ export class EventController {
         res: Response,
     ): Promise<Response<IEvent[] | []>> => {
         try {
-            const page = parseInt(req.query.page) || 1;
-            const perPage = parseInt(req.query.perPage) || 9;
+            const page = parseInt(req.query.page || "1");
+            const perPage = parseInt(req.query.perPage || "9");
             const { sort, order } = req.query;
             const { organizerId } = req.params;
 
@@ -70,8 +70,8 @@ export class EventController {
         res: Response,
     ): Promise<Response<IEvent[] | []>> => {
         try {
-            const page = parseInt(req.query.page) || 1;
-            const perPage = parseInt(req.query.perPage) || 9;
+            const page = parseInt(req.query.page || "1");
+            const perPage = parseInt(req.query.perPage || "9");
             const { sort, order } = req.query;
 
             const events = await this.eventService.getAllEvents({
@@ -85,7 +85,7 @@ export class EventController {
                     "id name location startDate endDate media status",
             });
 
-            const eventWithTicketDetails = events.map(async (event) => {
+            const eventWithTicketDetails = events.map(async (event: IEvent) => {
                 const { totalTickets, totalTicketsSold } =
                     await this.ticketService.getTicketSalesDetailsForEvent(
                         event.id,
@@ -157,7 +157,7 @@ export class EventController {
             );
             return res.status(201).json({ event: newEvent });
         } catch (error) {
-            res.status(500).json(error);
+            return res.status(500).json(error);
         }
     };
 
@@ -204,7 +204,7 @@ export class EventController {
                     eventId,
                 );
 
-            const totalRevenue = ticketTypes.reduce(
+            const totalRevenue = ticketTypes?.reduce(
                 (total, currentTicketType) => {
                     return (
                         total +

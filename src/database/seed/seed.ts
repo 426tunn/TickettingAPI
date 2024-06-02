@@ -2,7 +2,7 @@
 import { faker } from "@faker-js/faker";
 import { EventModel } from "../../Models/EventModel";
 import mongoose, { Types } from "mongoose";
-import { connectToDB } from "database";
+import { connectToDB } from "../../database";
 import { events as eventToSeed, ISeedEvent } from "./data/events";
 import { EventTicketTypeModel } from "../../Models/EventTicketTypeModel";
 import { UserRole } from "../../Enums/UserRole";
@@ -58,6 +58,7 @@ for (const event of events) {
         console.log("Data Seeded Successfully.");
         mongoose.disconnect();
     } catch (error) {
+        console.log("Err:", error.message);
         process.exit();
     }
 })();

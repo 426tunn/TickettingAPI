@@ -14,8 +14,8 @@ interface ILocation {
 }
 
 interface IMedia {
-    bannerImageURL: string;
-    mobilePreviewImageURL: string;
+    bannerImageURL?: string;
+    mobilePreviewImageURL?: string;
 }
 
 interface IEvent extends Document {
@@ -30,7 +30,7 @@ interface IEvent extends Document {
     organizerId: IUser;
     startDate: Date;
     endDate: Date;
-    media?: IMedia;
+    media: IMedia;
     totalTickets: number;
     tags: string[];
 }
