@@ -21,7 +21,16 @@ eventTicketTypeRouter.post(
     checkIfUserIsVerified,
     [
         body("name").notEmpty().withMessage("Ticket type name is required"),
-        body("price").notEmpty().withMessage("Ticket type price is required"),
+        body("price")
+            .notEmpty()
+            .withMessage("Ticket type price is required")
+            .custom(async (value) => {
+                if (parseFloat(value).toString().split(".")[1].length > 2) {
+                    throw new Error(
+                        "Ticket type should be a maximum of 2 decimal points",
+                    );
+                }
+            }),
         body("quantity").notEmpty().withMessage("No of tickets is required"),
     ],
     eventTicketTypeController.createEventTicketType,
@@ -69,7 +78,6 @@ eventTicketTypeRouter.delete(
  *        500:
  *         description: Internal server error
  */
-
 
 /**
  * @openapi
@@ -139,7 +147,7 @@ eventTicketTypeRouter.delete(
  *         required: true
  *         schema:
  *           type: string
- *     requestBody: 
+ *     requestBody:
  *       required: true
  *       content:
  *           application/json:

@@ -25,7 +25,7 @@ export class EventService {
         status = EventStatus.Approved,
         organizerId,
         fieldsToSelect,
-    }: IEventPaginationAndSort): Promise<IEvent[] | null> {
+    }: IEventPaginationAndSort): Promise<IEvent[] | []> {
         let events;
         if (sort === "latest") {
             events = this.getAllLatestEvents({

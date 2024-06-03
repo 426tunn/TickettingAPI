@@ -2,8 +2,8 @@
 import { faker } from "@faker-js/faker";
 import { EventModel } from "../../Models/EventModel";
 import mongoose, { Types } from "mongoose";
-import { connectToDB } from "database";
-import { events as eventToSeed, ISeedEvent } from "./data/events";
+import { connectToDB } from "../../database";
+import { events as eventToSeed } from "./data/events";
 import { EventTicketTypeModel } from "../../Models/EventTicketTypeModel";
 import { UserRole } from "../../Enums/UserRole";
 import { IUser, UserModel } from "../../Models/UserModel";
@@ -25,7 +25,7 @@ for (let i = 0; i < noOfUsers; i++) {
     });
 }
 
-const events = eventToSeed as ISeedEvent[];
+const events: any = eventToSeed;
 const ticketTypes: Array<{
     name: string;
     quantity: number;
@@ -58,6 +58,7 @@ for (const event of events) {
         console.log("Data Seeded Successfully.");
         mongoose.disconnect();
     } catch (error) {
+        console.log("Err:", error.message);
         process.exit();
     }
 })();

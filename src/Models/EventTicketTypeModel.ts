@@ -8,13 +8,10 @@ interface IEventTicketType extends Document {
     eventId: IEvent;
 }
 
-//TODO: make sure all ticket & ticket type prices are in 2 decimal places
 const eventTicketTypeSchema = new Schema<IEventTicketType>(
     {
         name: {
             type: String,
-            // enum: Object.values(TicketTypes),
-            // default: TicketTypes.Standard,
             required: true,
         },
         price: {
@@ -33,6 +30,10 @@ const eventTicketTypeSchema = new Schema<IEventTicketType>(
     },
     { timestamps: true },
 );
+
+eventTicketTypeSchema.pre("save", function () {
+    this.price = parseFloat(this.price.toFixed(2));
+});
 
 const EventTicketTypeModel = mongoose.model<IEventTicketType>(
     "EventTicketType",
