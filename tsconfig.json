@@ -16,4 +16,3 @@
         "./dist"
     ]
 }
-// TODO: change moduleResolution to Bundler/NodeNext
