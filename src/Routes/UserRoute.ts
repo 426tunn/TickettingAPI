@@ -37,6 +37,7 @@ UserRouter.get(
     checkRevokedToken,
     userController.getUserByToken,
 );
+
 UserRouter.get(
     "/verify-email", 
     userController.verifyUser
@@ -67,7 +68,7 @@ UserRouter.get(
     "/",
     authenticateJWT,
     checkRevokedToken,
-    // checkIfUserIsAdmin,
+    checkIfUserIsAdmin,
     userController.getAllUsers,
 );
 
@@ -94,7 +95,7 @@ UserRouter.patch(
 UserRouter.delete(
     "/:userId", 
     authenticateJWT,
-    // checkIfUserIsAdmin,
+    checkIfUserIsAdmin,
     userController.deleteUser);
 
 /**

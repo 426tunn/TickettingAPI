@@ -52,12 +52,13 @@ const userSchema = new Schema<IUser>({
         type: String,
         required: function() {
             return !this.googleId;
-            
         },
         validate: {
-            validator: passwordValidator,
+            validator: function(value: string) {
+                return this.isModified("password") ? passwordValidator(value) : true;
+            },
             message:
-                "Password must be at least 8 characters long and contain at least one uppercase letter and one number",
+                "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",
         },
     },
     isVerified: {
@@ -81,7 +82,9 @@ export const hashPassword = async (password: string) => {
 };
 
 userSchema.pre<IUser>("save", async function (next) {
-    this.password = await hashPassword(this.password);
+    if (this.isModified("password")) {
+        this.password = await hashPassword(this.password);
+    }
     next();
 });
 

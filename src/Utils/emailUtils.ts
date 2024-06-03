@@ -54,6 +54,6 @@ export const sendVerificationEmail = async (
         logger.info("Verification email sent successfully");
     } catch (error) {
         console.error("Error sending email:", error);
-        throw new Error("Error sending password reset email");
+        throw new Error("Error sending verification email");
     }
 };

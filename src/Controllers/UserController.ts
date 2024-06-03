@@ -61,7 +61,6 @@ export class UserController {
                 verificationExpire,
             );
             const newUser = { ...user.toObject(), password: undefined };
-            console.log(verificationToken)
             await sendVerificationEmail(email, verificationToken);
             res.status(201).json({ message: "Signup Successful", newUser });
         } catch (error) {
@@ -74,9 +73,9 @@ export class UserController {
         try {
             const user =
                 await this.userService.getUserByVerificationToken(
-                    token as string,
+                    token as string
                 );
-            if (!user && user.verificationExpire < new Date()) {
+            if (!user || user.verificationExpire < new Date()) {
                 return res
                     .status(404)
                     .json({ error: "User not found or token expired" });
@@ -105,9 +104,10 @@ export class UserController {
             if (user.isVerified) {
                 return res.status(400).json({ error: "User already verified" });
             }
-            await sendVerificationEmail(email, user.verificationToken);
-            user.verificationExpire = new Date(Date.now() + 600000);
-            await user.save();
+            const currentTime = new Date();
+            const verificationExpire = new Date(currentTime.getTime() + 5 * 60 * 1000);
+            user.verificationExpire = verificationExpire;
+            await user.save(); 
             res.status(200).json({ message: "Verification email sent" });
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -175,7 +175,13 @@ export class UserController {
         res: Response,
     ) => {
         try {
-            res.status(200).json({ user: req.user });
+            const { Token } = req.query
+            if (!Token) {
+                return res.status(400).json({ error: "Token is required or missing" });
+            }
+
+            const user = await this.userService.getUserByVerificationToken(Token as string);
+            res.status(200).json({ user });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
