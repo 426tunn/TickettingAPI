@@ -81,12 +81,23 @@ eventRouter.post(
             .withMessage("Event Tags should be an array of strings"),
         body("startDate")
             .notEmpty()
-            .toDate()
-            .withMessage("Event start date is required"),
+            .withMessage("Event start date is required")
+            .custom(async (value) => {
+                const date = new Date(value);
+                if (date instanceof Date === false) {
+                    throw new Error("Invalid start date");
+                }
+            }),
         body("endDate")
             .notEmpty()
             .toDate()
-            .withMessage("Event end date is required"),
+            .withMessage("Event end date is required")
+            .custom(async (value) => {
+                const date = new Date(value);
+                if (date instanceof Date === false) {
+                    throw new Error("Invalid end date");
+                }
+            }),
         body("location").notEmpty().withMessage("Event location is required"),
         body("media"),
         body("ticketTypes")
