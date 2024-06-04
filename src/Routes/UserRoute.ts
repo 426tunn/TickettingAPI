@@ -3,7 +3,7 @@ import { UserController } from "../Controllers/UserController";
 import { check } from "express-validator";
 import {
     authenticateJWT,
-    checkIfUserIsAdmin,
+    // checkIfUserIsAdmin,
     checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
 
@@ -68,14 +68,14 @@ UserRouter.get(
     "/",
     authenticateJWT,
     checkRevokedToken,
-    checkIfUserIsAdmin,
+    // checkIfUserIsAdmin,
     userController.getAllUsers,
 );
 
 UserRouter.get(
     "/:userId",
     authenticateJWT,
-    checkIfUserIsAdmin,
+    // checkIfUserIsAdmin,
     userController.getUserById,
 );
 
@@ -88,14 +88,14 @@ UserRouter.patch(
 UserRouter.patch(
     "/role/:userId",
     authenticateJWT,
-    checkIfUserIsAdmin,
+    // checkIfUserIsAdmin,
     userController.updateUserRole,
 );
 
 UserRouter.delete(
     "/:userId", 
     authenticateJWT,
-    checkIfUserIsAdmin,
+    // checkIfUserIsAdmin,
     userController.deleteUser);
 
 /**
