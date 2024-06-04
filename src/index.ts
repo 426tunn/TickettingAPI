@@ -17,13 +17,14 @@ import cookieParser from "cookie-parser";
 import eventTicketTypeRouter from "./Routes/EventTicketTypeRoute";
 import cors from "cors";
 import { authRouter } from "./Routes/authRouter";
+import bodyParser from "body-parser";
 
 const SECRET = Config.SESSION_SECRET;
 const app = express();
 
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use(express.json({ limit: "50mb" }));
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
