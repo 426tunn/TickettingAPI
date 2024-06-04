@@ -46,6 +46,7 @@ export class TicketService {
     }
 
     async getTicketSalesDetailsForEvent(eventId: string) {
+        // TODO: add the proper types to the return types
         const ticketsGroupedByType =
             (await this.getEventTicketsGroupedByTicketType(
                 eventId,
@@ -61,19 +62,28 @@ export class TicketService {
             };
         });
 
-        const [totalTicketsSold, totalTickets] = salesByTicketType.reduce(
-            (totalTicketsSoldAndTotalTickets, currentTicketTypeGroup) => {
-                return [
-                    totalTicketsSoldAndTotalTickets[0] +
-                        currentTicketTypeGroup.sold,
-                    totalTicketsSoldAndTotalTickets[1] +
-                        currentTicketTypeGroup.total,
-                ];
-            },
-            [0, 0],
-        );
+        const [totalTicketsSold, totalTickets, totalRevenue] =
+            salesByTicketType.reduce(
+                (totalTicketsSoldAndTotalTickets, currentTicketTypeGroup) => {
+                    return [
+                        totalTicketsSoldAndTotalTickets[0] +
+                            currentTicketTypeGroup.sold,
+                        totalTicketsSoldAndTotalTickets[1] +
+                            currentTicketTypeGroup.total,
+                        totalTicketsSoldAndTotalTickets[2] +
+                            currentTicketTypeGroup.sold *
+                                currentTicketTypeGroup.price,
+                    ];
+                },
+                [0, 0, 0],
+            );
 
-        return { totalTickets, totalTicketsSold, salesByTicketType };
+        return {
+            totalTickets,
+            totalTicketsSold,
+            salesByTicketType,
+            totalRevenue,
+        };
     }
 
     async getUserEventTicket(

@@ -210,18 +210,12 @@ export class EventController {
                     eventId,
                 );
 
-            const totalRevenue = ticketTypes?.reduce(
-                (total, currentTicketType) => {
-                    return (
-                        total +
-                        currentTicketType.price * currentTicketType.quantity
-                    );
-                },
-                0,
-            );
-
-            const { salesByTicketType, totalTicketsSold, totalTickets } =
-                await this.ticketService.getTicketSalesDetailsForEvent(eventId);
+            const {
+                salesByTicketType,
+                totalTicketsSold,
+                totalTickets,
+                totalRevenue,
+            } = await this.ticketService.getTicketSalesDetailsForEvent(eventId);
 
             return res.status(200).json({
                 event: event.toJSON(),
