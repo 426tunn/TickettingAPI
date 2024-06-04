@@ -131,24 +131,30 @@ export class EventController {
 
             const newEvent = this.eventService.createEvent(eventData as IEvent);
             // TODO: look into maximum file constraint
-            const { url: bannerURL } = await cloudinary.uploader.upload(
-                `${eventData.media.bannerImage}`,
-                {
-                    public_id: `${newEvent.id}`,
-                    resource_type: "image",
-                    folder: "teeket/event-image/banner/",
-                },
-            );
-            const { url: mobilePreviewURL } = await cloudinary.uploader.upload(
-                `${eventData.media.mobilePreviewImage}`,
-                {
-                    public_id: `${newEvent.id}`,
-                    resource_type: "image",
-                    folder: "teeket/event-image/mobile/",
-                },
-            );
-            newEvent.media.bannerImageURL = bannerURL;
-            newEvent.media.mobilePreviewImageURL = mobilePreviewURL;
+            if (eventData?.media?.bannerImage) {
+                const { url: bannerURL } = await cloudinary.uploader.upload(
+                    `${eventData.media.bannerImage}`,
+                    {
+                        public_id: `${newEvent.id}`,
+                        resource_type: "image",
+                        folder: "teeket/event-image/banner/",
+                    },
+                );
+                newEvent.media.bannerImageURL = bannerURL;
+            }
+
+            if (eventData?.media?.mobilePreviewImage) {
+                const { url: mobilePreviewURL } =
+                    await cloudinary.uploader.upload(
+                        `${eventData.media.mobilePreviewImage}`,
+                        {
+                            public_id: `${newEvent.id}`,
+                            resource_type: "image",
+                            folder: "teeket/event-image/mobile/",
+                        },
+                    );
+                newEvent.media.mobilePreviewImageURL = mobilePreviewURL;
+            }
             newEvent.save();
 
             await this.eventTicketTypeService.createEventTicketTypes(
