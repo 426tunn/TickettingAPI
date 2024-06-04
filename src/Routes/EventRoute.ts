@@ -6,6 +6,10 @@ import {
     checkIfUserIsVerified,
     checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
+import { EventCategory } from "../Enums/EventCategory";
+import { EventVisibility } from "../Enums/EventVisibility";
+import { EventType } from "../Enums/EventType";
+import { VenueType } from "../Enums/VenueType";
 
 const eventRouter: Router = router();
 const eventController = new EventController();
@@ -44,12 +48,33 @@ eventRouter.post(
             .withMessage(
                 "Event description should be less than 500 characters long",
             ),
-        body("category").notEmpty().withMessage("Event category is required"),
+        body("category")
+            .notEmpty()
+            .withMessage("Event category is required")
+            .toLowerCase()
+            .isIn(Object.values(EventCategory))
+            .withMessage("Invalid event category"),
         body("visibility")
             .notEmpty()
-            .withMessage("Event visibility is required"),
-        body("type").notEmpty().withMessage("Event type is required"),
-        body("venueType").notEmpty().withMessage("Event venueType is required"),
+            .withMessage("Event visibility is required")
+            .isIn(Object.values(EventVisibility))
+            .withMessage(
+                `Invalid event visibility. Valid - ${Object.values(EventVisibility)}`,
+            ),
+        body("type")
+            .notEmpty()
+            .withMessage("Event type is required")
+            .isIn(Object.values(EventType))
+            .withMessage(
+                `Invalid event type. Valid - ${Object.values(EventType)}`,
+            ),
+        body("venueType")
+            .notEmpty()
+            .withMessage("Event venueType is required")
+            .isIn(Object.values(VenueType))
+            .withMessage(
+                `Invalid event type. Valid - ${Object.values(VenueType)}`,
+            ),
         body("tags")
             .optional()
             .isArray()
