@@ -108,7 +108,7 @@ eventRouter.post(
     eventController.createEvent,
 );
 
-eventRouter.get("/:eventId", eventController.getEventById);
+eventRouter.get("/:eventId", authenticateJWT, eventController.getEventById);
 
 eventRouter.patch(
     "/:eventId",

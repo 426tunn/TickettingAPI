@@ -169,21 +169,29 @@ export class EventController {
     };
 
     public getEventById = async (
-        req: Request,
+        req: IAuthenticatedRequest<IUser>,
         res: Response,
     ): Promise<Response<IEvent | null>> => {
         try {
             const eventId = req.params.eventId;
             const event = await this.eventService.getEventById({
                 eventId,
-                status: EventStatus.Approved,
             });
 
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
             }
 
-            return res.status(200).json(event);
+            if (
+                req.user?.role === UserRole.Admin ||
+                req.user?._id.toString() === event.organizerId.toString()
+            ) {
+                return res.status(200).json(event);
+            }
+
+            return res
+                .status(403)
+                .json({ error: "You do not have access to this event" });
         } catch (error) {
             console.log(error);
             return res.status(500).json(error);
