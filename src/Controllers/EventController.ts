@@ -16,6 +16,7 @@ import { TicketModel } from "../Models/TicketModel";
 import cloudinary from "../Config/cloudinaryConfig";
 import { EventStatus } from "../Enums/EventStatus";
 
+// FIX: resolve inconsistency with using req.user.id && req.user._id
 export class EventController {
     private eventService: EventService;
     private eventTicketTypeService: EventTicketTypeService;
@@ -173,12 +174,18 @@ export class EventController {
     ): Promise<Response<IEvent | null>> => {
         try {
             const eventId = req.params.eventId;
-            const event = await this.eventService.getEventById(eventId);
+            const event = await this.eventService.getEventById({
+                eventId,
+                status: EventStatus.Approved,
+            });
+
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
             }
+
             return res.status(200).json(event);
         } catch (error) {
+            console.log(error);
             return res.status(500).json(error);
         }
     };
@@ -190,7 +197,7 @@ export class EventController {
         try {
             const eventId = req.params.eventId;
 
-            const event = await this.eventService.getEventById(eventId);
+            const event = await this.eventService.getEventById({ eventId });
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
             }
@@ -237,7 +244,7 @@ export class EventController {
         try {
             const eventId = req.params.eventId;
 
-            const event = await this.eventService.getEventById(eventId);
+            const event = await this.eventService.getEventById({ eventId });
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
             }
@@ -268,7 +275,7 @@ export class EventController {
     ): Promise<Response<null>> => {
         try {
             const eventId = req.params.eventId;
-            const event = await this.eventService.getEventById(eventId);
+            const event = await this.eventService.getEventById({ eventId });
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
             }
