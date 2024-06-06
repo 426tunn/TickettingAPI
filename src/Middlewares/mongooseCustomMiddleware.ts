@@ -12,6 +12,5 @@ export function isValidMongooseIdMiddleware(
             return res.status(400).json({ error: `Invalid Id for: ${key} ` });
         }
     }
-    console.log("req params:", req.params);
     return next();
 }
