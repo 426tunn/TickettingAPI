@@ -10,6 +10,7 @@ import { EventCategory } from "../Enums/EventCategory";
 import { EventVisibility } from "../Enums/EventVisibility";
 import { EventType } from "../Enums/EventType";
 import { VenueType } from "../Enums/VenueType";
+import { isValidMongooseIdMiddleware } from "../Middlewares/mongooseCustomMiddleware";
 
 const eventRouter: Router = router();
 const eventController = new EventController();
@@ -31,6 +32,7 @@ eventRouter.get(
     authenticateJWT,
     checkRevokedToken,
     checkIfUserIsVerified,
+    isValidMongooseIdMiddleware,
     eventController.getEventDetailsById,
 );
 
@@ -108,13 +110,19 @@ eventRouter.post(
     eventController.createEvent,
 );
 
-eventRouter.get("/:eventId", authenticateJWT, eventController.getEventById);
+eventRouter.get(
+    "/:eventId",
+    authenticateJWT,
+    isValidMongooseIdMiddleware,
+    eventController.getEventById,
+);
 
 eventRouter.patch(
     "/:eventId",
     authenticateJWT,
     checkRevokedToken,
     checkIfUserIsVerified,
+    isValidMongooseIdMiddleware,
     eventController.updateEventById,
 );
 
@@ -124,6 +132,7 @@ eventRouter.delete(
     authenticateJWT,
     checkRevokedToken,
     checkIfUserIsVerified,
+    isValidMongooseIdMiddleware,
     eventController.deleteEventById,
 );
 

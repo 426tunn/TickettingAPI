@@ -6,6 +6,7 @@ import {
     // checkIfUserIsAdmin,
     checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
+import { isValidMongooseIdMiddleware } from "../Middlewares/mongooseCustomMiddleware";
 
 const UserRouter = Router();
 const userController = new UserController();
@@ -24,10 +25,7 @@ UserRouter.post(
     userController.registerUser,
 );
 
-UserRouter.post(
-    "/login",
-     userController.loginUser
-);
+UserRouter.post("/login", userController.loginUser);
 
 UserRouter.post("/logout", userController.logoutUser);
 
@@ -38,10 +36,7 @@ UserRouter.get(
     userController.getUserByToken,
 );
 
-UserRouter.get(
-    "/verify-email", 
-    userController.verifyUser
-);
+UserRouter.get("/verify-email", userController.verifyUser);
 
 UserRouter.post(
     "/resend-verification-email",
@@ -49,14 +44,9 @@ UserRouter.post(
     userController.reverifyUser,
 );
 
-UserRouter.post(
-    "/forgot-password", 
-    userController.forgotPassword);
+UserRouter.post("/forgot-password", userController.forgotPassword);
 
-UserRouter.post(
-    "/reset-password", 
-    userController.resetPassword
-);
+UserRouter.post("/reset-password", userController.resetPassword);
 
 UserRouter.post(
     "/change-password",
@@ -75,28 +65,30 @@ UserRouter.get(
 UserRouter.get(
     "/:userId",
     authenticateJWT,
-    // checkIfUserIsAdmin,
+    isValidMongooseIdMiddleware,
     userController.getUserById,
 );
 
 UserRouter.patch(
-    "/:userId", 
-    authenticateJWT, 
-    userController.updateUser
+    "/:userId",
+    authenticateJWT,
+    isValidMongooseIdMiddleware,
+    userController.updateUser,
 );
 
 UserRouter.patch(
     "/role/:userId",
     authenticateJWT,
-    // checkIfUserIsAdmin,
+    isValidMongooseIdMiddleware,
     userController.updateUserRole,
 );
 
 UserRouter.delete(
-    "/:userId", 
+    "/:userId",
     authenticateJWT,
-    // checkIfUserIsAdmin,
-    userController.deleteUser);
+    isValidMongooseIdMiddleware,
+    userController.deleteUser,
+);
 
 /**
  * @openapi
@@ -335,7 +327,6 @@ UserRouter.delete(
  *         description: Internal server error
  */
 
-
 /**
  * @openapi
  *   /api/v1/users/{userId}:
@@ -386,7 +377,6 @@ UserRouter.delete(
  *       500:
  *         description: Internal server error
  */
-
 
 /**
  * @openapi
@@ -500,8 +490,6 @@ UserRouter.delete(
  *       500:
  *         description: Internal server error
  */
-
-
 
 /**
  * @openapi
