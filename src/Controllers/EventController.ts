@@ -213,7 +213,7 @@ export class EventController {
             const organizerId = event?.organizerId?.toString();
             if (
                 organizerId !== req.user._id.toString() ||
-                req.user.role === UserRole.Admin
+                req.user.role !== UserRole.Admin
             ) {
                 return res.status(403).json({
                     error: "Only the event organizers and admins can access this endpoint",
@@ -257,12 +257,26 @@ export class EventController {
                 return res.status(404).json({ error: "Event does not exists" });
             }
 
+            const currentUserId = req.user._id.toString();
+            const organizerId = event.organizerId.toString();
             if (
-                req.user.id !== event.organizerId ||
-                req.user.role !== UserRole.Admin
+                currentUserId !== organizerId &&
+                req.user.role === UserRole.User
             ) {
                 return res.status(403).json({
-                    error: "Only the event organizers and admins can update the event",
+                    error: "Only this event organizers and admins can update the event",
+                });
+            }
+
+            const currentDate = new Date();
+            if (currentDate > event.endDate) {
+                return res.status(400).json({
+                    error: "Event has ended. Date cannot be modified again",
+                });
+            }
+            if (currentDate > event.startDate) {
+                return res.status(400).json({
+                    error: "Event has started. Date cannot be modified again",
                 });
             }
 
