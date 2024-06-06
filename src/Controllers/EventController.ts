@@ -210,13 +210,14 @@ export class EventController {
                 return res.status(404).json({ error: "Event does not exists" });
             }
 
-            const organizerId = event?.organizerId?.toString();
+            const currentUserId = req.user._id.toString();
+            const organizerId = event.organizerId.toString();
             if (
-                organizerId !== req.user._id.toString() ||
-                req.user.role !== UserRole.Admin
+                currentUserId !== organizerId &&
+                req.user.role === UserRole.User
             ) {
                 return res.status(403).json({
-                    error: "Only the event organizers and admins can access this endpoint",
+                    error: "Only this event organizers and admins can access this endpoint",
                 });
             }
 
