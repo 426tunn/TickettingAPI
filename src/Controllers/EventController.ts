@@ -135,11 +135,8 @@ export class EventController {
             const newEvent = this.eventService.createEvent(eventData as IEvent);
 
             const today = new Date();
-            const eventDateIsInFuture =
-                newEvent.startDate.getFullYear() >= today.getFullYear() &&
-                newEvent.startDate.getMonth() >= today.getMonth() &&
-                newEvent.startDate.getDay() >= today.getDay();
-            if (!eventDateIsInFuture) {
+            const eventDateIsPast = today > newEvent.startDate;
+            if (eventDateIsPast) {
                 return res.status(400).json({
                     error: "The event start date should be in the future",
                 });
@@ -287,16 +284,14 @@ export class EventController {
                 });
             }
 
-            const currentDate = new Date();
-            const eventIsInTheFuture =
-                event.startDate.getFullYear() >= currentDate.getFullYear() &&
-                event.startDate.getMonth() >= currentDate.getMonth();
+            const today = new Date();
+            const eventIsInPast = today > event.startDate;
             const eventIsTodayOrAfter =
-                event.startDate.getFullYear() === currentDate.getFullYear() &&
-                event.startDate.getMonth() === currentDate.getMonth() &&
-                event.startDate.getDay() <= currentDate.getDay();
+                event.startDate.getFullYear() === today.getFullYear() &&
+                event.startDate.getMonth() === today.getMonth() &&
+                event.startDate.getDay() <= today.getDay();
 
-            if (!eventIsInTheFuture || eventIsTodayOrAfter) {
+            if (eventIsInPast || eventIsTodayOrAfter) {
                 return res.status(400).json({
                     error: "Event can only be modified before the start day",
                 });
