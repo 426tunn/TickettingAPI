@@ -88,8 +88,7 @@ eventRouter.post(
             .notEmpty()
             .withMessage("Event start date is required")
             .custom(async (value) => {
-                const date = new Date(value);
-                if (date instanceof Date === false) {
+                if (isNaN(Date.parse(value))) {
                     throw new Error("Invalid start date");
                 }
             })
@@ -98,8 +97,7 @@ eventRouter.post(
             .notEmpty()
             .withMessage("Event end date is required")
             .custom(async (value) => {
-                const date = new Date(value);
-                if (date instanceof Date === false) {
+                if (isNaN(Date.parse(value))) {
                     throw new Error("Invalid end date");
                 }
             })
