@@ -1,4 +1,4 @@
 export enum VenueType {
-    Online = "Online",
-    Physical = "Physical",
+    Online = "online",
+    Physical = "physical",
 }

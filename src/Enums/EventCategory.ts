@@ -1,4 +1,3 @@
-// FIX: make all enum values consistence with casing
 export enum EventCategory {
     Festival = "festival",
     Music = "music",
