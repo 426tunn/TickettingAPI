@@ -132,13 +132,24 @@ export class EventController {
             const { ticketTypes, ...eventData } = data;
             eventData.organizerId = req.user._id;
 
-            if (eventData.startDate >= eventData.endDate) {
+            const newEvent = this.eventService.createEvent(eventData as IEvent);
+
+            const today = new Date();
+            const eventDateIsInFuture =
+                newEvent.startDate.getFullYear() >= today.getFullYear() &&
+                newEvent.startDate.getMonth() >= today.getMonth() &&
+                newEvent.startDate.getDay() >= today.getDay();
+            if (!eventDateIsInFuture) {
+                return res.status(400).json({
+                    error: "The event start date should be in the future",
+                });
+            }
+            if (newEvent.startDate >= newEvent.endDate) {
                 return res.status(400).json({
                     error: "The start date should be before the end date",
                 });
             }
 
-            const newEvent = this.eventService.createEvent(eventData as IEvent);
             // TODO: look into maximum file constraint
             if (eventData?.media?.bannerImage) {
                 const { url: bannerURL } = await cloudinary.uploader.upload(
@@ -151,7 +162,6 @@ export class EventController {
                 );
                 newEvent.media.bannerImageURL = bannerURL;
             }
-
             if (eventData?.media?.mobilePreviewImage) {
                 const { url: mobilePreviewURL } =
                     await cloudinary.uploader.upload(
@@ -164,8 +174,8 @@ export class EventController {
                     );
                 newEvent.media.mobilePreviewImageURL = mobilePreviewURL;
             }
-            newEvent.save();
 
+            newEvent.save();
             await this.eventTicketTypeService.createEventTicketTypes(
                 ticketTypes,
                 newEvent._id as string,
