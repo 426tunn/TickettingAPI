@@ -270,14 +270,14 @@ export class EventController {
             }
 
             const currentDate = new Date();
-            if (currentDate > event.endDate) {
+            const eventIsModifiable =
+                currentDate.getFullYear() <= event.startDate.getFullYear() &&
+                currentDate.getMonth() <= event.startDate.getMonth();
+            const eventIsTodayOrAfter =
+                currentDate.getDay() >= event.startDate.getDay();
+            if (eventIsModifiable && eventIsTodayOrAfter) {
                 return res.status(400).json({
-                    error: "Event has ended. Date cannot be modified again",
-                });
-            }
-            if (currentDate > event.startDate) {
-                return res.status(400).json({
-                    error: "Event has started. Date cannot be modified again",
+                    error: "Event can only be modified before the start date",
                 });
             }
 
