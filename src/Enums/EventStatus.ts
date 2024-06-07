@@ -1,7 +1,7 @@
 export enum EventStatus {
-    Pending = "Pending",
-    Approved = "Approved",
-    Suspended = "Suspended",
-    Cancelled = "Cancelled",
-    Completed = "Completed",
+    Pending = "pending",
+    Approved = "approved",
+    Suspended = "suspended",
+    Cancelled = "cancelled",
+    Completed = "completed",
 }

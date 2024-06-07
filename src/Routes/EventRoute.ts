@@ -36,7 +36,6 @@ eventRouter.get(
     eventController.getEventDetailsById,
 );
 
-// FIX: check why unknown category works
 eventRouter.post(
     "/",
     authenticateJWT,
@@ -60,6 +59,7 @@ eventRouter.post(
         body("visibility")
             .notEmpty()
             .withMessage("Event visibility is required")
+            .toLowerCase()
             .isIn(Object.values(EventVisibility))
             .withMessage(
                 `Invalid event visibility. Valid - ${Object.values(EventVisibility)}`,
@@ -67,6 +67,7 @@ eventRouter.post(
         body("type")
             .notEmpty()
             .withMessage("Event type is required")
+            .toLowerCase()
             .isIn(Object.values(EventType))
             .withMessage(
                 `Invalid event type. Valid - ${Object.values(EventType)}`,
@@ -74,6 +75,7 @@ eventRouter.post(
         body("venueType")
             .notEmpty()
             .withMessage("Event venueType is required")
+            .toLowerCase()
             .isIn(Object.values(VenueType))
             .withMessage(
                 `Invalid event type. Valid - ${Object.values(VenueType)}`,

@@ -40,7 +40,7 @@ export function checkIfUserIsAdmin(
             .json({ message: "Unauthorized: You need to be logged in" });
     }
 
-    if (req.user?.role as UserRole !== "admin" && req.user?.role as UserRole !== "superadmin") {
+    if (req.user?.role !== "admin") {
         return res
             .status(403)
             .json({ message: "Forbidden: User is not an admin" });

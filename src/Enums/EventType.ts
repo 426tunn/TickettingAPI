@@ -1,4 +1,4 @@
 export enum EventType {
-    Free = "Free",
-    Paid = "Paid",
+    Free = "free",
+    Paid = "paid",
 }
