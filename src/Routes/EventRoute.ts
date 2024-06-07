@@ -127,7 +127,6 @@ eventRouter.patch(
     eventController.updateEventById,
 );
 
-// FIX: delete event image when event is deleted
 eventRouter.delete(
     "/:eventId",
     authenticateJWT,

@@ -15,12 +15,14 @@ import { TicketService } from "../Services/TicketService";
 import { TicketModel } from "../Models/TicketModel";
 import cloudinary from "../Config/cloudinaryConfig";
 import { EventStatus } from "../Enums/EventStatus";
+import { logger } from "../logging/logger";
 
-// FIX: resolve inconsistency with using req.user.id && req.user._id
 export class EventController {
     private eventService: EventService;
     private eventTicketTypeService: EventTicketTypeService;
     private ticketService: TicketService;
+    public eventBannerImageFolder = "teeket/event-image/banner";
+    public eventMobileImageFolder = "teeket/event-image/mobile";
     constructor() {
         this.eventService = new EventService(EventModel);
         this.eventTicketTypeService = new EventTicketTypeService(
@@ -312,6 +314,33 @@ export class EventController {
                 return res.status(404).json({ error: "Event does not exists" });
             }
             await this.eventService.deleteEventById(eventId);
+            const eventBannerImage = event?.media?.bannerImageURL;
+            const eventMobileImage = event?.media?.mobilePreviewImageURL;
+
+            if (eventBannerImage) {
+                const res = await cloudinary.uploader.destroy(
+                    `${this.eventBannerImageFolder}/${event.id}`,
+                    {
+                        resource_type: "image",
+                    },
+                );
+                logger.info(
+                    `Event ${event.id} - ${event.name}: Banner image deleted status -> ${res.result}`,
+                );
+            }
+
+            if (eventMobileImage) {
+                const res = await cloudinary.uploader.destroy(
+                    `${this.eventMobileImageFolder}/${event.id}`,
+                    {
+                        resource_type: "image",
+                    },
+                );
+                logger.info(
+                    `Event ${event.id} - ${event.name}: Mobile image deleted status -> ${res.result}`,
+                );
+            }
+
             return res.status(204).json();
         } catch (error) {
             return res.status(500).json(error);
