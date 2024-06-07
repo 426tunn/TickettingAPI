@@ -22,6 +22,9 @@ import bodyParser from "body-parser";
 const SECRET = Config.SESSION_SECRET;
 const app = express();
 
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
+app.use(helmet());
 app.use(cors());
 app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 app.use(bodyParser.json({ limit: "10mb" }));
