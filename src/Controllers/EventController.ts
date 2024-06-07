@@ -130,6 +130,12 @@ export class EventController {
             const { ticketTypes, ...eventData } = data;
             eventData.organizerId = req.user._id;
 
+            if (eventData.startDate >= eventData.endDate) {
+                return res.status(400).json({
+                    error: "The start date should be before the end date",
+                });
+            }
+
             const newEvent = this.eventService.createEvent(eventData as IEvent);
             // TODO: look into maximum file constraint
             if (eventData?.media?.bannerImage) {
@@ -270,14 +276,17 @@ export class EventController {
             }
 
             const currentDate = new Date();
-            const eventIsModifiable =
-                currentDate.getFullYear() <= event.startDate.getFullYear() &&
-                currentDate.getMonth() <= event.startDate.getMonth();
+            const eventIsInTheFuture =
+                event.startDate.getFullYear() >= currentDate.getFullYear() &&
+                event.startDate.getMonth() >= currentDate.getMonth();
             const eventIsTodayOrAfter =
-                currentDate.getDay() >= event.startDate.getDay();
-            if (eventIsModifiable && eventIsTodayOrAfter) {
+                event.startDate.getFullYear() === currentDate.getFullYear() &&
+                event.startDate.getMonth() === currentDate.getMonth() &&
+                event.startDate.getDay() <= currentDate.getDay();
+
+            if (!eventIsInTheFuture || eventIsTodayOrAfter) {
                 return res.status(400).json({
-                    error: "Event can only be modified before the start date",
+                    error: "Event can only be modified before the start day",
                 });
             }
 

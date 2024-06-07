@@ -90,17 +90,18 @@ eventRouter.post(
                 if (date instanceof Date === false) {
                     throw new Error("Invalid start date");
                 }
-            }),
+            })
+            .toDate(),
         body("endDate")
             .notEmpty()
-            .toDate()
             .withMessage("Event end date is required")
             .custom(async (value) => {
                 const date = new Date(value);
                 if (date instanceof Date === false) {
                     throw new Error("Invalid end date");
                 }
-            }),
+            })
+            .toDate(),
         body("location").notEmpty().withMessage("Event location is required"),
         body("media"),
         body("ticketTypes")
