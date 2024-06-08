@@ -26,7 +26,8 @@ eventTicketTypeRouter.post(
             .notEmpty()
             .withMessage("Ticket type price is required")
             .custom(async (value) => {
-                if (parseFloat(value).toString().split(".")[1].length > 2) {
+                const strVal = parseFloat(value).toString();
+                if (strVal.includes(".") && strVal.split(".")[1].length > 2) {
                     throw new Error(
                         "Ticket type should be a maximum of 2 decimal points",
                     );
