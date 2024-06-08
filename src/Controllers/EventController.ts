@@ -23,6 +23,7 @@ export class EventController {
     private ticketService: TicketService;
     public eventBannerImageFolder = "teeket/event-image/banner";
     public eventMobileImageFolder = "teeket/event-image/mobile";
+
     constructor() {
         this.eventService = new EventService(EventModel);
         this.eventTicketTypeService = new EventTicketTypeService(
@@ -289,7 +290,7 @@ export class EventController {
             const eventIsTodayOrAfter =
                 event.startDate.getFullYear() === today.getFullYear() &&
                 event.startDate.getMonth() === today.getMonth() &&
-                event.startDate.getDay() <= today.getDay();
+                event.startDate.getDay() >= today.getDay();
 
             if (eventIsInPast || eventIsTodayOrAfter) {
                 return res.status(400).json({
