@@ -44,11 +44,9 @@ eventRouter.post(
     [
         body("name").notEmpty().withMessage("Event name is required"),
         body("description")
-            .notEmpty()
-            .withMessage("Event description is required")
-            .isLength({ max: 500 })
+            .isLength({ max: 1000 })
             .withMessage(
-                "Event description should be less than 500 characters long",
+                "Event description should be less than 1000 characters long",
             ),
         body("category")
             .notEmpty()
