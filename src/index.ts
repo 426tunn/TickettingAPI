@@ -8,7 +8,6 @@ import session from "express-session";
 import userRoutes from "./Routes/UserRoute";
 import eventRoutes from "./Routes/EventRoute";
 import ticketRoutes from "./Routes/TicketRoute";
-import "./Config/PassportConfig";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./Config/swaggerConfig";
 import { authenticateJWT } from "./Utils/authUtils";
@@ -17,6 +16,7 @@ import cookieParser from "cookie-parser";
 import eventTicketTypeRouter from "./Routes/EventTicketTypeRoute";
 import cors from "cors";
 import { authRouter } from "./Routes/authRouter";
+import { notificationRouter } from "./Routes/NotificationRouter";
 
 const SECRET = Config.SESSION_SECRET;
 const app = express();
@@ -51,6 +51,7 @@ app.use(cookieParser());
 app.use("/api/v1/users", checkRevokedToken, userRoutes);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/events", eventRoutes);
+app.use('/api/v1', notificationRouter);
 app.use("/api/v1/tickets", authenticateJWT, ticketRoutes);
 app.use("/api/v1/ticket-types", eventTicketTypeRouter);
 
