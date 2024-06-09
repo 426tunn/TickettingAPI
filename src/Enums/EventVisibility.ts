@@ -1,4 +1,4 @@
 export enum EventVisibility {
-    Public = "Public",
-    Private = "Private",
+    Public = "public",
+    Private = "private",
 }

@@ -60,7 +60,7 @@ export class EventTicketTypeController {
         res: Response,
     ): Promise<Response<IEvent | null>> => {
         const { eventId } = req.params;
-        const event = await this.eventService.getEventById(eventId);
+        const event = await this.eventService.getEventById({ eventId });
         if (event == null) {
             return res.status(404).json({ error: "Event not found" });
         }
@@ -108,9 +108,9 @@ export class EventTicketTypeController {
                     .json({ error: "EventTicketType does not exists" });
             }
 
-            const event = await this.eventService.getEventById(
-                eventTicketType.eventId.toString(),
-            );
+            const event = await this.eventService.getEventById({
+                eventId: eventTicketType.eventId.toString(),
+            });
             if (event.organizerId.toString() !== req.user._id.toString()) {
                 return res.status(403).json({
                     error: "EventTicketType can only be modified by event owner",
@@ -147,9 +147,9 @@ export class EventTicketTypeController {
                 });
             }
 
-            const event = await this.eventService.getEventById(
-                eventTicketType.eventId.toString(),
-            );
+            const event = await this.eventService.getEventById({
+                eventId: eventTicketType.eventId.toString(),
+            });
             if (event.organizerId.toString() !== req.user._id.toString()) {
                 return res.status(403).json({
                     error: "EventTicketType can only be deleted by event owner",

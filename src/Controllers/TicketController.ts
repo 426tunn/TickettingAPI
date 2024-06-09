@@ -54,7 +54,7 @@ export class TicketController {
     ): Promise<Response<ITicket[] | []>> => {
         try {
             const { eventId } = req.params;
-            const event = await this.eventService.getEventById(eventId);
+            const event = await this.eventService.getEventById({ eventId });
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
             }
@@ -71,7 +71,7 @@ export class TicketController {
     ): Promise<Response<ITicket[] | []>> => {
         try {
             const { eventId, userId } = req.params;
-            const event = await this.eventService.getEventById(eventId);
+            const event = await this.eventService.getEventById({ eventId });
             const user = await this.userService.getUserById(userId);
 
             if (event == null) {
@@ -143,7 +143,7 @@ export class TicketController {
     ): Promise<Response<ITicket | null>> => {
         try {
             const { ticketId, userId, eventId } = req.params;
-            const event = await this.eventService.getEventById(eventId);
+            const event = await this.eventService.getEventById({ eventId });
             const user = await this.userService.getUserById(userId);
             const ticket = await this.ticketService.getTicketById(ticketId);
 
@@ -202,7 +202,7 @@ export class TicketController {
         try {
             const { ticketId, userId, eventId } = req.params;
 
-            const event = await this.eventService.getEventById(eventId);
+            const event = await this.eventService.getEventById({ eventId });
             const user = await this.userService.getUserById(userId);
             const ticket = await this.ticketService.getTicketById(ticketId);
 

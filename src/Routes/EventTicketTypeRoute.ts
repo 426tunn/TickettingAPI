@@ -6,6 +6,7 @@ import {
     checkIfUserIsVerified,
     checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
+import { isValidMongooseIdMiddleware } from "../Middlewares/mongooseCustomMiddleware";
 
 const eventTicketTypeRouter: Router = router();
 const eventTicketTypeController = new EventTicketTypeController();
@@ -25,7 +26,8 @@ eventTicketTypeRouter.post(
             .notEmpty()
             .withMessage("Ticket type price is required")
             .custom(async (value) => {
-                if (parseFloat(value).toString().split(".")[1].length > 2) {
+                const strVal = parseFloat(value).toString();
+                if (strVal.includes(".") && strVal.split(".")[1].length > 2) {
                     throw new Error(
                         "Ticket type should be a maximum of 2 decimal points",
                     );
@@ -38,11 +40,13 @@ eventTicketTypeRouter.post(
 
 eventTicketTypeRouter.get(
     "/:eventTicketTypeId",
+    isValidMongooseIdMiddleware,
     eventTicketTypeController.getEventTicketTypeById,
 );
 
 eventTicketTypeRouter.get(
     "/events/:eventId",
+    isValidMongooseIdMiddleware,
     eventTicketTypeController.getTicketTypesByEventId,
 );
 
@@ -51,6 +55,7 @@ eventTicketTypeRouter.patch(
     authenticateJWT,
     checkRevokedToken,
     checkIfUserIsVerified,
+    isValidMongooseIdMiddleware,
     eventTicketTypeController.updateEventTicketTypeById,
 );
 
@@ -59,6 +64,7 @@ eventTicketTypeRouter.delete(
     authenticateJWT,
     checkRevokedToken,
     checkIfUserIsVerified,
+    isValidMongooseIdMiddleware,
     eventTicketTypeController.deleteEventTicketTypeById,
 );
 

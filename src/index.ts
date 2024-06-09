@@ -16,14 +16,18 @@ import cookieParser from "cookie-parser";
 import eventTicketTypeRouter from "./Routes/EventTicketTypeRoute";
 import cors from "cors";
 import { authRouter } from "./Routes/authRouter";
+import bodyParser from "body-parser";
 import { notificationRouter } from "./Routes/NotificationRouter";
 
 const SECRET = Config.SESSION_SECRET;
 const app = express();
 
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
+app.use(helmet());
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
+app.use(bodyParser.json({ limit: "10mb" }));
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes

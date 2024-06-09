@@ -15,11 +15,15 @@ import { TicketService } from "../Services/TicketService";
 import { TicketModel } from "../Models/TicketModel";
 import cloudinary from "../Config/cloudinaryConfig";
 import { EventStatus } from "../Enums/EventStatus";
+import { logger } from "../logging/logger";
 
 export class EventController {
     private eventService: EventService;
     private eventTicketTypeService: EventTicketTypeService;
     private ticketService: TicketService;
+    public eventBannerImageFolder = "teeket/event-image/banner";
+    public eventMobileImageFolder = "teeket/event-image/mobile";
+
     constructor() {
         this.eventService = new EventService(EventModel);
         this.eventTicketTypeService = new EventTicketTypeService(
@@ -32,7 +36,7 @@ export class EventController {
         try {
             return res
                 .status(200)
-                .json({ eventCategories: Object.keys(EventCategory) });
+                .json({ eventCategories: Object.values(EventCategory) });
         } catch (error) {
             return res.status(500).json(error);
         }
@@ -130,27 +134,46 @@ export class EventController {
             eventData.organizerId = req.user._id;
 
             const newEvent = this.eventService.createEvent(eventData as IEvent);
-            // TODO: look into maximum file constraint
-            const { url: bannerURL } = await cloudinary.uploader.upload(
-                `${eventData.media.bannerImage}`,
-                {
-                    public_id: `${newEvent.id}`,
-                    resource_type: "image",
-                    folder: "teeket/event-image/banner/",
-                },
-            );
-            const { url: mobilePreviewURL } = await cloudinary.uploader.upload(
-                `${eventData.media.mobilePreviewImage}`,
-                {
-                    public_id: `${newEvent.id}`,
-                    resource_type: "image",
-                    folder: "teeket/event-image/mobile/",
-                },
-            );
-            newEvent.media.bannerImageURL = bannerURL;
-            newEvent.media.mobilePreviewImageURL = mobilePreviewURL;
-            newEvent.save();
 
+            const today = new Date();
+            const eventDateIsPast = today > newEvent.startDate;
+            if (eventDateIsPast) {
+                return res.status(400).json({
+                    error: "The event start date should be in the future",
+                });
+            }
+            if (newEvent.startDate >= newEvent.endDate) {
+                return res.status(400).json({
+                    error: "The start date should be before the end date",
+                });
+            }
+
+            // TODO: look into maximum file constraint
+            if (eventData?.media?.bannerImage) {
+                const { url: bannerURL } = await cloudinary.uploader.upload(
+                    `${eventData.media.bannerImage}`,
+                    {
+                        public_id: `${newEvent.id}`,
+                        resource_type: "image",
+                        folder: "teeket/event-image/banner/",
+                    },
+                );
+                newEvent.media.bannerImageURL = bannerURL;
+            }
+            if (eventData?.media?.mobilePreviewImage) {
+                const { url: mobilePreviewURL } =
+                    await cloudinary.uploader.upload(
+                        `${eventData.media.mobilePreviewImage}`,
+                        {
+                            public_id: `${newEvent.id}`,
+                            resource_type: "image",
+                            folder: "teeket/event-image/mobile/",
+                        },
+                    );
+                newEvent.media.mobilePreviewImageURL = mobilePreviewURL;
+            }
+
+            newEvent.save();
             await this.eventTicketTypeService.createEventTicketTypes(
                 ticketTypes,
                 newEvent._id as string,
@@ -162,17 +185,31 @@ export class EventController {
     };
 
     public getEventById = async (
-        req: Request,
+        req: IAuthenticatedRequest<IUser>,
         res: Response,
     ): Promise<Response<IEvent | null>> => {
         try {
             const eventId = req.params.eventId;
-            const event = await this.eventService.getEventById(eventId);
+            const event = await this.eventService.getEventById({
+                eventId,
+            });
+
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
             }
-            return res.status(200).json(event);
+
+            if (
+                req.user?.role === UserRole.Admin ||
+                req.user?._id.toString() === event.organizerId.toString()
+            ) {
+                return res.status(200).json(event);
+            }
+
+            return res
+                .status(403)
+                .json({ error: "You do not have access to this event" });
         } catch (error) {
+            console.log(error);
             return res.status(500).json(error);
         }
     };
@@ -184,18 +221,19 @@ export class EventController {
         try {
             const eventId = req.params.eventId;
 
-            const event = await this.eventService.getEventById(eventId);
+            const event = await this.eventService.getEventById({ eventId });
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
             }
 
-            const organizerId = event?.organizerId?.toString();
+            const currentUserId = req.user._id.toString();
+            const organizerId = event.organizerId.toString();
             if (
-                organizerId !== req.user._id.toString() ||
-                req.user.role === UserRole.Admin
+                currentUserId !== organizerId &&
+                req.user.role === UserRole.User
             ) {
                 return res.status(403).json({
-                    error: "Only the event organizers and admins can access this endpoint",
+                    error: "Only this event organizers and admins can access this endpoint",
                 });
             }
 
@@ -204,18 +242,12 @@ export class EventController {
                     eventId,
                 );
 
-            const totalRevenue = ticketTypes?.reduce(
-                (total, currentTicketType) => {
-                    return (
-                        total +
-                        currentTicketType.price * currentTicketType.quantity
-                    );
-                },
-                0,
-            );
-
-            const { salesByTicketType, totalTicketsSold, totalTickets } =
-                await this.ticketService.getTicketSalesDetailsForEvent(eventId);
+            const {
+                salesByTicketType,
+                totalTicketsSold,
+                totalTickets,
+                totalRevenue,
+            } = await this.ticketService.getTicketSalesDetailsForEvent(eventId);
 
             return res.status(200).json({
                 event: event.toJSON(),
@@ -237,17 +269,32 @@ export class EventController {
         try {
             const eventId = req.params.eventId;
 
-            const event = await this.eventService.getEventById(eventId);
+            const event = await this.eventService.getEventById({ eventId });
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
             }
 
+            const currentUserId = req.user._id.toString();
+            const organizerId = event.organizerId.toString();
             if (
-                req.user.id !== event.organizerId ||
-                req.user.role !== UserRole.Admin
+                currentUserId !== organizerId &&
+                req.user.role === UserRole.User
             ) {
                 return res.status(403).json({
-                    error: "Only the event organizers and admins can update the event",
+                    error: "Only this event organizers and admins can update the event",
+                });
+            }
+
+            const today = new Date();
+            const eventIsInPast = today > event.startDate;
+            const eventIsTodayOrAfter =
+                event.startDate.getFullYear() === today.getFullYear() &&
+                event.startDate.getMonth() === today.getMonth() &&
+                event.startDate.getDay() >= today.getDay();
+
+            if (eventIsInPast || eventIsTodayOrAfter) {
+                return res.status(400).json({
+                    error: "Event can only be modified before the start day",
                 });
             }
 
@@ -268,11 +315,38 @@ export class EventController {
     ): Promise<Response<null>> => {
         try {
             const eventId = req.params.eventId;
-            const event = await this.eventService.getEventById(eventId);
+            const event = await this.eventService.getEventById({ eventId });
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
             }
             await this.eventService.deleteEventById(eventId);
+            const eventBannerImage = event?.media?.bannerImageURL;
+            const eventMobileImage = event?.media?.mobilePreviewImageURL;
+
+            if (eventBannerImage) {
+                const res = await cloudinary.uploader.destroy(
+                    `${this.eventBannerImageFolder}/${event.id}`,
+                    {
+                        resource_type: "image",
+                    },
+                );
+                logger.info(
+                    `Event ${event.id} - ${event.name}: Banner image deleted status -> ${res.result}`,
+                );
+            }
+
+            if (eventMobileImage) {
+                const res = await cloudinary.uploader.destroy(
+                    `${this.eventMobileImageFolder}/${event.id}`,
+                    {
+                        resource_type: "image",
+                    },
+                );
+                logger.info(
+                    `Event ${event.id} - ${event.name}: Mobile image deleted status -> ${res.result}`,
+                );
+            }
+
             return res.status(204).json();
         } catch (error) {
             return res.status(500).json(error);

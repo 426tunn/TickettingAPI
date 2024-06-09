@@ -6,6 +6,11 @@ import {
     checkIfUserIsVerified,
     checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
+import { EventCategory } from "../Enums/EventCategory";
+import { EventVisibility } from "../Enums/EventVisibility";
+import { EventType } from "../Enums/EventType";
+import { VenueType } from "../Enums/VenueType";
+import { isValidMongooseIdMiddleware } from "../Middlewares/mongooseCustomMiddleware";
 
 const eventRouter: Router = router();
 const eventController = new EventController();
@@ -27,41 +32,74 @@ eventRouter.get(
     authenticateJWT,
     checkRevokedToken,
     checkIfUserIsVerified,
+    isValidMongooseIdMiddleware,
     eventController.getEventDetailsById,
 );
 
-// FIX: check why unknown category works
 eventRouter.post(
     "/",
     authenticateJWT,
     checkRevokedToken,
+    checkIfUserIsVerified,
     [
         body("name").notEmpty().withMessage("Event name is required"),
         body("description")
-            .notEmpty()
-            .withMessage("Event description is required")
-            .isLength({ max: 500 })
+            .isLength({ max: 1000 })
             .withMessage(
-                "Event description should be less than 500 characters long",
+                "Event description should be less than 1000 characters long",
             ),
-        body("category").notEmpty().withMessage("Event category is required"),
+        body("category")
+            .notEmpty()
+            .withMessage("Event category is required")
+            .toLowerCase()
+            .isIn(Object.values(EventCategory))
+            .withMessage("Invalid event category"),
         body("visibility")
             .notEmpty()
-            .withMessage("Event visibility is required"),
-        body("type").notEmpty().withMessage("Event type is required"),
-        body("venueType").notEmpty().withMessage("Event venueType is required"),
+            .withMessage("Event visibility is required")
+            .toLowerCase()
+            .isIn(Object.values(EventVisibility))
+            .withMessage(
+                `Invalid event visibility. Valid - ${Object.values(EventVisibility)}`,
+            ),
+        body("type")
+            .notEmpty()
+            .withMessage("Event type is required")
+            .toLowerCase()
+            .isIn(Object.values(EventType))
+            .withMessage(
+                `Invalid event type. Valid - ${Object.values(EventType)}`,
+            ),
+        body("venueType")
+            .notEmpty()
+            .withMessage("Event venueType is required")
+            .toLowerCase()
+            .isIn(Object.values(VenueType))
+            .withMessage(
+                `Invalid event type. Valid - ${Object.values(VenueType)}`,
+            ),
         body("tags")
             .optional()
             .isArray()
             .withMessage("Event Tags should be an array of strings"),
         body("startDate")
             .notEmpty()
-            .toDate()
-            .withMessage("Event start date is required"),
+            .withMessage("Event start date is required")
+            .custom(async (value) => {
+                if (isNaN(Date.parse(value))) {
+                    throw new Error("Invalid start date");
+                }
+            })
+            .toDate(),
         body("endDate")
             .notEmpty()
-            .toDate()
-            .withMessage("Event end date is required"),
+            .withMessage("Event end date is required")
+            .custom(async (value) => {
+                if (isNaN(Date.parse(value))) {
+                    throw new Error("Invalid end date");
+                }
+            })
+            .toDate(),
         body("location").notEmpty().withMessage("Event location is required"),
         body("media"),
         body("ticketTypes")
@@ -71,22 +109,28 @@ eventRouter.post(
     eventController.createEvent,
 );
 
-eventRouter.get("/:eventId", eventController.getEventById);
+eventRouter.get(
+    "/:eventId",
+    authenticateJWT,
+    isValidMongooseIdMiddleware,
+    eventController.getEventById,
+);
 
 eventRouter.patch(
     "/:eventId",
     authenticateJWT,
     checkRevokedToken,
     checkIfUserIsVerified,
+    isValidMongooseIdMiddleware,
     eventController.updateEventById,
 );
 
-// FIX: delete event image when event is deleted
 eventRouter.delete(
     "/:eventId",
     authenticateJWT,
     checkRevokedToken,
     checkIfUserIsVerified,
+    isValidMongooseIdMiddleware,
     eventController.deleteEventById,
 );
 

@@ -115,8 +115,17 @@ export class EventService {
             .skip((page - 1) * perPage);
     }
 
-    async getEventById(eventId: string): Promise<IEvent | null> {
-        return this.eventModel.findById(eventId);
+    async getEventById({
+        eventId,
+        status,
+    }: {
+        eventId: string;
+        status?: string;
+    }): Promise<IEvent | null> {
+        if (status == undefined) {
+            return this.eventModel.findOne({ _id: eventId });
+        }
+        return this.eventModel.findOne({ _id: eventId, status });
     }
 
     async updateEventById(
