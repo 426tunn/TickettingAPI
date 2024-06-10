@@ -14,6 +14,7 @@ const getConfig = function () {
         JWTSecret: String(process.env.JWT_SECRET),
         SESSION_SECRET: String(process.env.SESSION_SECRET),
         HOST_URL: String(process.env.HOST_URL),
+        BASE_URL: String(process.env.BASE_URL),
         EMAIL: String(process.env.EMAIL),
         EMAIL_PASSWORD: String(process.env.EMAIL_PASSWORD),
         GOOGLE_CLIENT_ID: String(process.env.GOOGLE_CLIENT_ID),

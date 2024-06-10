@@ -9,9 +9,11 @@ import { IAuthenticatedRequest } from "../Types/RequestTypes";
 import * as crypto from "crypto";
 import {
     sendPasswordResetEmail,
+    sendUserVerifiedEmail,
     sendVerificationEmail,
 } from "../Utils/emailUtils";
 import { logger } from "../logging/logger";
+import { NotificationModel } from "../Models/NotificationModel";
 
 export class UserController {
     private userService: UserService;
@@ -71,6 +73,9 @@ export class UserController {
     public verifyUser = async (req: Request, res: Response) => {
         const { token } = req.query;
         try {
+            if (!token) {
+                return res.status(400).json({ error: "Verification token is required" });
+            }
             const user =
                 await this.userService.getUserByVerificationToken(
                     token as string
@@ -81,7 +86,8 @@ export class UserController {
                     .json({ error: "User not found or token expired" });
             }
             await this.userService.verifyUser(user._id.toString());
-            res.status(200).json({ message: "User verified" });
+            await sendUserVerifiedEmail(user.email, user._id.toString());
+            res.redirect("https://api.teekect.africa");
         } catch (error) {
             logger.error("Error verifying user:", error);
             res.status(500).json({ error: error.message });
@@ -225,6 +231,13 @@ export class UserController {
             if (!roleToUpdate) {
                 return res.status(400).json({ error: "Role is required" });
             }
+
+            const notification = new NotificationModel({
+                action: 'Role Change Request',
+                details: `User ID: ${userId} requested a role change to "${roleToUpdate}"`,
+                userId: userId,
+            });
+            await notification.save();
             const updatedUser = await this.userService.updateUserRole(
                 userId,
                 roleToUpdate,

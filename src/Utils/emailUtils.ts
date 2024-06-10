@@ -10,6 +10,28 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+
+export const sendUserVerifiedEmail = async (
+    email: string,
+    userId: string,
+) => {
+    try {
+        const mailOptions = {
+            from: Config.EMAIL,
+            to: email,
+            subject: "Account Verified",
+        text: `Account with user id ${userId}  has been successfully verified. Thank you!`,
+        };
+
+        await transporter.sendMail(mailOptions);
+        logger.info("Verified email sent successfully");
+    } catch (error) {
+        console.error("Error sending email:", error);
+        throw new Error("Error sending verified email");
+    }
+};
+
+
 export const sendPasswordResetEmail = async (
     email: string,
     verificationToken: string,
@@ -46,7 +68,7 @@ export const sendVerificationEmail = async (
             subject: "Account Verification",
             text: `You are receiving this email because you (or someone else) has requested to verify your account.
             Please click the following link, or paste it into your browser to complete the process:
-            http://${Config.HOST_URL}/users/verify-email?token=${verificationToken}
+            http://${Config.BASE_URL}/users/verify-email?token=${verificationToken}
              verification: ${verificationToken}`,
         };
 
