@@ -133,7 +133,9 @@ export class EventController {
             const { ticketTypes, ...eventData } = data;
             eventData.organizerId = req.user._id;
 
+            console.log("creating event");
             const newEvent = this.eventService.createEvent(eventData as IEvent);
+            console.log("created event");
 
             const today = new Date();
             const eventDateIsPast = today > newEvent.startDate;
@@ -148,6 +150,7 @@ export class EventController {
                 });
             }
 
+            console.log("uploading image");
             // TODO: look into maximum file constraint
             if (eventData?.media?.bannerImage) {
                 const { url: bannerURL } = await cloudinary.uploader.upload(
@@ -173,11 +176,14 @@ export class EventController {
                 newEvent.media.mobilePreviewImageURL = mobilePreviewURL;
             }
 
+            console.log("uploaded image");
             newEvent.save();
+            console.log("creating tickettypes");
             await this.eventTicketTypeService.createEventTicketTypes(
                 ticketTypes,
                 newEvent._id as string,
             );
+            console.log("done");
             return res.status(201).json({ event: newEvent });
         } catch (error) {
             return res.status(500).json(error);
@@ -290,7 +296,7 @@ export class EventController {
             const eventIsTodayOrAfter =
                 event.startDate.getFullYear() === today.getFullYear() &&
                 event.startDate.getMonth() === today.getMonth() &&
-                event.startDate.getDay() >= today.getDay();
+                today.getDate() >= event.startDate.getDate();
 
             if (eventIsInPast || eventIsTodayOrAfter) {
                 return res.status(400).json({
