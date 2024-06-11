@@ -7,7 +7,7 @@ const authRouter = Router();
 
 authRouter.get(
     "/google",
-    passport.authenticate("google", { scope: ["profile", "email"] })
+    passport.authenticate("google", { scope: ["profile", "email"] }),
 );
 
 authRouter.get(
@@ -15,16 +15,17 @@ authRouter.get(
     passport.authenticate("google", { failureRedirect: "/login" }),
     (req, res) => {
         if (!req.user) {
-            return res.status(401).json({ message: "User authentication failed" });
+            return res
+                .status(401)
+                .json({ message: "User authentication failed" });
         }
         const token = generateTokenWithRole(res, req.user as IUser);
         res.status(200).json({
             message: "Login Successful",
             token,
         });
-    }
+    },
 );
-
 
 /**
  * @openapi

@@ -12,7 +12,7 @@ const JWT_SECRET = Config.JWTSecret;
 const cookieExtractor = (req: Request) => {
     let token = null;
     if (req && req.cookies) {
-        token = req.cookies['jwt_token'];
+        token = req.cookies["jwt_token"];
     }
     return token;
 };
@@ -22,7 +22,10 @@ passport.use(
     new JWTStrategy(
         {
             secretOrKey: JWT_SECRET,
-            jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor, ExtractJwt.fromAuthHeaderAsBearerToken()]),
+            jwtFromRequest: ExtractJwt.fromExtractors([
+                cookieExtractor,
+                ExtractJwt.fromAuthHeaderAsBearerToken(),
+            ]),
         },
         async (payload, done) => {
             try {
@@ -114,20 +117,23 @@ passport.use(
             } catch (error) {
                 return done(error);
             }
-        }
-    )
+        },
+    ),
 );
 
+passport.serializeUser(
+    (user: IUser, done: (err: Error | null, id?: string) => void) => {
+        done(null, user.id);
+    },
+);
 
-passport.serializeUser((user: IUser, done: (err: Error | null, id?: string) => void) => {
-    done(null, user.id);
-});
-
-passport.deserializeUser(async (id: string, done: (err: Error | null, user?: IUser) => void) => {
-    try {
-        const user = await userService.getUserById(id);
-        done(null, user);
-    } catch (error) {
-        done(error);
-    }
-});
+passport.deserializeUser(
+    async (id: string, done: (err: Error | null, user?: IUser) => void) => {
+        try {
+            const user = await userService.getUserById(id);
+            done(null, user);
+        } catch (error) {
+            done(error);
+        }
+    },
+);

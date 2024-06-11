@@ -3,7 +3,8 @@ import bcrypt from "bcrypt";
 import { UserRole } from "../Enums/UserRole";
 
 const passwordValidator = (password: string) => {
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$%&+,:;<=>?@^_`{|}~-])[a-zA-Z\d#$%&+,:;<=>?@^_`{|}~-]{8,}$/;
+    const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$%&+,:;<=>?@^_`{|}~-])[a-zA-Z\d#$%&+,:;<=>?@^_`{|}~-]{8,}$/;
     return passwordRegex.test(password);
 };
 
@@ -31,7 +32,7 @@ const userSchema = new Schema<IUser>({
     },
     username: {
         type: String,
-        required: function() {
+        required: function () {
             return !this.googleId;
         },
         maxlength: 50,
@@ -50,12 +51,14 @@ const userSchema = new Schema<IUser>({
     },
     password: {
         type: String,
-        required: function() {
+        required: function () {
             return !this.googleId;
         },
         validate: {
-            validator: function(value: string) {
-                return this.isModified("password") ? passwordValidator(value) : true;
+            validator: function (value: string) {
+                return this.isModified("password")
+                    ? passwordValidator(value)
+                    : true;
             },
             message:
                 "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character",

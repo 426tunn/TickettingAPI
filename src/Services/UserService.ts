@@ -42,7 +42,7 @@ export class UserService {
             firstname: profile.name.givenName,
             lastname: profile.name.familyName,
             email: profile.emails[0].value,
-            username: profile.emails[0].value.split('@')[0],
+            username: profile.emails[0].value.split("@")[0],
             password: securedPassword,
             isVerified: true,
         });
@@ -53,14 +53,14 @@ export class UserService {
         return await this.userModel.findById(userId).exec();
     }
 
-   async getUserByGoogleId(googleId: string): Promise<IUser | null> {
+    async getUserByGoogleId(googleId: string): Promise<IUser | null> {
         return this.userModel.findOne({ googleId });
     }
 
     async getUserByEmail(email: string): Promise<IUser | null> {
         return await this.userModel.findOne({ email }).exec();
     }
-  
+
     async getUserByUsername(username: string): Promise<IUser | null> {
         return await this.userModel.findOne({ username }).exec();
     }

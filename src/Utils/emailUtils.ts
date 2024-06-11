@@ -10,17 +10,13 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-
-export const sendUserVerifiedEmail = async (
-    email: string,
-    userId: string,
-) => {
+export const sendUserVerifiedEmail = async (email: string, userId: string) => {
     try {
         const mailOptions = {
             from: Config.EMAIL,
             to: email,
             subject: "Account Verified",
-        text: `Account with user id ${userId}  has been successfully verified. Thank you!`,
+            text: `Account with user id ${userId}  has been successfully verified. Thank you!`,
         };
 
         await transporter.sendMail(mailOptions);
@@ -30,7 +26,6 @@ export const sendUserVerifiedEmail = async (
         throw new Error("Error sending verified email");
     }
 };
-
 
 export const sendPasswordResetEmail = async (
     email: string,

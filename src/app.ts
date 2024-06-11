@@ -1,3 +1,4 @@
+// TODO: improve the entire error handling and logging capability
 import { Config } from "./Config/config";
 import { connectToDB } from "./database";
 import app from "./index";

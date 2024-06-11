@@ -74,12 +74,13 @@ export class UserController {
         const { token } = req.query;
         try {
             if (!token) {
-                return res.status(400).json({ error: "Verification token is required" });
+                return res
+                    .status(400)
+                    .json({ error: "Verification token is required" });
             }
-            const user =
-                await this.userService.getUserByVerificationToken(
-                    token as string
-                );
+            const user = await this.userService.getUserByVerificationToken(
+                token as string,
+            );
             if (!user || user.verificationExpire < new Date()) {
                 return res
                     .status(404)
@@ -111,9 +112,11 @@ export class UserController {
                 return res.status(400).json({ error: "User already verified" });
             }
             const currentTime = new Date();
-            const verificationExpire = new Date(currentTime.getTime() + 5 * 60 * 1000);
+            const verificationExpire = new Date(
+                currentTime.getTime() + 5 * 60 * 1000,
+            );
             user.verificationExpire = verificationExpire;
-            await user.save(); 
+            await user.save();
             res.status(200).json({ message: "Verification email sent" });
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -181,12 +184,16 @@ export class UserController {
         res: Response,
     ) => {
         try {
-            const { Token } = req.query
+            const { Token } = req.query;
             if (!Token) {
-                return res.status(400).json({ error: "Token is required or missing" });
+                return res
+                    .status(400)
+                    .json({ error: "Token is required or missing" });
             }
 
-            const user = await this.userService.getUserByVerificationToken(Token as string);
+            const user = await this.userService.getUserByVerificationToken(
+                Token as string,
+            );
             res.status(200).json({ user });
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -233,7 +240,7 @@ export class UserController {
             }
 
             const notification = new NotificationModel({
-                action: 'Role Change Request',
+                action: "Role Change Request",
                 details: `User ID: ${userId} requested a role change to "${roleToUpdate}"`,
                 userId: userId,
             });
