@@ -286,10 +286,7 @@ export class EventController {
             }
 
             const today = new Date();
-            const eventIsInPast =
-                today.getFullYear() > event.startDate.getFullYear() &&
-                today.getMonth() > event.startDate.getMonth() &&
-                today.getDate() > event.startDate.getDate();
+            const eventIsInPast = today > event.startDate;
             const updateIsOnEventDay = eventUpdate?.startDate?.getDate()
                 ? event.startDate.getDate() !==
                       eventUpdate.startDate.getDate() &&
