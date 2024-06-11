@@ -122,6 +122,56 @@ eventRouter.patch(
     checkRevokedToken,
     checkIfUserIsVerified,
     isValidMongooseIdMiddleware,
+    [
+        body("name").optional(),
+        body("description")
+            .isLength({ max: 1000 })
+            .withMessage(
+                "Event description should be less than 1000 characters long",
+            ),
+        body("category")
+            .toLowerCase()
+            .isIn(Object.values(EventCategory))
+            .withMessage("Invalid event category"),
+        body("visibility")
+            .toLowerCase()
+            .isIn(Object.values(EventVisibility))
+            .withMessage(
+                `Invalid event visibility. Valid - ${Object.values(EventVisibility)}`,
+            ),
+        body("type")
+            .toLowerCase()
+            .isIn(Object.values(EventType))
+            .withMessage(
+                `Invalid event type. Valid - ${Object.values(EventType)}`,
+            ),
+        body("venueType")
+            .toLowerCase()
+            .isIn(Object.values(VenueType))
+            .withMessage(
+                `Invalid event type. Valid - ${Object.values(VenueType)}`,
+            ),
+        body("tags")
+            .optional()
+            .isArray()
+            .withMessage("Event Tags should be an array of strings"),
+        body("startDate")
+            .custom(async (value) => {
+                if (isNaN(Date.parse(value))) {
+                    throw new Error("Invalid start date");
+                }
+            })
+            .toDate(),
+        body("endDate")
+            .custom(async (value) => {
+                if (isNaN(Date.parse(value))) {
+                    throw new Error("Invalid end date");
+                }
+            })
+            .toDate(),
+        body("location"),
+        body("media"),
+    ],
     eventController.updateEventById,
 );
 

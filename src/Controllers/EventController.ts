@@ -133,9 +133,7 @@ export class EventController {
             const { ticketTypes, ...eventData } = data;
             eventData.organizerId = req.user._id;
 
-            console.log("creating event");
             const newEvent = this.eventService.createEvent(eventData as IEvent);
-            console.log("created event");
 
             const today = new Date();
             const eventDateIsPast = today > newEvent.startDate;
@@ -150,7 +148,6 @@ export class EventController {
                 });
             }
 
-            console.log("uploading image");
             // TODO: look into maximum file constraint
             if (eventData?.media?.bannerImage) {
                 const { url: bannerURL } = await cloudinary.uploader.upload(
@@ -176,14 +173,11 @@ export class EventController {
                 newEvent.media.mobilePreviewImageURL = mobilePreviewURL;
             }
 
-            console.log("uploaded image");
             newEvent.save();
-            console.log("creating tickettypes");
             await this.eventTicketTypeService.createEventTicketTypes(
                 ticketTypes,
                 newEvent._id as string,
             );
-            console.log("done");
             return res.status(201).json({ event: newEvent });
         } catch (error) {
             return res.status(500).json(error);
@@ -215,7 +209,6 @@ export class EventController {
                 .status(403)
                 .json({ error: "You do not have access to this event" });
         } catch (error) {
-            console.log(error);
             return res.status(500).json(error);
         }
     };
@@ -274,6 +267,7 @@ export class EventController {
     ): Promise<Response<Event | null>> => {
         try {
             const eventId = req.params.eventId;
+            const eventUpdate: Partial<IEvent> = req.body;
 
             const event = await this.eventService.getEventById({ eventId });
             if (event == null) {
@@ -292,25 +286,34 @@ export class EventController {
             }
 
             const today = new Date();
-            const eventIsInPast = today > event.startDate;
-            const eventIsTodayOrAfter =
-                event.startDate.getFullYear() === today.getFullYear() &&
-                event.startDate.getMonth() === today.getMonth() &&
-                today.getDate() >= event.startDate.getDate();
+            const eventIsInPast =
+                today.getFullYear() > event.startDate.getFullYear() &&
+                today.getMonth() > event.startDate.getMonth() &&
+                today.getDate() > event.startDate.getDate();
+            const updateIsOnEventDay = eventUpdate?.startDate?.getDate()
+                ? event.startDate.getDate() !==
+                      eventUpdate.startDate.getDate() &&
+                  event.startDate.getDate() === today.getDate()
+                : false;
 
-            if (eventIsInPast || eventIsTodayOrAfter) {
+            if (eventIsInPast) {
                 return res.status(400).json({
-                    error: "Event can only be modified before the start day",
+                    error: "You cannot modify a past event.",
+                });
+            }
+            if (updateIsOnEventDay) {
+                return res.status(400).json({
+                    error: "Event day can only be modified before the start day",
                 });
             }
 
-            const eventUpdate = req.body;
             const updatedEvent = await this.eventService.updateEventById(
                 eventId,
                 eventUpdate,
             );
             return res.status(200).json({ event: updatedEvent });
         } catch (error) {
+            console.log(error);
             return res.status(500).json(error);
         }
     };
