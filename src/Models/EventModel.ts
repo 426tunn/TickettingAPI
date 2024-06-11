@@ -1,6 +1,5 @@
 import { EventCategory } from "../Enums/EventCategory";
 import { EventStatus } from "../Enums/EventStatus";
-import { EventType } from "../Enums/EventType";
 import { EventVisibility } from "../Enums/EventVisibility";
 import { VenueType } from "../Enums/VenueType";
 import { IUser } from "./UserModel";
@@ -24,7 +23,6 @@ interface IEvent extends Document {
     category: EventCategory;
     status: EventStatus;
     visibility: EventVisibility;
-    type: EventType;
     location: ILocation;
     venueType: VenueType;
     organizerId: IUser;
@@ -70,11 +68,6 @@ const eventSchema = new Schema<IEvent>(
         visibility: {
             type: String,
             enum: Object.values(EventVisibility),
-            required: true,
-        },
-        type: {
-            type: String,
-            enum: Object.values(EventType),
             required: true,
         },
         location: {

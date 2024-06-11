@@ -8,7 +8,6 @@ import {
 } from "../Middlewares/AuthMiddleware";
 import { EventCategory } from "../Enums/EventCategory";
 import { EventVisibility } from "../Enums/EventVisibility";
-import { EventType } from "../Enums/EventType";
 import { VenueType } from "../Enums/VenueType";
 import { isValidMongooseIdMiddleware } from "../Middlewares/mongooseCustomMiddleware";
 
@@ -61,14 +60,6 @@ eventRouter.post(
             .isIn(Object.values(EventVisibility))
             .withMessage(
                 `Invalid event visibility. Valid - ${Object.values(EventVisibility)}`,
-            ),
-        body("type")
-            .notEmpty()
-            .withMessage("Event type is required")
-            .toLowerCase()
-            .isIn(Object.values(EventType))
-            .withMessage(
-                `Invalid event type. Valid - ${Object.values(EventType)}`,
             ),
         body("venueType")
             .notEmpty()
@@ -138,12 +129,6 @@ eventRouter.patch(
             .isIn(Object.values(EventVisibility))
             .withMessage(
                 `Invalid event visibility. Valid - ${Object.values(EventVisibility)}`,
-            ),
-        body("type")
-            .toLowerCase()
-            .isIn(Object.values(EventType))
-            .withMessage(
-                `Invalid event type. Valid - ${Object.values(EventType)}`,
             ),
         body("venueType")
             .toLowerCase()
