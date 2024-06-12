@@ -1,4 +1,3 @@
-import { UserRole } from "Enums/UserRole";
 import { IUser } from "Models/UserModel";
 import { IAuthenticatedRequest } from "Types/RequestTypes";
 import { Request, Response, NextFunction } from "express";

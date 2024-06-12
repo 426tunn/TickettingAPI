@@ -26,6 +26,10 @@ const options: swaggerJsdoc.Options = {
                 url: `http://localhost:${PORT}`, // Update with your server URL
                 description: "Local server",
             },
+            {
+                url: "https://www.api.teeket.africa/",
+                description: "Production server",
+            },
         ],
     },
     // Path to the API docs, using TypeScript paths
