@@ -23,6 +23,8 @@ interface IUser extends Document {
     resetPasswordToken?: string;
     resetPasswordExpire?: Date;
     isValidPassword(password: string): Promise<boolean>;
+    authenticateUsername(username: string): Promise<boolean>;
+    authenticateEmail(email: string): Promise<boolean>;
 }
 
 const userSchema = new Schema<IUser>({
@@ -32,6 +34,8 @@ const userSchema = new Schema<IUser>({
     },
     username: {
         type: String,
+        unique: true,
+        lowercase: true,
         required: function () {
             return !this.googleId;
         },
@@ -48,6 +52,8 @@ const userSchema = new Schema<IUser>({
     email: {
         type: String,
         required: true,
+        unique: true,
+        lowercase: true
     },
     password: {
         type: String,
@@ -94,6 +100,14 @@ userSchema.pre<IUser>("save", async function (next) {
 userSchema.methods.isValidPassword = async function (password: string) {
     const compare = await bcrypt.compare(password, this.password);
     return compare;
+};
+
+userSchema.methods.authenticateUsername = function (username: string) {
+    return this.username === username.toLowerCase();
+};
+
+userSchema.methods.authenticateEmail = function (email: string) {
+    return this.email === email.toLowerCase();
 };
 
 const UserModel = mongoose.model<IUser>("User", userSchema);

@@ -50,8 +50,20 @@ passport.use(
                 let user;
                 if (usernameOrEmail.includes("@")) {
                     user = await userService.getUserByEmail(usernameOrEmail);
+                    const isEmailMatch = user.authenticateEmail(usernameOrEmail);
+                    if (!isEmailMatch) {
+                        return done(null, false, {
+                            message: "Invalid email",
+                        });
+                    }
                 } else {
                     user = await userService.getUserByUsername(usernameOrEmail);
+                    const isMatchUsername = user.authenticateUsername(usernameOrEmail);
+                    if (!isMatchUsername) {
+                        return done(null, false, {
+                            message: "Invalid username",
+                        });
+                    }
                 }
                 if (!user) {
                     return done(null, false, {
