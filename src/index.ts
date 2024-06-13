@@ -8,6 +8,7 @@ import session from "express-session";
 import userRoutes from "./Routes/UserRoute";
 import eventRoutes from "./Routes/EventRoute";
 import ticketRoutes from "./Routes/TicketRoute";
+import adminRouter from "./Routes/adminRouter";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "./Config/swaggerConfig";
 import { authenticateJWT } from "./Utils/authUtils";
@@ -59,6 +60,7 @@ app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1", notificationRouter);
 app.use("/api/v1/tickets", authenticateJWT, ticketRoutes);
 app.use("/api/v1/ticket-types", eventTicketTypeRouter);
+app.use("/api/v1/admin", adminRouter);
 
 app.get("/home", authenticateJWT, (_req, res) => {
     logger.info("WELCOME");
