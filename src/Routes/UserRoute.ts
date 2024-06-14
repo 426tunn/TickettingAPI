@@ -56,7 +56,7 @@ UserRouter.post(
 
 UserRouter.get(
     "/",
-    authenticateJWT,
+    // authenticateJWT,
     checkRevokedToken,
     // checkIfUserIsAdmin,
     userController.getAllUsers,
@@ -64,7 +64,7 @@ UserRouter.get(
 
 UserRouter.get(
     "/:userId",
-    authenticateJWT,
+    // authenticateJWT,
     isValidMongooseIdMiddleware,
     userController.getUserById,
 );
@@ -85,7 +85,7 @@ UserRouter.patch(
 
 UserRouter.delete(
     "/:userId",
-    authenticateJWT,
+    // authenticateJWT,
     isValidMongooseIdMiddleware,
     userController.deleteUser,
 );
