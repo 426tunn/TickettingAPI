@@ -1,0 +1,19 @@
+name: Trigger Render Auto Deploy
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Production
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with: 
+          service-id: ${{ secrets.SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
+          wait-for-success: true
