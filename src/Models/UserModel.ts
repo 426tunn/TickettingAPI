@@ -91,7 +91,7 @@ export const hashPassword = async (password: string) => {
 };
 
 userSchema.pre<IUser>("save", async function (next) {
-    if (this.isModified("password")) {
+    if (this.isNew || this.isModified("password")) {
         this.password = await hashPassword(this.password);
     }
     next();
