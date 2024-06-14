@@ -155,7 +155,7 @@ export class EventController {
                     {
                         public_id: `${newEvent.id}`,
                         resource_type: "image",
-                        folder: "teeket/event-image/banner/",
+                        folder: this.eventBannerImageFolder,
                     },
                 );
                 newEvent.media.bannerImageURL = bannerURL;
@@ -167,7 +167,7 @@ export class EventController {
                         {
                             public_id: `${newEvent.id}`,
                             resource_type: "image",
-                            folder: "teeket/event-image/mobile/",
+                            folder: this.eventMobileImageFolder,
                         },
                     );
                 newEvent.media.mobilePreviewImageURL = mobilePreviewURL;
