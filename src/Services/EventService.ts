@@ -25,6 +25,7 @@ export class EventService {
         status = EventStatus.Approved,
         organizerId,
         fieldsToSelect,
+        isDeleted = false,
     }: IEventPaginationAndSort): Promise<IEvent[] | []> {
         let events;
         if (sort === "latest") {
@@ -52,7 +53,7 @@ export class EventService {
             events = events.where({ organizerId });
         }
 
-        return events.select(fieldsToSelect);
+        return events.select(fieldsToSelect).where({ isDeleted });
     }
 
     createEvent({
@@ -135,10 +136,11 @@ export class EventService {
         });
     }
 
-    async deleteEventById(eventId: string): Promise<null> {
-        await this.eventTicketTypeService.deleteEventTicketTypesByEventId(
-            eventId,
-        );
-        return this.eventModel.findByIdAndDelete(eventId);
+    async deleteEventById(eventId: string): Promise<void> {
+        await this.eventModel.findByIdAndUpdate(eventId, { isDeleted: true });
+        // await this.eventTicketTypeService.deleteEventTicketTypesByEventId(
+        //     eventId,
+        // );
+        // return this.eventModel.findByIdAndDelete(eventId);
     }
 }

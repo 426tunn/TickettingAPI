@@ -31,6 +31,7 @@ interface IEvent extends Document {
     media: IMedia;
     totalTickets: number;
     tags: string[];
+    isDeleted: boolean;
 }
 
 const locationSchema = new Schema<ILocation>({
@@ -99,6 +100,10 @@ const eventSchema = new Schema<IEvent>(
         totalTickets: {
             type: Number,
             default: 0,
+        },
+        isDeleted: {
+            type: Boolean,
+            default: false,
         },
     },
     { timestamps: true },

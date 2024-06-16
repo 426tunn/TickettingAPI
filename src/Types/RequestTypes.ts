@@ -10,6 +10,7 @@ export interface IEventPaginationAndSort {
     status?: EventStatus | EventStatus[];
     organizerId?: string;
     fieldsToSelect?: string;
+    isDeleted?: boolean;
 }
 
 export interface IEventPaginationAndSortReq {
