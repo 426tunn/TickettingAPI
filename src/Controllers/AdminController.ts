@@ -1,6 +1,7 @@
 import { matchedData, validationResult } from "express-validator";
 import { EventService } from "../Services/EventService";
 import { NextFunction, Request, Response } from "express";
+import { IEventPaginationAndSortReq } from "../Types/RequestTypes";
 
 export default class AdminController {
     constructor(private eventService: EventService) {}
@@ -33,6 +34,42 @@ export default class AdminController {
                 return next(error);
             }
             return res.status(500).json({ error, message: error.message });
+        }
+    };
+
+    public getDeletedEvents = async (
+        req: Request & IEventPaginationAndSortReq,
+        res: Response,
+        next: NextFunction,
+    ) => {
+        try {
+            const page = parseInt(req.query.page || "1");
+            const perPage = parseInt(req.query.perPage || "9");
+            const { sort, order } = req.query;
+            const { organizerId } = req.params;
+
+            const events = await this.eventService.getAllEvents({
+                sort,
+                order,
+                page,
+                perPage,
+                organizerId,
+                isDeleted: true,
+            });
+
+            const totalNoOfPages = Math.ceil(events.length / perPage);
+            return res.status(200).json({
+                message: "Deleted events",
+                page,
+                perPage,
+                totalNoOfPages,
+                events,
+            });
+        } catch (error) {
+            if (error.statusCode && error.statusCode !== 500) {
+                return next(error);
+            }
+            return res.status(500).json(error);
         }
     };
 }
