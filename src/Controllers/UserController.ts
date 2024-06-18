@@ -13,7 +13,7 @@ import {
     sendVerificationEmail,
 } from "../Utils/emailUtils";
 import { logger } from "../logging/logger";
-import { NotificationModel } from "../Models/NotificationModel";
+import { UserNotificationUtils } from "../Utils/UserNotificationUtils";
 
 export class UserController {
     private userService: UserService;
@@ -64,6 +64,7 @@ export class UserController {
             );
             const newUser = { ...user.toObject(), password: undefined };
             await sendVerificationEmail(email, verificationToken);
+            await UserNotificationUtils.createUserCreationNotification(user._id.toString(), user.email);
             res.status(201).json({ message: "Signup Successful", newUser });
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -238,13 +239,9 @@ export class UserController {
             if (!roleToUpdate) {
                 return res.status(400).json({ error: "Role is required" });
             }
+            //Notification
+            await UserNotificationUtils.createRoleChangeNotification(userId, roleToUpdate)
 
-            const notification = new NotificationModel({
-                action: "Role Change Request",
-                details: `User ID: ${userId} requested a role change to "${roleToUpdate}"`,
-                userId: userId,
-            });
-            await notification.save();
             const updatedUser = await this.userService.updateUserRole(
                 userId,
                 roleToUpdate,
@@ -256,7 +253,7 @@ export class UserController {
             }
             res.status(200).json({
                 message: "User role updated successfully",
-                user: updatedUser, //update this part
+                user: updatedUser,
             });
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -294,6 +291,9 @@ export class UserController {
 
             await this.userService.updateUser(userId, updates);
             const updatedUser = await this.userService.getUserById(userId);
+            await UserNotificationUtils.updateUserProfileNotification(
+                userId
+            )
             res.status(200).json({
                 message: "User updated successfully",
                 updatedUser,

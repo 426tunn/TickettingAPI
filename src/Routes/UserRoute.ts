@@ -95,7 +95,7 @@ UserRouter.delete(
  * /api/v1/users/register:
  *   post:
  *     tags:
- *       - User Management
+ *       - Auth Management
  *     summary: Register a new user
  *     requestBody:
  *       required: true
@@ -134,7 +134,7 @@ UserRouter.delete(
  * /api/v1/users/login:
  *   post:
  *     tags:
- *       - User Management
+ *       - Auth Management
  *     summary: Login user
  *     requestBody:
  *       required: true
@@ -166,7 +166,7 @@ UserRouter.delete(
  * /api/v1/users/logout:
  *   post:
  *     tags:
- *       - User Management
+ *       - Auth Management
  *     summary: Logout user
  *     security: [{ bearerAuth: [] }]
  *     responses:
@@ -433,8 +433,9 @@ UserRouter.delete(
  *               oldPassword:
  *                 type: string
  *             example:
- *               password: newpassword123
- *               oldPassword: password123
+ *               CurrentPassword: newpassword123
+ *               NewPassword: password123
+ *               ConfirmPassword: password123
  *     responses:
  *       200:
  *         description: Successful change password

@@ -16,6 +16,7 @@ import { TicketModel } from "../Models/TicketModel";
 import cloudinary from "../Config/cloudinaryConfig";
 import { EventStatus } from "../Enums/EventStatus";
 import { logger } from "../logging/logger";
+import { EventNotificationUtils } from "../Utils/EventNotificationUtils";
 
 export class EventController {
     private eventService: EventService;
@@ -133,7 +134,13 @@ export class EventController {
             const { ticketTypes, ...eventData } = data;
             eventData.organizerId = req.user._id;
 
-            const newEvent = this.eventService.createEvent(eventData as IEvent);
+            const newEvent = await this.eventService.createEvent(eventData as IEvent);
+
+            await EventNotificationUtils.createEventNotification(
+                eventData.organizerId,
+                eventData.name,
+                newEvent.id,
+            )
 
             const today = new Date();
             const eventDateIsPast = today > newEvent.startDate;

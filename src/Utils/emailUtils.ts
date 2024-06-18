@@ -22,7 +22,7 @@ export const sendUserVerifiedEmail = async (email: string, userId: string) => {
         await transporter.sendMail(mailOptions);
         logger.info("Verified email sent successfully");
     } catch (error) {
-        console.error("Error sending email:", error);
+        logger.error("Error sending email:", error);
         throw new Error("Error sending verified email");
     }
 };
@@ -47,7 +47,7 @@ export const sendPasswordResetEmail = async (
         await transporter.sendMail(mailOptions);
         logger.info("Verification email sent successfully");
     } catch (error) {
-        console.error("Error sending email:", error);
+        logger.error("Error sending email:", error);
         throw new Error("Error sending verification email");
     }
 };
@@ -70,7 +70,7 @@ export const sendVerificationEmail = async (
         await transporter.sendMail(mailOptions);
         logger.info("Verification email sent successfully");
     } catch (error) {
-        console.error("Error sending email:", error);
+        logger.error("Error sending email:", error);
         throw new Error("Error sending verification email");
     }
 };
