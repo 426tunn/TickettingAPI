@@ -23,6 +23,7 @@ import { authRouter } from "./Routes/authRouter";
 import bodyParser from "body-parser";
 import { notificationRouter } from "./Routes/NotificationRouter";
 import "./Config/PassportConfig";
+import errorHandler from "./Middlewares/ErrorHandlingMiddleware";
 
 const SECRET = Config.SESSION_SECRET;
 const app = express();
@@ -72,18 +73,6 @@ app.get("/home", authenticateJWT, (_req, res) => {
     });
 });
 
-app.use(
-    (
-        err: Error,
-        _req: express.Request,
-        res: express.Response,
-        next: express.NextFunction,
-    ) => {
-        res.status(500).json({
-            error: err.message,
-        });
-        next(err);
-    },
-);
+app.use(errorHandler);
 
 export default app;
