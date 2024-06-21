@@ -217,6 +217,22 @@ export class UserController {
         }
     };
 
+    public getUserProfile = async (
+        req: IAuthenticatedRequest<IUser>,
+        res: Response,
+    ) => {
+        try {
+            const userId = req.user._id;
+            const user = await this.userService.getUserById(userId.toString());
+            if (!user) {
+                return res.status(404).json({ error: "User not found" });
+            }
+            res.status(200).json({ user });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    };
+
     public updateUserRole = async (
         req: IAuthenticatedRequest<IUser>,
         res: Response,
@@ -308,7 +324,7 @@ export class UserController {
             const { email } = req.body;
             const user = await this.userService.getUserByEmail(email);
             if (!user) {
-                return res.status(404).json({ error: "User not found forgot" });
+                return res.status(404).json({ error: "User not found" });
             }
 
             const originalResetToken = crypto.randomBytes(32).toString("hex");
@@ -370,13 +386,13 @@ export class UserController {
     ) => {
         try {
             const { CurrentPassword, NewPassword, ConfirmPassword } = req.body;
-            const a = req.user._id.toString();
+            const id = req.user._id.toString();
             if (!CurrentPassword || !NewPassword || !ConfirmPassword) {
                 return res
                     .status(400)
                     .json({ error: "All fields are required" });
             }
-            const user = await this.userService.getUserById(a);
+            const user = await this.userService.getUserById(id);
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
             }

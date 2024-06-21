@@ -62,6 +62,12 @@ UserRouter.get(
     userController.getAllUsers,
 );
 
+UserRouter.get("/profile",
+    authenticateJWT,
+    // checkRevokedToken,
+    userController.getUserProfile
+)
+
 UserRouter.get(
     "/:userId",
     // authenticateJWT,
@@ -191,6 +197,28 @@ UserRouter.delete(
  *     responses:
  *       200:
  *         description: Successful get all users
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+
+
+/**
+ * @openapi
+ * /api/v1/users/profile:
+ *   get:
+ *     tags:
+ *       - User Management
+ *     summary: Get user profile
+ *     security: [{ bearerAuth: [] }]
+ *     responses:
+ *       200:
+ *         description: Successful get user profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
  *       401:
  *         description: Unauthorized
  *       500:
