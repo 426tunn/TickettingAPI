@@ -354,7 +354,7 @@ export class EventController {
     };
 
     public deleteEventById = async (
-        req: Request,
+        req: IAuthenticatedRequest<IUser>,
         res: Response,
     ): Promise<Response<null>> => {
         try {
@@ -363,34 +363,46 @@ export class EventController {
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
             }
+
+            const currentUserId = req.user._id.toString();
+            const organizerId = event.organizerId.toString();
+            if (
+                currentUserId !== organizerId &&
+                req.user.role === UserRole.User
+            ) {
+                return res.status(403).json({
+                    error: "Only this event organizers and admins can update the event",
+                });
+            }
+
+            const eventBannerImage = event?.media?.bannerImageURL;
+            const eventMobileImage = event?.media?.mobilePreviewImageURL;
+
+            if (eventBannerImage) {
+                const res = await cloudinary.uploader.destroy(
+                    `${this.eventBannerImageFolder}/${event.id}`,
+                    {
+                        resource_type: "image",
+                    },
+                );
+                logger.info(
+                    `Event ${event.id} - ${event.name}: Banner image deleted status -> ${res.result}`,
+                );
+            }
+
+            if (eventMobileImage) {
+                const res = await cloudinary.uploader.destroy(
+                    `${this.eventMobileImageFolder}/${event.id}`,
+                    {
+                        resource_type: "image",
+                    },
+                );
+                logger.info(
+                    `Event ${event.id} - ${event.name}: Mobile image deleted status -> ${res.result}`,
+                );
+            }
+
             await this.eventService.deleteEventById(eventId);
-            // const eventBannerImage = event?.media?.bannerImageURL;
-            // const eventMobileImage = event?.media?.mobilePreviewImageURL;
-            //
-            // if (eventBannerImage) {
-            //     const res = await cloudinary.uploader.destroy(
-            //         `${this.eventBannerImageFolder}/${event.id}`,
-            //         {
-            //             resource_type: "image",
-            //         },
-            //     );
-            //     logger.info(
-            //         `Event ${event.id} - ${event.name}: Banner image deleted status -> ${res.result}`,
-            //     );
-            // }
-            //
-            // if (eventMobileImage) {
-            //     const res = await cloudinary.uploader.destroy(
-            //         `${this.eventMobileImageFolder}/${event.id}`,
-            //         {
-            //             resource_type: "image",
-            //         },
-            //     );
-            //     logger.info(
-            //         `Event ${event.id} - ${event.name}: Mobile image deleted status -> ${res.result}`,
-            //     );
-            // }
-            //
             return res.status(204).json();
         } catch (error) {
             return res.status(500).json(error);
