@@ -17,7 +17,7 @@ export class EventService {
         return this.eventModel.countDocuments();
     }
 
-    async getAllEvents({
+    getAllEvents({
         page,
         perPage,
         sort,
@@ -26,7 +26,7 @@ export class EventService {
         organizerId,
         fieldsToSelect,
         isDeleted = false,
-    }: IEventPaginationAndSort): Promise<IEvent[] | []> {
+    }: IEventPaginationAndSort): Query<IEvent[] | [], IEvent> {
         let events;
         if (sort === "latest") {
             events = this.getAllLatestEvents({
