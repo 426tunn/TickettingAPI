@@ -134,13 +134,15 @@ export class EventController {
             const { ticketTypes, ...eventData } = data;
             eventData.organizerId = req.user._id;
 
-            const newEvent = await this.eventService.createEvent(eventData as IEvent);
+            const newEvent = await this.eventService.createEvent(
+                eventData as IEvent,
+            );
 
             await EventNotificationUtils.createEventNotification(
                 eventData.organizerId,
                 eventData.name,
                 newEvent.id,
-            )
+            );
 
             const today = new Date();
             const eventDateIsPast = today > newEvent.startDate;
@@ -273,8 +275,13 @@ export class EventController {
         res: Response,
     ): Promise<Response<Event | null>> => {
         try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            }
+
             const eventId = req.params.eventId;
-            const eventUpdate: Partial<IEvent> = req.body;
+            const eventUpdate = matchedData(req);
 
             const event = await this.eventService.getEventById({ eventId });
             if (event == null) {
@@ -309,6 +316,30 @@ export class EventController {
                 return res.status(400).json({
                     error: "Event day can only be modified before the start day",
                 });
+            }
+
+            if (eventUpdate?.media?.bannerImage) {
+                const { url: bannerURL } = await cloudinary.uploader.upload(
+                    `${eventUpdate.media.bannerImage}`,
+                    {
+                        public_id: `${event.id}`,
+                        resource_type: "image",
+                        folder: this.eventBannerImageFolder,
+                    },
+                );
+                eventUpdate.media.bannerImageURL = bannerURL;
+            }
+            if (eventUpdate?.media?.mobilePreviewImage) {
+                const { url: mobilePreviewURL } =
+                    await cloudinary.uploader.upload(
+                        `${eventUpdate.media.mobilePreviewImage}`,
+                        {
+                            public_id: `${event.id}`,
+                            resource_type: "image",
+                            folder: this.eventMobileImageFolder,
+                        },
+                    );
+                eventUpdate.media.mobilePreviewImageURL = mobilePreviewURL;
             }
 
             const updatedEvent = await this.eventService.updateEventById(
