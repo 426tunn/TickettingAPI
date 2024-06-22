@@ -141,6 +141,7 @@ eventRouter.patch(
             .isArray()
             .withMessage("Event Tags should be an array of strings"),
         body("startDate")
+            .optional()
             .custom(async (value) => {
                 if (isNaN(Date.parse(value))) {
                     throw new Error("Invalid start date");
@@ -148,6 +149,7 @@ eventRouter.patch(
             })
             .toDate(),
         body("endDate")
+            .optional()
             .custom(async (value) => {
                 if (isNaN(Date.parse(value))) {
                     throw new Error("Invalid end date");
