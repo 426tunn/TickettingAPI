@@ -116,21 +116,25 @@ eventRouter.patch(
     [
         body("name").optional(),
         body("description")
+            .optional()
             .isLength({ max: 1000 })
             .withMessage(
                 "Event description should be less than 1000 characters long",
             ),
         body("category")
+            .optional()
             .toLowerCase()
             .isIn(Object.values(EventCategory))
             .withMessage("Invalid event category"),
         body("visibility")
+            .optional()
             .toLowerCase()
             .isIn(Object.values(EventVisibility))
             .withMessage(
                 `Invalid event visibility. Valid - ${Object.values(EventVisibility)}`,
             ),
         body("venueType")
+            .optional()
             .toLowerCase()
             .isIn(Object.values(VenueType))
             .withMessage(
@@ -156,8 +160,8 @@ eventRouter.patch(
                 }
             })
             .toDate(),
-        body("location"),
-        body("media"),
+        body("location").optional(),
+        body("media").optional(),
     ],
     eventController.updateEventById,
 );
