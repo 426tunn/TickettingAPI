@@ -37,6 +37,7 @@ eventRouter.post(
     "/",
     authenticateJWT,
     checkRevokedToken,
+    checkIfUserIsVerified,
     [
         body("name").notEmpty().withMessage("Event name is required"),
         body("description")
