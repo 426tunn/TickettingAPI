@@ -64,7 +64,7 @@ export const sendVerificationEmail = async (
             subject: "Account Verification",
             text: `You are receiving this email because you (or someone else) has requested to verify your account.
             Please click the following link, or paste it into your browser to complete the process:
-            http://${Config.BASE_URL}/users/verify-email?token=${verificationToken}
+           ${Config.BASE_URL}/users/verify-email?token=${verificationToken}
              verification: ${verificationToken}`,
         };
 
