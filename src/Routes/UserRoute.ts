@@ -76,7 +76,7 @@ UserRouter.get(
 );
 
 UserRouter.patch(
-    "/:userId",
+    "/update-profile",
     authenticateJWT,
     isValidMongooseIdMiddleware,
     userController.updateUser,
@@ -357,11 +357,11 @@ UserRouter.delete(
 
 /**
  * @openapi
- *   /api/v1/users/{userId}:
+ *   /api/v1/users/update-profile:
  *    patch:
  *     tags:
  *       - User Management
- *     summary: Update user by id
+ *     summary: Update user
  *     security: [{ bearerAuth: [] }]
  *     parameters:
  *       - in: path

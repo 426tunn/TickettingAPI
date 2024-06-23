@@ -281,20 +281,13 @@ export class UserController {
         res: Response,
     ) => {
         try {
-            const userId = req.params.userId;
-            // let user: IUser;
+            const userId = req.user._id;
             if (!userId) {
                 return res.status(400).json({ error: "User ID is required" });
             }
-            const user = await this.userService.getUserById(userId);
+            const user = await this.userService.getUserById(userId.toString().toString());
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
-            }
-
-            if (req.user._id.toString() !== userId) {
-                return res.status(401).json({
-                    error: "You can only edit your own user information",
-                });
             }
 
             const updates: Partial<IUser> = req.body;
@@ -305,14 +298,13 @@ export class UserController {
                 return res.status(400).json({ error: "Invalid email" });
             }
 
-            await this.userService.updateUser(userId, updates);
-            const updatedUser = await this.userService.getUserById(userId);
+            await this.userService.updateUser(userId.toString(), updates);
             await UserNotificationUtils.updateUserProfileNotification(
-                userId
+                userId.toString()
             )
             res.status(200).json({
-                message: "User updated successfully",
-                updatedUser,
+                message: `User with ID ${userId} updated successfully`,
+                updates,
             });
         } catch (error) {
             res.status(500).json({ error: error.message });
