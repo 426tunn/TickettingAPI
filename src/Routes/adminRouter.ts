@@ -5,18 +5,15 @@ import { EventModel } from "../Models/EventModel";
 import { isValidMongooseIdMiddleware } from "../Middlewares/mongooseCustomMiddleware";
 import { body } from "express-validator";
 import { EventStatus } from "../Enums/EventStatus";
-import { checkIfUserIsAdmin } from "../Middlewares/AuthMiddleware";
 
 const adminRouter: Router = router();
 
 const eventService = new EventService(EventModel);
 const adminController = new AdminController(eventService);
 
-adminRouter.get(
-    "/events/deleted",
-    checkIfUserIsAdmin,
-    adminController.getDeletedEvents,
-);
+adminRouter.get("/events", adminController.getAllEvents);
+
+adminRouter.get("/events/deleted", adminController.getDeletedEvents);
 adminRouter.patch(
     "/event/status/:eventId",
     isValidMongooseIdMiddleware,
