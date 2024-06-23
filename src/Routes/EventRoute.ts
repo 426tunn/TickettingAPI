@@ -22,7 +22,6 @@ eventRouter.get(
     "/organizer-view/",
     authenticateJWT,
     checkRevokedToken,
-    checkIfUserIsVerified,
     eventController.getOrganizerEvents,
 );
 
@@ -30,7 +29,6 @@ eventRouter.get(
     "/:eventId/organizer-view",
     authenticateJWT,
     checkRevokedToken,
-    checkIfUserIsVerified,
     isValidMongooseIdMiddleware,
     eventController.getEventDetailsById,
 );
@@ -39,7 +37,6 @@ eventRouter.post(
     "/",
     authenticateJWT,
     checkRevokedToken,
-    checkIfUserIsVerified,
     [
         body("name").notEmpty().withMessage("Event name is required"),
         body("description")
