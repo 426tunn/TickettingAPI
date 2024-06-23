@@ -118,6 +118,7 @@ export class UserController {
             );
             user.verificationExpire = verificationExpire;
             await user.save();
+            await sendVerificationEmail(email, user.verificationToken);
             res.status(200).json({ message: "Verification email sent" });
         } catch (error) {
             res.status(500).json({ error: error.message });
