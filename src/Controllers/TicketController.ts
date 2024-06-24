@@ -77,7 +77,10 @@ export class TicketController {
                     error: "Only this event organizers and admins can update the event",
                 });
             }
-            const tickets = await this.ticketService.getEventTickets(eventId);
+            const tickets = await this.ticketService
+                .getEventTickets(eventId)
+                .populate("userId", "username firstname lastname email")
+                .populate("eventTicketTypeId");
             return res.status(200).json({ tickets });
         } catch (error) {
             return res.status(500).json(error);
