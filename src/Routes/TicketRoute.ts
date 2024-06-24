@@ -2,6 +2,7 @@ import router, { Router } from "express";
 import { TicketController } from "../Controllers/TicketController";
 import { body } from "express-validator";
 import {
+    blockRouteMiddleware,
     checkIfUserIsVerified,
     checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
@@ -50,24 +51,28 @@ ticketRouter.get(
 
 ticketRouter.patch(
     "/:ticketId",
+    blockRouteMiddleware,
     isValidMongooseIdMiddleware,
     ticketController.updateTicketById,
 );
 
 ticketRouter.patch(
     "/:ticketId/events/:eventId/users/:userId",
+    blockRouteMiddleware,
     isValidMongooseIdMiddleware,
     ticketController.updateTicketByEventIdAndUserId,
 );
 
 ticketRouter.delete(
     "/:ticketId",
+    blockRouteMiddleware,
     isValidMongooseIdMiddleware,
     ticketController.deleteTicketById,
 );
 
 ticketRouter.delete(
     "/:ticketId/events/:eventId/users/:userId",
+    blockRouteMiddleware,
     isValidMongooseIdMiddleware,
     ticketController.deleteTicketByEventIdAndUserId,
 );

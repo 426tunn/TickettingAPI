@@ -79,3 +79,7 @@ export const checkRevokedToken = (
     }
     next();
 };
+
+export const blockRouteMiddleware = (_req: Request, res: Response) => {
+    return res.status(403).json({ error: "Action blocked" });
+};
