@@ -122,9 +122,9 @@ export class EventService {
         status?: string;
     }): Promise<IEvent | null> {
         if (status == undefined) {
-            return this.eventModel.findOne({ _id: eventId });
+            return this.eventModel.findOne({ id: eventId });
         }
-        return this.eventModel.findOne({ _id: eventId, status });
+        return this.eventModel.findOne({ id: eventId, status });
     }
 
     async updateEventById(
