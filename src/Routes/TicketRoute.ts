@@ -1,7 +1,11 @@
 import router, { Router } from "express";
 import { TicketController } from "../Controllers/TicketController";
 import { body } from "express-validator";
-import { authenticateJWT } from "../Middlewares/AuthMiddleware";
+import {
+    authenticateJWT,
+    checkIfUserIsVerified,
+    checkRevokedToken,
+} from "../Middlewares/AuthMiddleware";
 import { isValidMongooseIdMiddleware } from "../Middlewares/mongooseCustomMiddleware";
 import { isValidMongooseIdValidator } from "../Utils/validatorUtils";
 
@@ -13,19 +17,21 @@ ticketRouter.get("/", ticketController.getAllTickets);
 ticketRouter.post(
     "/",
     authenticateJWT,
+    checkRevokedToken,
+    checkIfUserIsVerified,
     [
         body("eventTicketTypeId")
             .notEmpty()
             .withMessage("Event Ticket Type is required")
             .custom(isValidMongooseIdValidator("Event Ticket")),
-        body("userId")
-            .notEmpty()
-            .withMessage("User is required")
-            .custom(isValidMongooseIdValidator("User")),
         body("eventId")
             .notEmpty()
             .withMessage("Event is required")
             .custom(isValidMongooseIdValidator("Event")),
+        body("quantity")
+            .optional()
+            .isInt({ gt: 0 })
+            .default(1)
     ],
     ticketController.createTicket,
 );

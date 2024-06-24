@@ -4,18 +4,26 @@ import { TicketService } from "../Services/TicketService";
 import { validationResult } from "express-validator";
 import { EventService } from "../Services/EventService";
 import { UserService } from "../Services/UserService";
-import { UserModel } from "../Models/UserModel";
+import { IUser, UserModel } from "../Models/UserModel";
 import { EventModel } from "../Models/EventModel";
+import { IAuthenticatedRequest } from "../Types/RequestTypes";
+import { UserRole } from "../Enums/UserRole";
+import { EventTicketTypeService } from "../Services/EventTicketTypeService";
+import { EventTicketTypeModel } from "../Models/EventTicketTypeModel";
 
 export class TicketController {
     private ticketService: TicketService;
     private eventService: EventService;
     private userService: UserService;
+    private eventTicketTypeService: EventTicketTypeService;
 
     constructor() {
         this.ticketService = new TicketService(TicketModel);
         this.eventService = new EventService(EventModel);
         this.userService = new UserService(UserModel);
+        this.eventTicketTypeService = new EventTicketTypeService(
+            EventTicketTypeModel,
+        );
     }
 
     public getAllTickets = async (
@@ -49,7 +57,7 @@ export class TicketController {
     };
 
     public getEventTickets = async (
-        req: Request & { eventId: string },
+        req: IAuthenticatedRequest<IUser> & { eventId: string },
         res: Response,
     ): Promise<Response<ITicket[] | []>> => {
         try {
@@ -57,6 +65,17 @@ export class TicketController {
             const event = await this.eventService.getEventById({ eventId });
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
+            }
+
+            const currentUserId = req.user._id.toString();
+            const organizerId = event.organizerId.toString();
+            if (
+                currentUserId !== organizerId &&
+                req.user.role === UserRole.User
+            ) {
+                return res.status(403).json({
+                    error: "Only this event organizers and admins can update the event",
+                });
             }
             const tickets = await this.ticketService.getEventTickets(eventId);
             return res.status(200).json({ tickets });
@@ -92,7 +111,7 @@ export class TicketController {
     };
 
     public createTicket = async (
-        req: Request,
+        req: IAuthenticatedRequest<IUser>,
         res: Response,
     ): Promise<Response<ITicket>> => {
         try {
@@ -101,7 +120,46 @@ export class TicketController {
                 return res.status(400).json({ errors: errors.array() });
             }
 
-            const newTicket = await this.ticketService.createTicket(req.body);
+            const { eventTicketTypeId, eventId, quantity } = req.body;
+            const event = await this.eventService.getEventById({ eventId });
+            const ticketType =
+                await this.eventTicketTypeService.getEventTicketTypeById(
+                    eventTicketTypeId,
+                );
+
+            if (event == null) {
+                return res.status(400).json({ error: "Event not found" });
+            }
+
+            if (ticketType == null) {
+                return res
+                    .status(400)
+                    .json({ error: "Event ticket Type not found" });
+            }
+
+            if (ticketType.eventId.toString() !== event.id) {
+                return res
+                    .status(400)
+                    .json({ error: "Invalid event ticket type" });
+            }
+
+            const totalTicketSoldForTicketType =
+                await this.ticketService.getTotalEventTicketTypessSold(
+                    eventId,
+                    eventTicketTypeId,
+                );
+            if (totalTicketSoldForTicketType + quantity > ticketType.quantity) {
+                return res
+                    .status(400)
+                    .json({ error: "Event ticket type has sold out" });
+            }
+
+            const newTicket = await this.ticketService.createTicket({
+                eventTicketTypeId: ticketType.id,
+                eventId: event.id,
+                userId: req.user._id as unknown as IUser,
+                quantity,
+            } as ITicket);
             res.status(201).json({ ticket: newTicket });
         } catch (error) {
             res.status(500).json(error);

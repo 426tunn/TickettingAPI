@@ -114,6 +114,7 @@ export class EventService {
             .skip((page - 1) * perPage);
     }
 
+    // TODO: make the service take one string argument (eventId)
     async getEventById({
         eventId,
         status,
@@ -122,7 +123,7 @@ export class EventService {
         status?: string;
     }): Promise<IEvent | null> {
         if (status == undefined) {
-            return this.eventModel.findOne({ id: eventId });
+            return this.eventModel.findById(eventId);
         }
         return this.eventModel.findOne({ id: eventId, status });
     }

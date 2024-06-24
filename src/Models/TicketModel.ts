@@ -8,6 +8,7 @@ interface ITicket extends Document {
     eventTicketTypeId: IEventTicketType;
     userId: IUser;
     eventId: IEvent;
+    quantity: number;
 }
 
 export interface ITicketGroupedByType {
@@ -33,6 +34,10 @@ const ticketSchema = new Schema<ITicket>(
             type: mongoose.Schema.Types.ObjectId,
             ref: "Event",
             required: true,
+        },
+        quantity: {
+            type: mongoose.Schema.Types.Number,
+            default: 1,
         },
     },
     { timestamps: true },

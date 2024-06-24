@@ -1,5 +1,5 @@
 import { ITicket, ITicketGroupedByType } from "../Models/TicketModel";
-import mongoose, { Model } from "mongoose";
+import mongoose, { Model, Query } from "mongoose";
 
 export class TicketService {
     constructor(public ticketModel: Model<ITicket>) {}
@@ -12,7 +12,14 @@ export class TicketService {
         return this.ticketModel.findById(ticketId);
     }
 
-    async getEventTickets(eventId: string): Promise<ITicket[] | null> {
+    getTotalEventTicketTypessSold(
+        eventId: string,
+        eventTicketTypeId: string,
+    ): Promise<number> {
+        return this.ticketModel.countDocuments({ eventId, eventTicketTypeId });
+    }
+
+    getEventTickets(eventId: string): Query<ITicket[] | null, ITicket> {
         return this.ticketModel.find({ eventId });
     }
 
@@ -97,11 +104,13 @@ export class TicketService {
         eventTicketTypeId,
         userId,
         eventId,
+        quantity,
     }: ITicket): Promise<ITicket> {
         return this.ticketModel.create({
             eventTicketTypeId,
             userId,
             eventId,
+            quantity,
         });
     }
 
