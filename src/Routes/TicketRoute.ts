@@ -4,7 +4,6 @@ import { body } from "express-validator";
 import {
     blockRouteMiddleware,
     checkIfUserIsVerified,
-    checkRevokedToken,
 } from "../Middlewares/AuthMiddleware";
 import { isValidMongooseIdMiddleware } from "../Middlewares/mongooseCustomMiddleware";
 import { isValidMongooseIdValidator } from "../Utils/validatorUtils";
