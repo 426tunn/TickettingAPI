@@ -17,16 +17,18 @@ export class EventService {
         return this.eventModel.countDocuments();
     }
 
-    getAllEvents({
-        page,
-        perPage,
-        sort,
-        order,
-        status = EventStatus.Approved,
-        organizerId,
-        fieldsToSelect,
-        isDeleted = false,
-    }: IEventPaginationAndSort): Query<IEvent[] | [], IEvent> {
+    getAllEvents(
+        {
+            page,
+            perPage,
+            sort,
+            order,
+            status = EventStatus.Approved,
+            organizerId,
+            fieldsToSelect,
+            isDeleted = false,
+        }: IEventPaginationAndSort,
+    ): Query<IEvent[] | [], IEvent> {
         let events;
         if (sort === "latest") {
             events = this.getAllLatestEvents({
@@ -53,7 +55,9 @@ export class EventService {
             events = events.where({ organizerId });
         }
 
-        return events.select(fieldsToSelect).where({ isDeleted });
+        return events
+            .select(fieldsToSelect)
+            .where({ isDeleted })
     }
 
     createEvent({

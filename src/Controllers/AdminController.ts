@@ -20,6 +20,8 @@ export default class AdminController {
                     page,
                     perPage,
                     status: Object.values(EventStatus),
+                    fieldsToSelect:
+                        "name startDate endDate status category location",
                 })
                 .populate(
                     "organizerId",
