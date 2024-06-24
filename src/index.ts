@@ -32,6 +32,7 @@ app.set("trust proxy", 1);
 app.disable("x-powered-by");
 app.use(helmet());
 app.use(cors());
+app.use(limiter);
 app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 app.use(bodyParser.json({ limit: "10mb" }));
 
@@ -43,8 +44,6 @@ const limiter = rateLimit({
 });
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use(helmet());
-app.use(limiter);
 
 app.use(
     session({
@@ -62,7 +61,7 @@ app.use("/api/v1/users", checkRevokedToken, userRoutes);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1", notificationRouter);
-app.use("/api/v1/tickets", authenticateJWT, ticketRoutes);
+app.use("/api/v1/tickets", authenticateJWT, checkRevokedToken, ticketRoutes);
 app.use("/api/v1/ticket-types", eventTicketTypeRouter);
 app.use("/api/v1/admin", authenticateJWT, checkIfUserIsAdmin, adminRouter);
 
