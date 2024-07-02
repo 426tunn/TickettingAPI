@@ -3,7 +3,7 @@ import { Request } from "express";
 import { SortOrder } from "mongoose";
 
 export interface IEventPaginationAndSort {
-    sort?: "latest" | "popularity";
+    sort?: "latest" | "popularity" | "date";
     order?: SortOrder;
     page?: number;
     perPage?: number;
@@ -11,15 +11,19 @@ export interface IEventPaginationAndSort {
     organizerId?: string;
     fieldsToSelect?: string;
     isDeleted?: boolean;
+    startDate?: Date;
+    endDate?: Date;
 }
 
 export interface IEventPaginationAndSortReq {
     query: {
-        sort?: "latest" | "popularity";
+        sort?: "latest" | "popularity" | "date";
         order?: SortOrder;
         page?: string;
         perPage?: string;
         organizerId: string;
+        start?: string;
+        end?: string;
     };
 }
 

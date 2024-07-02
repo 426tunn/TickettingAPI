@@ -52,13 +52,28 @@ export class EventController {
             const perPage = parseInt(req.query.perPage || "9");
             const { sort, order } = req.query;
             const { organizerId } = req.params;
+            const start = req.query.start;
+            const end = req.query.end;
 
+            if (
+                sort === "date" &&
+                (isNaN(Date.parse(start)) || isNaN(Date.parse(end)))
+            ) {
+                return res
+                    .status(400)
+                    .json({ error: "Enter valid date range" });
+            }
+
+            const startDate = new Date(start),
+                endDate = new Date(end);
             const events = await this.eventService.getAllEvents({
                 sort,
                 order,
                 page,
                 perPage,
                 organizerId,
+                startDate,
+                endDate,
             });
 
             const totalNoOfPages = Math.ceil(events.length / perPage);

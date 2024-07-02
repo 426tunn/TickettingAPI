@@ -17,18 +17,18 @@ export class EventService {
         return this.eventModel.countDocuments();
     }
 
-    getAllEvents(
-        {
-            page,
-            perPage,
-            sort,
-            order,
-            status = EventStatus.Approved,
-            organizerId,
-            fieldsToSelect,
-            isDeleted = false,
-        }: IEventPaginationAndSort,
-    ): Query<IEvent[] | [], IEvent> {
+    getAllEvents({
+        page,
+        perPage,
+        sort,
+        order,
+        status = EventStatus.Approved,
+        organizerId,
+        fieldsToSelect,
+        isDeleted = false,
+        startDate,
+        endDate,
+    }: IEventPaginationAndSort): Query<IEvent[] | [], IEvent> {
         let events;
         if (sort === "latest") {
             events = this.getAllLatestEvents({
@@ -44,6 +44,17 @@ export class EventService {
                 perPage,
                 status,
             });
+        } else if (sort === "date") {
+            events = this.eventModel
+                .find({
+                    $and: [
+                        { startDate: { $gte: startDate } },
+                        { startDate: { $lte: endDate } },
+                    ],
+                })
+                .find({ status })
+                .limit(perPage)
+                .skip((page - 1) * perPage);
         } else {
             events = this.eventModel
                 .find({ status })
@@ -55,9 +66,7 @@ export class EventService {
             events = events.where({ organizerId });
         }
 
-        return events
-            .select(fieldsToSelect)
-            .where({ isDeleted })
+        return events.select(fieldsToSelect).where({ isDeleted });
     }
 
     createEvent({
@@ -119,7 +128,7 @@ export class EventService {
     }
 
     // TODO: make the service take one string argument (eventId)
-    async getEventById({
+    getEventById({
         eventId,
         status,
     }: {
