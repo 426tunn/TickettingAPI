@@ -207,6 +207,10 @@ export class EventController {
                 return res.status(404).json({ error: "Event does not exists" });
             }
 
+            if (event.status === EventStatus.Approved) {
+                return res.status(200).json(event);
+            }
+
             if (
                 req.user?.role === UserRole.Admin ||
                 req.user?._id.toString() === event.organizerId.toString()
