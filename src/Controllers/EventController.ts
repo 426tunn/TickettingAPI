@@ -66,17 +66,27 @@ export class EventController {
 
             const startDate = new Date(start),
                 endDate = new Date(end);
-            const events = await this.eventService.getAllEvents({
-                sort,
-                order,
-                page,
-                perPage,
-                organizerId,
-                startDate,
-                endDate,
-            });
+            const events = await this.eventService
+                .getAllEvents({
+                    sort,
+                    order,
+                    organizerId,
+                    startDate,
+                    endDate,
+                })
+                .limit(perPage)
+                .skip((page - 1) * perPage);
+            const eventsCount = await this.eventService
+                .getAllEvents({
+                    sort,
+                    order,
+                    organizerId,
+                    startDate,
+                    endDate,
+                })
+                .countDocuments();
 
-            const totalNoOfPages = Math.ceil(events.length / perPage);
+            const totalNoOfPages = Math.ceil(eventsCount / perPage);
             return res
                 .status(200)
                 .json({ page, perPage, totalNoOfPages, events });
@@ -94,16 +104,27 @@ export class EventController {
             const perPage = parseInt(req.query.perPage || "9");
             const { sort, order } = req.query;
 
-            const events = await this.eventService.getAllEvents({
-                status: Object.values(EventStatus),
-                sort,
-                order,
-                page,
-                perPage,
-                organizerId: req.user._id.toString(),
-                fieldsToSelect:
-                    "id name location startDate endDate media status",
-            });
+            const events = await this.eventService
+                .getAllEvents({
+                    status: Object.values(EventStatus),
+                    sort,
+                    order,
+                    organizerId: req.user._id.toString(),
+                    fieldsToSelect:
+                        "id name location startDate endDate media status",
+                })
+                .limit(perPage)
+                .skip((page - 1) * perPage);
+            const eventsCount = await this.eventService
+                .getAllEvents({
+                    status: Object.values(EventStatus),
+                    sort,
+                    order,
+                    organizerId: req.user._id.toString(),
+                    fieldsToSelect:
+                        "id name location startDate endDate media status",
+                })
+                .countDocuments();
 
             const eventWithTicketDetails = events.map(async (event: IEvent) => {
                 const { totalTickets, totalTicketsSold } =
@@ -123,7 +144,7 @@ export class EventController {
                 };
             });
 
-            const totalNoOfPages = Math.ceil(events.length / perPage);
+            const totalNoOfPages = Math.ceil(eventsCount / perPage);
             return res.status(200).json({
                 page,
                 perPage,

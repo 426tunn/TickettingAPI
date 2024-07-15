@@ -17,12 +17,12 @@ export default class AdminController {
             const perPage = parseInt((req.query.perPage as string) || "9");
             const events = await this.eventService
                 .getAllEvents({
-                    page,
-                    perPage,
                     status: Object.values(EventStatus),
                     fieldsToSelect:
                         "name startDate endDate status category location",
                 })
+                .limit(perPage)
+                .skip((page - 1) * perPage)
                 .populate(
                     "organizerId",
                     "-password -verificationToken -verificationExpire",
@@ -82,16 +82,27 @@ export default class AdminController {
             const { sort, order } = req.query;
             const { organizerId } = req.params;
 
-            const events = await this.eventService.getAllEvents({
-                sort,
-                order,
-                page,
-                perPage,
-                organizerId,
-                isDeleted: true,
-            });
+            const events = await this.eventService
+                .getAllEvents({
+                    sort,
+                    order,
+                    organizerId,
+                    isDeleted: true,
+                })
+                .limit(perPage)
+                .skip((page - 1) * perPage);
+            const eventsCount = await this.eventService
+                .getAllEvents({
+                    sort,
+                    order,
+                    organizerId,
+                    isDeleted: true,
+                })
+                .limit(perPage)
+                .skip((page - 1) * perPage)
+                .countDocuments();
 
-            const totalNoOfPages = Math.ceil(events.length / perPage);
+            const totalNoOfPages = Math.ceil(eventsCount / perPage);
             return res.status(200).json({
                 message: "Deleted events",
                 page,

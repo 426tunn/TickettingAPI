@@ -5,8 +5,6 @@ import { SortOrder } from "mongoose";
 export interface IEventPaginationAndSort {
     sort?: "latest" | "popularity" | "date";
     order?: SortOrder;
-    page?: number;
-    perPage?: number;
     status?: EventStatus | EventStatus[];
     organizerId?: string;
     fieldsToSelect?: string;

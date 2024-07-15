@@ -13,13 +13,7 @@ export class EventService {
         );
     }
 
-    async getAllEventsCount(): Promise<number> {
-        return this.eventModel.countDocuments();
-    }
-
     getAllEvents({
-        page,
-        perPage,
         sort,
         order,
         status = EventStatus.Approved,
@@ -33,15 +27,11 @@ export class EventService {
         if (sort === "latest") {
             events = this.getAllLatestEvents({
                 order,
-                page,
-                perPage,
                 status,
             });
         } else if (sort === "popularity") {
             events = this.getAllPopularEvents({
                 order,
-                page,
-                perPage,
                 status,
             });
         } else if (sort === "date") {
@@ -52,14 +42,9 @@ export class EventService {
                         { startDate: { $lte: endDate } },
                     ],
                 })
-                .find({ status })
-                .limit(perPage)
-                .skip((page - 1) * perPage);
+                .find({ status });
         } else {
-            events = this.eventModel
-                .find({ status })
-                .limit(perPage)
-                .skip((page - 1) * perPage);
+            events = this.eventModel.find({ status });
         }
 
         if (organizerId) {
@@ -101,30 +86,18 @@ export class EventService {
 
     getAllLatestEvents({
         order = "desc",
-        page,
-        perPage,
         status,
     }: IEventPaginationAndSort): Query<IEvent[], IEvent> {
-        return this.eventModel
-            .find({ status })
-            .sort({ createdAt: order })
-            .limit(perPage)
-            .skip((page - 1) * perPage);
+        return this.eventModel.find({ status }).sort({ createdAt: order });
     }
 
     getAllPopularEvents({
         order = "desc",
-        page,
-        perPage,
         status,
     }: IEventPaginationAndSort): Query<IEvent[], IEvent> {
-        return this.eventModel
-            .find({ status })
-            .sort({
-                totalTickets: order,
-            })
-            .limit(perPage)
-            .skip((page - 1) * perPage);
+        return this.eventModel.find({ status }).sort({
+            totalTickets: order,
+        });
     }
 
     // TODO: make the service take one string argument (eventId)
