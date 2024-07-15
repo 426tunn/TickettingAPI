@@ -64,8 +64,15 @@ export class UserController {
             );
             const newUser = { ...user.toObject(), password: undefined };
             const recipientName = newUser.firstname;
-            await sendVerificationEmail(email, verificationToken, recipientName);
-            await UserNotificationUtils.createUserCreationNotification(user._id.toString(), user.email);
+            await sendVerificationEmail(
+                email,
+                verificationToken,
+                recipientName,
+            );
+            await UserNotificationUtils.createUserCreationNotification(
+                user._id.toString(),
+                user.email,
+            );
             res.status(201).json({ message: "Signup Successful", newUser });
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -120,7 +127,11 @@ export class UserController {
             user.verificationExpire = verificationExpire;
             await user.save();
             const recipientName = user.firstname;
-            await sendVerificationEmail(email, user.verificationToken, recipientName);
+            await sendVerificationEmail(
+                email,
+                user.verificationToken,
+                recipientName,
+            );
             res.status(200).json({ message: "Verification email sent" });
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -259,7 +270,10 @@ export class UserController {
                 return res.status(400).json({ error: "Role is required" });
             }
             //Notification
-            await UserNotificationUtils.createRoleChangeNotification(userId, roleToUpdate)
+            await UserNotificationUtils.createRoleChangeNotification(
+                userId,
+                roleToUpdate,
+            );
 
             const updatedUser = await this.userService.updateUserRole(
                 userId,
@@ -288,7 +302,9 @@ export class UserController {
             if (!userId) {
                 return res.status(400).json({ error: "User ID is required" });
             }
-            const user = await this.userService.getUserById(userId.toString().toString());
+            const user = await this.userService.getUserById(
+                userId.toString().toString(),
+            );
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
             }
@@ -303,8 +319,8 @@ export class UserController {
 
             await this.userService.updateUser(userId.toString(), updates);
             await UserNotificationUtils.updateUserProfileNotification(
-                userId.toString()
-            )
+                userId.toString(),
+            );
             res.status(200).json({
                 message: `User with ID ${userId} updated successfully`,
                 updates,
@@ -329,7 +345,11 @@ export class UserController {
                 .digest("hex");
             user.resetPasswordExpire = new Date(Date.now() + 300000);
             await user.save();
-            await sendPasswordResetEmail(email, originalResetToken, recipientName);
+            await sendPasswordResetEmail(
+                email,
+                originalResetToken,
+                recipientName,
+            );
             res.status(200).json({ message: "Password reset email sent" });
         } catch (error) {
             res.status(500).json({ error: error.message });

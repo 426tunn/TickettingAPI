@@ -35,12 +35,20 @@ export const sendPasswordResetEmail = async (
     recipientName: string,
 ) => {
     try {
-
-        const htmlPath = path.join(__dirname, "../templates/reset-password.html");
+        const htmlPath = path.join(
+            __dirname,
+            "../templates/reset-password.html",
+        );
         let resetPasswordHtml = fs.readFileSync(htmlPath, "utf8");
 
-        resetPasswordHtml = resetPasswordHtml.replace('[Recipient\'s Name]', recipientName);
-        resetPasswordHtml = resetPasswordHtml.replace('{{resetLink}}', `${Config.FRONTEND_URL}/auth/reset-password?resetToken=${resetToken}`);
+        resetPasswordHtml = resetPasswordHtml.replace(
+            "[Recipient's Name]",
+            recipientName,
+        );
+        resetPasswordHtml = resetPasswordHtml.replace(
+            "{{resetLink}}",
+            `${Config.FRONTEND_URL}/auth/reset-password?resetToken=${resetToken}`,
+        );
 
         const mailOptions = {
             from: Config.EMAIL,
@@ -60,14 +68,23 @@ export const sendPasswordResetEmail = async (
 export const sendVerificationEmail = async (
     email: string,
     verificationToken: string,
-    recipientName: string
+    recipientName: string,
 ) => {
     try {
-        const htmlPath = path.join(__dirname, "../templates/welcome-email-verification.html");
+        const htmlPath = path.join(
+            __dirname,
+            "../templates/welcome-email-verification.html",
+        );
         let verifyEmailHtml = fs.readFileSync(htmlPath, "utf8");
 
-        verifyEmailHtml = verifyEmailHtml.replace('[Recipient\'s Name]', recipientName);
-        verifyEmailHtml = verifyEmailHtml.replace('{{resetLink}}', `${Config.BASE_URL}users/verify-email?token=${verificationToken}`);
+        verifyEmailHtml = verifyEmailHtml.replace(
+            "[Recipient's Name]",
+            recipientName,
+        );
+        verifyEmailHtml = verifyEmailHtml.replace(
+            "{{resetLink}}",
+            `${Config.BASE_URL}users/verify-email?token=${verificationToken}`,
+        );
         const mailOptions = {
             from: Config.EMAIL,
             to: email,
@@ -78,6 +95,7 @@ export const sendVerificationEmail = async (
         await transporter.sendMail(mailOptions);
         logger.info("Verification email sent successfully");
     } catch (error) {
+        logger.error("Error sending verification email:", error);
         console.error("Error sending email:", error);
         throw new Error("Error sending verification email");
     }
