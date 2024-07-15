@@ -230,7 +230,7 @@ export class EventController {
     };
 
     public getEventById = async (
-        req: IAuthenticatedRequest<IUser>,
+        req: Request,
         res: Response,
     ): Promise<Response<IEvent | null>> => {
         try {
@@ -245,6 +245,28 @@ export class EventController {
 
             if (event.status === EventStatus.Approved) {
                 return res.status(200).json(event);
+            }
+
+            return res
+                .status(403)
+                .json({ error: "You do not have access to this event" });
+        } catch (error) {
+            return res.status(500).json(error);
+        }
+    };
+
+    public getEventPreviewById = async (
+        req: IAuthenticatedRequest<IUser>,
+        res: Response,
+    ): Promise<Response<IEvent | null>> => {
+        try {
+            const eventId = req.params.eventId;
+            const event = await this.eventService.getEventById({
+                eventId,
+            });
+
+            if (event == null) {
+                return res.status(404).json({ error: "Event does not exists" });
             }
 
             if (
