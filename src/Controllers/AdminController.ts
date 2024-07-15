@@ -27,7 +27,18 @@ export default class AdminController {
                     "organizerId",
                     "-password -verificationToken -verificationExpire",
                 );
+            const eventsCount = await this.eventService
+                .getAllEvents({
+                    status: Object.values(EventStatus),
+                    fieldsToSelect:
+                        "name startDate endDate status category location",
+                })
+                .countDocuments();
+            const totalNoOfPages = Math.ceil(eventsCount / perPage);
             return res.status(200).json({
+                page,
+                perPage,
+                totalNoOfPages,
                 data: events,
                 message: "Events gotten",
             });
@@ -98,8 +109,6 @@ export default class AdminController {
                     organizerId,
                     isDeleted: true,
                 })
-                .limit(perPage)
-                .skip((page - 1) * perPage)
                 .countDocuments();
 
             const totalNoOfPages = Math.ceil(eventsCount / perPage);
