@@ -62,11 +62,12 @@ UserRouter.get(
     userController.getAllUsers,
 );
 
-UserRouter.get("/profile",
+UserRouter.get(
+    "/profile",
     authenticateJWT,
     // checkRevokedToken,
-    userController.getUserProfile
-)
+    userController.getUserProfile,
+);
 
 UserRouter.get(
     "/:userId",
@@ -202,7 +203,6 @@ UserRouter.delete(
  *       500:
  *         description: Internal server error
  */
-
 
 /**
  * @openapi

@@ -50,9 +50,12 @@ export class UserService {
     }
 
     async getUserById(userId: string): Promise<IUser | null> {
-        return await this.userModel.findById(userId)
-        .select("-password -verificationToken -verificationExpire -__v -resetPasswordToken -resetPasswordExpire")
-        .exec();
+        return await this.userModel
+            .findById(userId)
+            .select(
+                "-password -verificationToken -verificationExpire -__v -resetPasswordToken -resetPasswordExpire",
+            )
+            .exec();
     }
 
     async getUserByGoogleId(googleId: string): Promise<IUser | null> {
@@ -73,7 +76,9 @@ export class UserService {
     ): Promise<IUser | null> {
         return await this.userModel
             .findByIdAndUpdate(userId, { role }, { new: true })
-            .select("-password -verificationToken -verificationExpire -__v -resetPasswordToken -resetPasswordExpire")
+            .select(
+                "-password -verificationToken -verificationExpire -__v -resetPasswordToken -resetPasswordExpire",
+            )
             .exec();
     }
 
@@ -83,14 +88,18 @@ export class UserService {
     ): Promise<IUser | null> {
         return await this.userModel
             .findByIdAndUpdate(userId, updates, { new: true })
-            .select("-password -verificationToken -verificationExpire -__v -resetPasswordToken -resetPasswordExpire")
+            .select(
+                "-password -verificationToken -verificationExpire -__v -resetPasswordToken -resetPasswordExpire",
+            )
             .exec();
     }
 
     async getAllUsers(): Promise<IUser[]> {
         return await this.userModel
             .find()
-            .select("-password -verificationToken -verificationExpire -__v -resetPasswordToken -resetPasswordExpire")
+            .select(
+                "-password -verificationToken -verificationExpire -__v -resetPasswordToken -resetPasswordExpire",
+            )
             .exec();
     }
 
@@ -101,7 +110,9 @@ export class UserService {
     async getUserByResetToken(resetToken: string): Promise<IUser | null> {
         return await this.userModel
             .findOne({ resetPasswordToken: resetToken })
-            .select("-password -verificationToken -verificationExpire -__v -resetPasswordToken -resetPasswordExpire")
+            .select(
+                "-password -verificationToken -verificationExpire -__v -resetPasswordToken -resetPasswordExpire",
+            );
     }
 
     async getUserByVerificationToken(
