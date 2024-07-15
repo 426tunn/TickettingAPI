@@ -2,16 +2,9 @@ import { IEventPaginationAndSort } from "../Types/RequestTypes";
 import { IEvent } from "../Models/EventModel";
 import { Model, Query } from "mongoose";
 import { EventStatus } from "../Enums/EventStatus";
-import { EventTicketTypeService } from "./EventTicketTypeService";
-import { EventTicketTypeModel } from "../Models/EventTicketTypeModel";
 
 export class EventService {
-    private eventTicketTypeService: EventTicketTypeService;
-    constructor(public eventModel: Model<IEvent>) {
-        this.eventTicketTypeService = new EventTicketTypeService(
-            EventTicketTypeModel,
-        );
-    }
+    constructor(public eventModel: Model<IEvent>) {}
 
     getAllEvents({
         sort,
@@ -24,27 +17,32 @@ export class EventService {
         endDate,
     }: IEventPaginationAndSort): Query<IEvent[] | [], IEvent> {
         let events;
-        if (sort === "latest") {
-            events = this.getAllLatestEvents({
-                order,
-                status,
-            });
-        } else if (sort === "popularity") {
-            events = this.getAllPopularEvents({
-                order,
-                status,
-            });
-        } else if (sort === "date") {
-            events = this.eventModel
-                .find({
-                    $and: [
-                        { startDate: { $gte: startDate } },
-                        { startDate: { $lte: endDate } },
-                    ],
-                })
-                .find({ status });
-        } else {
-            events = this.eventModel.find({ status });
+        switch (sort) {
+            case "latest":
+                events = this.getAllLatestEvents({
+                    order,
+                    status,
+                });
+                break;
+            case "popularity":
+                events = this.getAllPopularEvents({
+                    order,
+                    status,
+                });
+                break;
+            case "date":
+                events = this.eventModel
+                    .find({
+                        $and: [
+                            { startDate: { $gte: startDate } },
+                            { startDate: { $lte: endDate } },
+                        ],
+                    })
+                    .find({ status });
+                break;
+            default:
+                events = this.eventModel.find({ status });
+                break;
         }
 
         if (organizerId) {
