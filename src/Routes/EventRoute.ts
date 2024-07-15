@@ -100,7 +100,6 @@ eventRouter.post(
 
 eventRouter.get(
     "/:eventId",
-    authenticateJWT,
     isValidMongooseIdMiddleware,
     eventController.getEventById,
 );

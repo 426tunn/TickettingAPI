@@ -1,4 +1,6 @@
 import nodemailer from "nodemailer";
+import fs from "fs";
+import path from "path";
 import { Config } from "../Config/config";
 import { logger } from "../logging/logger";
 
@@ -30,19 +32,21 @@ export const sendUserVerifiedEmail = async (email: string, userId: string) => {
 export const sendPasswordResetEmail = async (
     email: string,
     resetToken: string,
+    recipientName: string,
 ) => {
     try {
+
+        const htmlPath = path.join(__dirname, "../templates/reset-password.html");
+        let resetPasswordHtml = fs.readFileSync(htmlPath, "utf8");
+
+        resetPasswordHtml = resetPasswordHtml.replace('[Recipient\'s Name]', recipientName);
+        resetPasswordHtml = resetPasswordHtml.replace('{{resetLink}}', `${Config.FRONTEND_URL}/auth/reset-password?resetToken=${resetToken}`);
+
         const mailOptions = {
             from: Config.EMAIL,
             to: email,
             subject: "Password Reset",
-            text: `You are receiving this email because you (or someone else) has requested a password reset for your account.
-        Please click the following link, or paste it into your browser to complete the process:
-        
-        http://${Config.HOST_URL}/users/reset-password?resetToken=${resetToken}
-        reset: ${resetToken}
-        
-        If you did not request this, please ignore this email and your password will remain unchanged.`,
+            html: resetPasswordHtml,
         };
 
         await transporter.sendMail(mailOptions);
@@ -56,16 +60,19 @@ export const sendPasswordResetEmail = async (
 export const sendVerificationEmail = async (
     email: string,
     verificationToken: string,
+    recipientName: string
 ) => {
     try {
+        const htmlPath = path.join(__dirname, "../templates/welcome-email-verification.html");
+        let verifyEmailHtml = fs.readFileSync(htmlPath, "utf8");
+
+        verifyEmailHtml = verifyEmailHtml.replace('[Recipient\'s Name]', recipientName);
+        verifyEmailHtml = verifyEmailHtml.replace('{{resetLink}}', `${Config.BASE_URL}users/verify-email?token=${verificationToken}`);
         const mailOptions = {
             from: Config.EMAIL,
             to: email,
             subject: "Account Verification",
-            text: `You are receiving this email because you (or someone else) has requested to verify your account.
-            Please click the following link, or paste it into your browser to complete the process:
-           ${Config.BASE_URL}users/verify-email?token=${verificationToken}
-             verification: ${verificationToken}`,
+            html: verifyEmailHtml,
         };
 
         await transporter.sendMail(mailOptions);

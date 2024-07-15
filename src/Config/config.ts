@@ -20,6 +20,7 @@ const getConfig = function () {
         GOOGLE_CLIENT_ID: String(process.env.GOOGLE_CLIENT_ID),
         GOOGLE_CLIENT_SECRET: String(process.env.GOOGLE_CLIENT_SECRET),
         OAUTH_PASSWORD: String(process.env.OAUTH_PASSWORD),
+        FRONTEND_URL: String(process.env.FRONTEND_URL),
     };
 };
 

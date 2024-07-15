@@ -63,7 +63,8 @@ export class UserController {
                 verificationExpire,
             );
             const newUser = { ...user.toObject(), password: undefined };
-            await sendVerificationEmail(email, verificationToken);
+            const recipientName = newUser.firstname;
+            await sendVerificationEmail(email, verificationToken, recipientName);
             await UserNotificationUtils.createUserCreationNotification(user._id.toString(), user.email);
             res.status(201).json({ message: "Signup Successful", newUser });
         } catch (error) {
@@ -89,7 +90,7 @@ export class UserController {
             }
             await this.userService.verifyUser(user._id.toString());
             await sendUserVerifiedEmail(user.email, user._id.toString());
-            res.redirect("https://api.teekect.africa");
+            res.redirect("https://teeket.africa");
         } catch (error) {
             logger.error("Error verifying user:", error);
             res.status(500).json({ error: error.message });
@@ -118,7 +119,8 @@ export class UserController {
             );
             user.verificationExpire = verificationExpire;
             await user.save();
-            await sendVerificationEmail(email, user.verificationToken);
+            const recipientName = user.firstname;
+            await sendVerificationEmail(email, user.verificationToken, recipientName);
             res.status(200).json({ message: "Verification email sent" });
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -319,7 +321,7 @@ export class UserController {
             if (!user) {
                 return res.status(404).json({ error: "User not found" });
             }
-
+            const recipientName = user.firstname;
             const originalResetToken = crypto.randomBytes(32).toString("hex");
             user.resetPasswordToken = crypto
                 .createHash("sha256")
@@ -327,10 +329,8 @@ export class UserController {
                 .digest("hex");
             user.resetPasswordExpire = new Date(Date.now() + 300000);
             await user.save();
-            await sendPasswordResetEmail(email, originalResetToken);
-            res.status(200).json({
-                message: "Password reset token sent to email",
-            });
+            await sendPasswordResetEmail(email, originalResetToken, recipientName);
+            res.status(200).json({ message: "Password reset email sent" });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -338,8 +338,18 @@ export class UserController {
 
     public resetPassword = async (req: Request, res: Response) => {
         try {
-            const { resetToken } = req.body;
-            const { password } = req.body;
+            const { resetToken } = req.query;
+            const { NewPassword, ConfirmPassword } = req.body;
+            if (!NewPassword || !ConfirmPassword) {
+                return res
+                    .status(400)
+                    .json({ error: "All fields are required" });
+            }
+            if (NewPassword !== ConfirmPassword) {
+                return res
+                    .status(400)
+                    .json({ error: "Passwords do not match" });
+            }
             if (!resetToken) {
                 return res
                     .status(400)
@@ -347,7 +357,7 @@ export class UserController {
             }
             const resetPasswordToken = crypto
                 .createHash("sha256")
-                .update(resetToken)
+                .update(resetToken.toString())
                 .digest("hex");
             const user =
                 await this.userService.getUserByResetToken(resetPasswordToken);
@@ -362,7 +372,7 @@ export class UserController {
                     .status(400)
                     .json({ error: "Reset token has expired" });
             }
-            user.password = password;
+            user.password = NewPassword;
             user.resetPasswordToken = null;
             user.resetPasswordExpire = null;
             await user.save();
