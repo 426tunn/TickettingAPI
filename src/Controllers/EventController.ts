@@ -50,7 +50,7 @@ export class EventController {
         try {
             const page = parseInt(req.query.page || "1");
             const perPage = parseInt(req.query.perPage || "9");
-            const { sort, order } = req.query;
+            const { sort, order, q } = req.query;
             const { organizerId } = req.params;
             const start = req.query.start;
             const end = req.query.end;
@@ -68,6 +68,7 @@ export class EventController {
                 endDate = new Date(end);
             const events = await this.eventService
                 .getAllEvents({
+                    q,
                     sort,
                     order,
                     organizerId,
@@ -167,8 +168,12 @@ export class EventController {
             }
 
             const data = matchedData(req);
+
             const { ticketTypes, ...eventData } = data;
             eventData.organizerId = req.user._id;
+            eventData.tags = eventData?.tags?.map((tag: string) =>
+                tag.toLowerCase(),
+            );
 
             const newEvent = await this.eventService.createEvent(
                 eventData as IEvent,
@@ -405,7 +410,6 @@ export class EventController {
             );
             return res.status(200).json({ event: updatedEvent });
         } catch (error) {
-            console.log(error);
             return res.status(500).json(error);
         }
     };

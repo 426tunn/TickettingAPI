@@ -7,6 +7,7 @@ export class EventService {
     constructor(public eventModel: Model<IEvent>) {}
 
     getAllEvents({
+        q,
         sort,
         order,
         status = EventStatus.Approved,
@@ -47,6 +48,19 @@ export class EventService {
 
         if (organizerId) {
             events = events.where({ organizerId });
+        }
+
+        if (q) {
+            events.populate("location").find({
+                $or: [
+                    { name: { $regex: q, $options: "i" } },
+                    { tags: { $in: q.toLowerCase() } },
+                    { "location.venue": { $regex: q, $options: "i" } },
+                    { "location.city": { $regex: q, $options: "i" } },
+                    { "location.state": { $regex: q, $options: "i" } },
+                    { "location.address": { $regex: q, $options: "i" } },
+                ],
+            });
         }
 
         return events.select(fieldsToSelect).where({ isDeleted });

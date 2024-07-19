@@ -2,6 +2,7 @@ import { EventStatus } from "../Enums/EventStatus";
 import { Request } from "express";
 import { SortOrder } from "mongoose";
 
+// TODO: rename interface to IEventQuery
 export interface IEventPaginationAndSort {
     sort?: "latest" | "popularity" | "date";
     order?: SortOrder;
@@ -11,10 +12,12 @@ export interface IEventPaginationAndSort {
     isDeleted?: boolean;
     startDate?: Date;
     endDate?: Date;
+    q?: string;
 }
 
 export interface IEventPaginationAndSortReq {
     query: {
+        q?: string;
         sort?: "latest" | "popularity" | "date";
         order?: SortOrder;
         page?: string;
