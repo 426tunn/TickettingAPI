@@ -98,7 +98,6 @@ export class EventService {
         });
     }
 
-    // TODO: make the service take one string argument (eventId)
     getEventById({
         eventId,
         status,
@@ -109,7 +108,7 @@ export class EventService {
         if (status == undefined) {
             return this.eventModel.findById(eventId);
         }
-        return this.eventModel.findOne({ id: eventId, status });
+        return this.eventModel.findOne({ _id: eventId, status });
     }
 
     async updateEventById(
