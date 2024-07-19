@@ -102,6 +102,8 @@ eventRouter.get(
     "/preview/:eventId",
     isValidMongooseIdMiddleware,
     authenticateJWT,
+    checkRevokedToken,
+    checkIfUserIsVerified,
     eventController.getEventPreviewById,
 );
 

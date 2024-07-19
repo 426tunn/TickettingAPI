@@ -265,15 +265,15 @@ export class EventController {
             }
 
             if (
-                req.user?.role === UserRole.Admin ||
-                req.user?._id.toString() === event.organizerId.toString()
+                event.organizerId.toString() !== req.user._id.toString() &&
+                req.user.role !== UserRole.Admin
             ) {
-                return res.status(200).json(event);
+                return res
+                    .status(403)
+                    .json({ error: "You do not have access to this event" });
             }
 
-            return res
-                .status(403)
-                .json({ error: "You do not have access to this event" });
+            return res.status(200).json(event);
         } catch (error) {
             return res.status(500).json(error);
         }
