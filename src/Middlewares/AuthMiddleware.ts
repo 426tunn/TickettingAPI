@@ -13,10 +13,10 @@ export function authenticateJWT(
         "jwt",
         { session: false },
         (err: Error, user: IUser) => {
-            if (err || !user) {
+            const token = req.headers.authorization?.split(" ")[1];
+            if (err || !user || !token) {
                 return res.status(401).json({ message: "Unauthorized" });
             }
-            const token = req.headers.authorization?.split(" ")[1];
             if (token && revokedTokens.has(token)) {
                 return res
                     .status(401)
