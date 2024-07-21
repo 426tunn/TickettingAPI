@@ -99,6 +99,13 @@ eventRouter.post(
 );
 
 eventRouter.get(
+    "/preview/:eventId",
+    isValidMongooseIdMiddleware,
+    authenticateJWT,
+    eventController.getEventPreviewById,
+);
+
+eventRouter.get(
     "/:eventId",
     isValidMongooseIdMiddleware,
     eventController.getEventById,
