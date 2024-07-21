@@ -4,18 +4,31 @@ import path from "path";
 import { Config } from "../Config/config";
 import { logger } from "../logging/logger";
 
+// const transporter = nodemailer.createTransport({
+//     service: "googlemail.com",
+//     auth: {
+//         user: Config.EMAIL,
+//         pass: Config.EMAIL_PASSWORD,
+//     },
+// });
+
 const transporter = nodemailer.createTransport({
-    service: "googlemail.com",
+    host: 'mail.privateemail.com', // replace with your SMTP server
+    port: 465, // or 465 for SSL
+    secure: true, // true for 465, false for other ports 
     auth: {
-        user: Config.EMAIL,
-        pass: Config.EMAIL_PASSWORD,
+        user: 'support@teeket.africa', // your email address
+        pass: 'E*6nghU)em7TEzT' // your email password
     },
+    tls: {
+        rejectUnauthorized: false // avoid issues with self-signed certificates
+    }
 });
 
 export const sendUserVerifiedEmail = async (email: string, userId: string) => {
     try {
         const mailOptions = {
-            from: Config.EMAIL,
+            from: Config.EMAIL, 
             to: email,
             subject: "Account Verified",
             text: `Account with user id ${userId}  has been successfully verified. Thank you!`,
