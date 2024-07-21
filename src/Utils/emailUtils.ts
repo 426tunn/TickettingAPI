@@ -3,22 +3,16 @@ import fs from "fs";
 import path from "path";
 import { Config } from "../Config/config";
 import { logger } from "../logging/logger";
-
-// const transporter = nodemailer.createTransport({
-//     service: "googlemail.com",
-//     auth: {
-//         user: Config.EMAIL,
-//         pass: Config.EMAIL_PASSWORD,
-//     },
-// });
+import dotenv from 'dotenv';
+dotenv.config();
 
 const transporter = nodemailer.createTransport({
-    host: 'mail.privateemail.com', // replace with your SMTP server
-    port: 465, // or 465 for SSL
-    secure: true, // true for 465, false for other ports 
+    host: process.env.SMTP_HOST, 
+    port: parseInt(process.env.SMTP_PORT || '465', 10),
+    secure: process.env.SMTP_PORT === '465', 
     auth: {
-        user: 'support@teeket.africa', // your email address
-        pass: 'E*6nghU)em7TEzT' // your email password
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS  
     },
     tls: {
         rejectUnauthorized: false // avoid issues with self-signed certificates

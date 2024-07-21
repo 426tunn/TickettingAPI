@@ -4,3 +4,4 @@ dist
 .vscode/
 logs/
 coverage/
+package-lock.json
