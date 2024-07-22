@@ -11,7 +11,7 @@
     "lint": "eslint --ext .js,.ts .",
     "format": "prettier --ignore-path .gitignore --write \"./src/**/*.+(js|ts|json)\"",
     "seed": "tsx ./src/database/seed/seed.ts",
-    "copy-templates": "copyfiles -u 1 src/templates/* dist/templates"
+    "copy-templates": "copyfiles -u 1 src/templates/* dist"
   },
   "keywords": [],
   "author": "",
