@@ -22,7 +22,7 @@ const transporter = nodemailer.createTransport({
 export const sendUserVerifiedEmail = async (email: string, userId: string) => {
     try {
         const mailOptions = {
-            from: Config.EMAIL, 
+            from: process.env.SMTP_USER, 
             to: email,
             subject: "Account Verified",
             text: `Account with user id ${userId}  has been successfully verified. Thank you!`,
@@ -58,7 +58,7 @@ export const sendPasswordResetEmail = async (
         );
 
         const mailOptions = {
-            from: Config.EMAIL,
+            from: process.env.SMTP_USER,
             to: email,
             subject: "Password Reset",
             html: resetPasswordHtml,
@@ -93,7 +93,7 @@ export const sendVerificationEmail = async (
             `${Config.BASE_URL}users/verify-email?token=${verificationToken}`,
         );
         const mailOptions = {
-            from: Config.EMAIL,
+            from: process.env.SMTP_USER,
             to: email,
             subject: "Account Verification",
             html: verifyEmailHtml,
