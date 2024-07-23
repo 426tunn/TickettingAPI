@@ -53,7 +53,7 @@ export const sendPasswordResetEmail = async (
             recipientName,
         );
         resetPasswordHtml = resetPasswordHtml.replace(
-            "{{resetLink}}",
+            "resetLink",
             `${Config.FRONTEND_URL}/auth/reset-password?resetToken=${resetToken}`,
         );
 
@@ -89,7 +89,7 @@ export const sendVerificationEmail = async (
             recipientName,
         );
         verifyEmailHtml = verifyEmailHtml.replace(
-            "{{resetLink}}",
+            "verificationLink",
             `${Config.BASE_URL}users/verify-email?token=${verificationToken}`,
         );
         const mailOptions = {
