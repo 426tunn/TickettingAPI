@@ -90,7 +90,7 @@ export const sendVerificationEmail = async (
         );
         verifyEmailHtml = verifyEmailHtml.replace(
             "verificationLink",
-            `${Config.BASE_URL}users/verify-email?token=${verificationToken}`,
+            `${Config.BASE_URL}/users/verify-email?token=${verificationToken}`,
         );
         const mailOptions = {
             from: process.env.SMTP_USER,
