@@ -3,19 +3,26 @@ import fs from "fs";
 import path from "path";
 import { Config } from "../Config/config";
 import { logger } from "../logging/logger";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const transporter = nodemailer.createTransport({
-    service: "googlemail.com",
+    host: process.env.SMTP_HOST, 
+    port: parseInt(process.env.SMTP_PORT || '465', 10),
+    secure: process.env.SMTP_PORT === '465', 
     auth: {
-        user: Config.EMAIL,
-        pass: Config.EMAIL_PASSWORD,
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS  
     },
+    tls: {
+        rejectUnauthorized: false // avoid issues with self-signed certificates
+    }
 });
 
 export const sendUserVerifiedEmail = async (email: string, userId: string) => {
     try {
         const mailOptions = {
-            from: Config.EMAIL,
+            from: process.env.SMTP_USER, 
             to: email,
             subject: "Account Verified",
             text: `Account with user id ${userId}  has been successfully verified. Thank you!`,
@@ -46,12 +53,12 @@ export const sendPasswordResetEmail = async (
             recipientName,
         );
         resetPasswordHtml = resetPasswordHtml.replace(
-            "{{resetLink}}",
+            "resetLink",
             `${Config.FRONTEND_URL}/auth/reset-password?resetToken=${resetToken}`,
         );
 
         const mailOptions = {
-            from: Config.EMAIL,
+            from: process.env.SMTP_USER,
             to: email,
             subject: "Password Reset",
             html: resetPasswordHtml,
@@ -82,11 +89,11 @@ export const sendVerificationEmail = async (
             recipientName,
         );
         verifyEmailHtml = verifyEmailHtml.replace(
-            "{{resetLink}}",
-            `${Config.BASE_URL}users/verify-email?token=${verificationToken}`,
+            "verificationLink",
+            `${Config.BASE_URL}/users/verify-email?token=${verificationToken}`,
         );
         const mailOptions = {
-            from: Config.EMAIL,
+            from: process.env.SMTP_USER,
             to: email,
             subject: "Account Verification",
             html: verifyEmailHtml,
@@ -95,8 +102,8 @@ export const sendVerificationEmail = async (
         await transporter.sendMail(mailOptions);
         logger.info("Verification email sent successfully");
     } catch (error) {
-        logger.error("Error sending verification email:", error);
-        console.error("Error sending email:", error);
-        throw new Error("Error sending verification email");
+        logger.error(error.message);
+        console.error(error.message);
+        throw new Error(error.message);
     }
 };

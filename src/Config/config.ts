@@ -21,6 +21,11 @@ const getConfig = function () {
         GOOGLE_CLIENT_SECRET: String(process.env.GOOGLE_CLIENT_SECRET),
         OAUTH_PASSWORD: String(process.env.OAUTH_PASSWORD),
         FRONTEND_URL: String(process.env.FRONTEND_URL),
+        SMTP_HOST: String(process.env.SMTP_HOST),
+        SMTP_PORT: Number(process.env.SMTP_PORT),
+        SMTP_SECURE: Boolean(process.env.SMTP_SECURE),
+        SMTP_USER: String(process.env.SMTP_USER),
+        SMTP_PASS: String(process.env.SMTP_PASS),
     };
 };
 

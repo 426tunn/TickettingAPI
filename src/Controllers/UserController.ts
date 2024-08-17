@@ -14,6 +14,7 @@ import {
 } from "../Utils/emailUtils";
 import { logger } from "../logging/logger";
 import { UserNotificationUtils } from "../Utils/UserNotificationUtils";
+import mongoose from "mongoose";
 
 export class UserController {
     private userService: UserService;
@@ -28,6 +29,9 @@ export class UserController {
         }
 
         const { username, firstname, lastname, email, password } = req.body;
+
+        const session = await mongoose.startSession();
+        session.startTransaction();
 
         try {
             if (!this.userService) {
@@ -61,20 +65,35 @@ export class UserController {
                 password,
                 verificationToken,
                 verificationExpire,
+                { session }
             );
             const newUser = { ...user.toObject(), password: undefined };
             const recipientName = newUser.firstname;
-            await sendVerificationEmail(
-                email,
-                verificationToken,
-                recipientName,
-            );
+            
+            try {
+                await sendVerificationEmail(
+                    email,
+                    verificationToken,
+                    recipientName,
+                );                
+            } catch (emailError) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(500).json({ error: emailError.message, "message": "Email could not be sent" });
+            }
+
             await UserNotificationUtils.createUserCreationNotification(
                 user._id.toString(),
                 user.email,
             );
+
+            await session.commitTransaction();
+            session.endSession();
+
             res.status(201).json({ message: "Signup Successful", newUser });
         } catch (error) {
+            await session.abortTransaction();
+            session.endSession();
             res.status(500).json({ error: error.message });
         }
     };

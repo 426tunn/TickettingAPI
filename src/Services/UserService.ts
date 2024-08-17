@@ -1,4 +1,4 @@
-import { Model } from "mongoose";
+import { ClientSession, Model } from "mongoose";
 import { Profile } from "passport-google-oauth20";
 import { IUser } from "../Models/UserModel";
 import { UserRole } from "../Enums/UserRole";
@@ -19,9 +19,10 @@ export class UserService {
         password: string,
         verificationToken?: string,
         verificationExpire?: Date,
+        options?: { session?: ClientSession }
     ): Promise<IUser> {
         try {
-            return await this.userModel.create({
+            const [user] = await this.userModel.create([{
                 username,
                 email,
                 firstname,
@@ -29,7 +30,8 @@ export class UserService {
                 password,
                 verificationToken,
                 verificationExpire,
-            });
+            }], options);
+            return user;
         } catch (error) {
             throw new Error(`Error creating user: ${error.message}`);
         }
