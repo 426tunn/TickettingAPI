@@ -105,12 +105,14 @@ export class TicketService {
         userId,
         eventId,
         quantity,
+        owner,
     }: ITicket): Promise<ITicket> {
         return this.ticketModel.create({
             eventTicketTypeId,
             userId,
             eventId,
             quantity,
+            owner,
         });
     }
 

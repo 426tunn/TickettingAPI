@@ -9,6 +9,7 @@ interface ITicket extends Document {
     userId: IUser;
     eventId: IEvent;
     quantity: number;
+    owner: ITicketOwnerDetails;
 }
 
 export interface ITicketGroupedByType {
@@ -18,6 +19,18 @@ export interface ITicketGroupedByType {
     totalTicketsSold: number;
 }
 
+interface ITicketOwnerDetails {
+    firstName: string;
+    lastName: string;
+    email: string;
+}
+
+const ownerDetails = new Schema<ITicketOwnerDetails>({
+    firstName: String,
+    lastName: String,
+    email: String,
+});
+
 const ticketSchema = new Schema<ITicket>(
     {
         eventTicketTypeId: {
@@ -25,6 +38,7 @@ const ticketSchema = new Schema<ITicket>(
             ref: "EventTicketType",
             required: true,
         },
+        owner: ownerDetails,
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",

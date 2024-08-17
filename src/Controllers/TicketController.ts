@@ -123,7 +123,7 @@ export class TicketController {
                 return res.status(400).json({ errors: errors.array() });
             }
 
-            const { eventTicketTypeId, eventId, quantity } = req.body;
+            const { eventTicketTypeId, eventId, quantity, owner } = req.body;
             const event = await this.eventService.getEventById({ eventId });
             const ticketType =
                 await this.eventTicketTypeService.getEventTicketTypeById(
@@ -162,6 +162,7 @@ export class TicketController {
                 eventId: event.id,
                 userId: req.user._id as unknown as IUser,
                 quantity,
+                owner,
             } as ITicket);
             res.status(201).json({ ticket: newTicket });
         } catch (error) {
@@ -287,5 +288,12 @@ export class TicketController {
         } catch (error) {
             return res.status(500).json(error);
         }
+    };
+
+    public initializePayment = async (
+        req: IAuthenticatedRequest<IUser>,
+        res: Response,
+    ) => {
+        return;
     };
 }
