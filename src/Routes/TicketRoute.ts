@@ -43,7 +43,7 @@ ticketRouter.get(
 );
 
 ticketRouter.get(
-    "/events/:eventId/users/:userId",
+    "/events/:eventId/users/:buyerId",
     isValidMongooseIdMiddleware,
     ticketController.getUserEventTicket,
 );
@@ -55,25 +55,11 @@ ticketRouter.patch(
     ticketController.updateTicketById,
 );
 
-ticketRouter.patch(
-    "/:ticketId/events/:eventId/users/:userId",
-    blockRouteMiddleware,
-    isValidMongooseIdMiddleware,
-    ticketController.updateTicketByEventIdAndUserId,
-);
-
 ticketRouter.delete(
     "/:ticketId",
     blockRouteMiddleware,
     isValidMongooseIdMiddleware,
     ticketController.deleteTicketById,
-);
-
-ticketRouter.delete(
-    "/:ticketId/events/:eventId/users/:userId",
-    blockRouteMiddleware,
-    isValidMongooseIdMiddleware,
-    ticketController.deleteTicketByEventIdAndUserId,
 );
 
 export default ticketRouter;

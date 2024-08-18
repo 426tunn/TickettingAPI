@@ -8,8 +8,15 @@ export class TicketService {
         return this.ticketModel.find();
     }
 
-    async getTicketById(ticketId: string): Promise<ITicket | null> {
-        return this.ticketModel.findById(ticketId);
+    async getTicketById(
+        ticketId: string,
+        populatePrice = false,
+    ): Promise<ITicket | null> {
+        let query = this.ticketModel.findById(ticketId);
+        if (populatePrice) {
+            query.populate("eventTicketTypeId", "price");
+        }
+        return query;
     }
 
     getTotalEventTicketTypessSold(
@@ -94,22 +101,22 @@ export class TicketService {
     }
 
     async getUserEventTicket(
-        userId: string,
+        buyerId: string,
         eventId: string,
     ): Promise<ITicket[] | null> {
-        return this.ticketModel.find({ userId, eventId });
+        return this.ticketModel.find({ buyerId, eventId });
     }
 
     async createTicket({
         eventTicketTypeId,
-        userId,
+        buyerId,
         eventId,
         quantity,
         owner,
     }: ITicket): Promise<ITicket> {
         return this.ticketModel.create({
             eventTicketTypeId,
-            userId,
+            buyerId,
             eventId,
             quantity,
             owner,
@@ -127,12 +134,12 @@ export class TicketService {
 
     async updateTicketByEventIdAndUserId(
         eventId: string,
-        userId: string,
+        buyerId: string,
         ticketUpdate: Partial<ITicket>,
     ): Promise<ITicket | null> {
-        const finalUpdate = { ...ticketUpdate, userId, eventId };
+        const finalUpdate = { ...ticketUpdate, buyerId, eventId };
         return this.ticketModel.findOneAndUpdate(
-            { userId, eventId },
+            { buyerId, eventId },
             finalUpdate,
             {
                 new: true,
@@ -142,9 +149,9 @@ export class TicketService {
 
     async deleteTicketByEventIdAndUserId(
         eventId: string,
-        userId: string,
+        buyerId: string,
     ): Promise<ITicket | null> {
-        return this.ticketModel.findOneAndDelete({ userId, eventId });
+        return this.ticketModel.findOneAndDelete({ buyerId, eventId });
     }
 
     async deleteTicketById(ticketId: string): Promise<null> {

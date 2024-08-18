@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { TicketModel, ITicket } from "../Models/TicketModel";
 import { TicketService } from "../Services/TicketService";
-import { validationResult } from "express-validator";
+import { matchedData, validationResult } from "express-validator";
 import { EventService } from "../Services/EventService";
 import { UserService } from "../Services/UserService";
 import { IUser, UserModel } from "../Models/UserModel";
@@ -79,7 +79,7 @@ export class TicketController {
             }
             const tickets = await this.ticketService
                 .getEventTickets(eventId)
-                .populate("userId", "username firstname lastname email")
+                .populate("buyerId", "username firstname lastname email")
                 .populate("eventTicketTypeId");
             return res.status(200).json({ tickets });
         } catch (error) {
@@ -88,13 +88,13 @@ export class TicketController {
     };
 
     public getUserEventTicket = async (
-        req: Request & { eventId: string; userId: string },
+        req: Request & { eventId: string; buyerId: string },
         res: Response,
     ): Promise<Response<ITicket[] | []>> => {
         try {
-            const { eventId, userId } = req.params;
+            const { eventId, buyerId } = req.params;
             const event = await this.eventService.getEventById({ eventId });
-            const user = await this.userService.getUserById(userId);
+            const user = await this.userService.getUserById(buyerId);
 
             if (event == null) {
                 return res.status(404).json({ error: "Event does not exists" });
@@ -104,7 +104,7 @@ export class TicketController {
             }
 
             const tickets = await this.ticketService.getUserEventTicket(
-                userId,
+                buyerId,
                 eventId,
             );
             return res.status(200).json({ tickets });
@@ -160,7 +160,7 @@ export class TicketController {
             const newTicket = await this.ticketService.createTicket({
                 eventTicketTypeId: ticketType.id,
                 eventId: event.id,
-                userId: req.user._id as unknown as IUser,
+                buyerId: req.user._id as unknown as IUser,
                 quantity,
                 owner,
             } as ITicket);
@@ -187,51 +187,12 @@ export class TicketController {
             const ticketUpdate = {
                 ...req.body,
                 eventId: ticket.eventId,
-                userId: ticket.userId,
+                buyerId: ticket.buyerId,
             };
             const updatedTicket = await this.ticketService.updateTicketById(
                 ticketId,
                 ticketUpdate,
             );
-            return res.status(200).json({ ticket: updatedTicket });
-        } catch (error) {
-            return res.status(500).json(error);
-        }
-    };
-
-    public updateTicketByEventIdAndUserId = async (
-        req: Request & { ticketId: string; eventId: string; userId: string },
-        res: Response,
-    ): Promise<Response<ITicket | null>> => {
-        try {
-            const { ticketId, userId, eventId } = req.params;
-            const event = await this.eventService.getEventById({ eventId });
-            const user = await this.userService.getUserById(userId);
-            const ticket = await this.ticketService.getTicketById(ticketId);
-
-            if (event == null) {
-                return res.status(404).json({ error: "Event does not exists" });
-            }
-            if (user == null) {
-                return res.status(404).json({ error: "User does not exists" });
-            }
-            if (ticket == null) {
-                return res
-                    .status(404)
-                    .json({ error: "Ticket does not exists" });
-            }
-
-            const ticketUpdate = {
-                ...req.body,
-                eventId: ticket.eventId,
-                userId: ticket.userId,
-            };
-            const updatedTicket =
-                await this.ticketService.updateTicketByEventIdAndUserId(
-                    eventId,
-                    userId,
-                    ticketUpdate,
-                );
             return res.status(200).json({ ticket: updatedTicket });
         } catch (error) {
             return res.status(500).json(error);
@@ -255,45 +216,5 @@ export class TicketController {
         } catch (error) {
             return res.status(500).json(error);
         }
-    };
-
-    public deleteTicketByEventIdAndUserId = async (
-        req: Request & { ticketId: string; eventId: string; userId: string },
-        res: Response,
-    ): Promise<Response<ITicket | null>> => {
-        try {
-            const { ticketId, userId, eventId } = req.params;
-
-            const event = await this.eventService.getEventById({ eventId });
-            const user = await this.userService.getUserById(userId);
-            const ticket = await this.ticketService.getTicketById(ticketId);
-
-            if (event == null) {
-                return res.status(404).json({ error: "Event does not exists" });
-            }
-            if (user == null) {
-                return res.status(404).json({ error: "User does not exists" });
-            }
-            if (ticket == null) {
-                return res
-                    .status(404)
-                    .json({ error: "Ticket does not exists" });
-            }
-
-            await this.ticketService.deleteTicketByEventIdAndUserId(
-                eventId,
-                userId,
-            );
-            return res.status(200).json();
-        } catch (error) {
-            return res.status(500).json(error);
-        }
-    };
-
-    public initializePayment = async (
-        req: IAuthenticatedRequest<IUser>,
-        res: Response,
-    ) => {
-        return;
     };
 }

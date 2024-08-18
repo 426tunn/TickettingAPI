@@ -6,7 +6,7 @@ import { EventService } from "../Services/EventService";
 
 interface ITicket extends Document {
     eventTicketTypeId: IEventTicketType;
-    userId: IUser;
+    buyerId: IUser;
     eventId: IEvent;
     quantity: number;
     owner: ITicketOwnerDetails;
@@ -39,7 +39,7 @@ const ticketSchema = new Schema<ITicket>(
             required: true,
         },
         owner: ownerDetails,
-        userId: {
+        buyerId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
