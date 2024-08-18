@@ -239,4 +239,9 @@ export class TicketService {
     async deleteTicketById(ticketId: string): Promise<null> {
         return this.ticketModel.findByIdAndDelete(ticketId);
     }
+
+    // services for Ticket Orders
+    getUserTicketOrders(userId: string) {
+        return this.ticketsOrderModel.find({ buyerId: userId });
+    }
 }

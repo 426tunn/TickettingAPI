@@ -11,6 +11,10 @@ import { isValidMongooseIdValidator } from "../Utils/validatorUtils";
 const ticketRouter: Router = router();
 const ticketController = new TicketController();
 
+//  Ticket Order Routes
+ticketRouter.get("/orders", ticketController.getUserTicketOrders);
+
+// Tickets Routes
 ticketRouter.get("/", ticketController.getAllTickets);
 
 ticketRouter.post(

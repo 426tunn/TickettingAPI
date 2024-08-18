@@ -244,4 +244,20 @@ export class TicketController {
             return res.status(500).json(error);
         }
     };
+
+    // controllers for Ticket Order Routes
+    public getUserTicketOrders = async (
+        req: IAuthenticatedRequest<IUser>,
+        res: Response,
+    ) => {
+        try {
+            const { user } = req;
+            const ticketsOrders = await this.ticketService.getUserTicketOrders(
+                user._id.toString(),
+            );
+            return res.status(200).json({ ticketsOrders });
+        } catch (error) {
+            return res.status(500).json(error);
+        }
+    };
 }
