@@ -26,6 +26,7 @@ const getConfig = function () {
         SMTP_SECURE: Boolean(process.env.SMTP_SECURE),
         SMTP_USER: String(process.env.SMTP_USER),
         SMTP_PASS: String(process.env.SMTP_PASS),
+        PAYSTACK_PAYMENT_SECRET: String(process.env.PAYSTACK_PAYMENT_SECRET),
     };
 };
 

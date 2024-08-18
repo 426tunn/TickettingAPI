@@ -1,8 +1,15 @@
 import { ITicket, ITicketGroupedByType } from "../Models/TicketModel";
 import mongoose, { Model, Query } from "mongoose";
+import { TicketsOrderModel, ITicketsOrder } from "../Models/TicketsOrderModel";
+import { Config } from "../Config/config";
+import { IUser } from "Models/UserModel";
 
 export class TicketService {
-    constructor(public ticketModel: Model<ITicket>) {}
+    private readonly ticketsOrderModel: Model<ITicketsOrder>;
+
+    constructor(public ticketModel: Model<ITicket>) {
+        this.ticketsOrderModel = TicketsOrderModel;
+    }
 
     async getAllTickets(): Promise<ITicket[] | null> {
         return this.ticketModel.find();
@@ -121,6 +128,81 @@ export class TicketService {
             quantity,
             owner,
         });
+    }
+
+    async buyTickets({
+        ticketsId,
+        buyer,
+    }: {
+        ticketsId: Array<string>;
+        buyer: IUser;
+    }) {
+        const tickets = await Promise.all(
+            ticketsId.map((id) => {
+                const ticket = this.getTicketById(id, true);
+                return ticket;
+            }),
+        );
+
+        const invalidTicket = tickets.some((ticket) => ticket === null);
+        if (invalidTicket) {
+            throw new Error("Invalid ticket found");
+        }
+
+        const totalPrice = Math.ceil(
+            tickets.reduce((acc, ticket) => {
+                return acc + ticket.eventTicketTypeId.price;
+            }, 0),
+        );
+        const paymentInfo = await this.initializePayment({
+            price: totalPrice,
+            customerEmail: buyer.email,
+        });
+        const ticketsOrder = this.ticketsOrderModel.create({
+            tickets: ticketsId,
+            totalPrice,
+            paymentURL: paymentInfo.data.authorization_url,
+            paymentAccessCode: paymentInfo.data.access_code,
+            paymentReference: paymentInfo.data.reference,
+            buyerId: buyer._id.toString(),
+        });
+
+        return ticketsOrder;
+    }
+
+    async initializePayment({
+        price,
+        customerEmail,
+    }: {
+        price: number;
+        customerEmail: string;
+    }) {
+        const params = JSON.stringify({
+            email: customerEmail,
+            amount: price * 100, // base unit of 100 kb to 1 naira
+        });
+        const options = {
+            body: params,
+            hostname: "api.paystack.co",
+            port: 443,
+            path: "/transaction/initialize",
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${Config.PAYSTACK_PAYMENT_SECRET}`,
+                "Content-Type": "application/json",
+            },
+        };
+
+        try {
+            const resp = await fetch(
+                "https://api.paystack.co/transaction/initialize",
+                options,
+            );
+            const data = await resp.json();
+            return data;
+        } catch (error) {
+            console.error("err", error);
+        }
     }
 
     async updateTicketById(

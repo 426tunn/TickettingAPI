@@ -170,6 +170,33 @@ export class TicketController {
         }
     };
 
+    public buyTickets = async (
+        req: IAuthenticatedRequest<IUser>,
+        res: Response,
+    ) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            }
+            let { ticketsId } = matchedData(req);
+            const data = await this.ticketService.buyTickets({
+                ticketsId,
+                buyer: req.user,
+            });
+
+            return res.status(200).json({ data });
+        } catch (error) {
+            console.error("Error in buyTickets:", error);
+            if (error instanceof Error) {
+                return res.status(400).json({ message: error.message });
+            }
+            return res
+                .status(500)
+                .json({ message: "An unexpected error occurred" });
+        }
+    };
+
     public updateTicketById = async (
         req: Request & { ticketId: string },
         res: Response,

@@ -30,6 +30,16 @@ ticketRouter.post(
     ticketController.createTicket,
 );
 
+ticketRouter.post(
+    "/buy-tickets",
+    body("ticketsId")
+        .notEmpty()
+        .withMessage("ticketsId is required")
+        .isArray({ min: 1 })
+        .withMessage("ticketsId should be an array of tickets"),
+    ticketController.buyTickets,
+);
+
 ticketRouter.get(
     "/:ticketId",
     isValidMongooseIdMiddleware,

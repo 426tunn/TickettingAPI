@@ -24,6 +24,11 @@ import { notificationRouter } from "./Routes/NotificationRouter";
 import "./Config/PassportConfig";
 import errorHandler from "./Middlewares/ErrorHandlingMiddleware";
 import rateLimiter from "./Utils/rateLimiterUtils";
+import crypto from "node:crypto";
+import {
+    TicketsOrderModel,
+    TicketsOrderStatusEnum,
+} from "./Models/TicketsOrderModel";
 
 const SECRET = Config.SESSION_SECRET;
 const app = express();
@@ -69,6 +74,40 @@ app.get("/home", authenticateJWT, (_req, res) => {
     res.status(200).send({
         message: "Welcome!!",
     });
+});
+
+//TODO: refactor into a service
+app.post("/api/v1/ticket-payment-confirmation-webhook", async (req, res) => {
+    const hash = crypto
+        .createHmac("sha512", Config.PAYSTACK_PAYMENT_SECRET)
+        .update(JSON.stringify(req.body))
+        .digest("hex");
+    if (hash !== req.headers["x-paystack-signature"]) {
+        return res.status(401).json({ message: "Unknown data source" });
+    }
+
+    const event = req.body;
+    const data = event.data;
+    const ticketsOrder = await TicketsOrderModel.findOne({
+        paymentReference: data?.reference,
+    });
+
+    if (!ticketsOrder) {
+        return res.status(400).json({ message: "Invalid tickets order" });
+    }
+
+    if (event.event !== "charge.success") {
+        return res.status(400).json({ message: "Payment unsuccessful" });
+    }
+
+    if (data.amount < ticketsOrder.totalPrice) {
+        return res.status(400).json({ message: "Incomplete payment" });
+    }
+
+    await ticketsOrder.updateOne({
+        status: TicketsOrderStatusEnum.paid,
+    });
+    return res.status(200).json({ message: "Success" });
 });
 
 app.use(errorHandler);
