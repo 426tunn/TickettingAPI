@@ -5,25 +5,20 @@ import { logger } from "./logger";
 const format = json({
     method: ":method",
     url: ":url",
-    status: ":status",
-    contentLength: ":res[content-length]",
-    responseTime: ":response-time",
+    status: ":status"
 });
 
 const httpLogger = morgan(format, {
     stream: {
         write: (message: string) => {
-            const { method, url, status, contentLength, responseTime } =
+            const { method, url, status } =
                 JSON.parse(message);
 
-            logger.info("HTTP Access Log", {
-                timestamp: new Date().toString(),
-                method,
-                url,
-                status: Number(status),
-                contentLength,
-                responseTime: Number(responseTime),
-            });
+                if (status >= 400) {
+                    logger.error(`HTTP ${status} - ${method} ${url}`);
+                } else {
+                    logger.info(`HTTP ${status} - ${method} ${url}`);
+                }
         },
     },
 });

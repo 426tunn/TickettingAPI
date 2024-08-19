@@ -8,5 +8,5 @@ connectToDB();
 const PORT = Config.PORT;
 
 app.listen(PORT, () => {
-    logger.info(`Serverissss running at PORT: ${PORT}`);
+    logger.info(`listening on port ${PORT}`);
 });

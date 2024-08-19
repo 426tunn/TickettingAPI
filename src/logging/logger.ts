@@ -15,6 +15,9 @@ const options = {
         handleExceptions: true,
         json: false,
         colorize: true,
+         format: winston.format.printf(
+        ({ level, message}) => `${level}: ${message}`
+    ),
     },
 };
 
